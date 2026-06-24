@@ -38,6 +38,14 @@ export default function Dashboard() {
     .sort((a, b) => new Date(b.orderDate || b.createdAt || 0) - new Date(a.orderDate || a.createdAt || 0))
     .slice(0, 5);
 
+  const getStatusBadgeVariant = (status) => {
+    const s = (status || '').toUpperCase();
+    if (['COMPLETED', 'DELIVERED', 'SUCCESS'].includes(s)) return 'success';
+    if (['PENDING', 'PROCESSING'].includes(s)) return 'warning';
+    if (['CANCELLED', 'FAILED', 'DECLINED'].includes(s)) return 'destructive';
+    return 'default';
+  };
+
   const statCards = [
     {
       title: 'Total Users',
@@ -133,7 +141,7 @@ export default function Dashboard() {
                   </div>
                   <div className="text-right">
                     <p className="text-sm font-bold">${order.totalAmount?.toFixed(2) || '0.00'}</p>
-                    <Badge variant={order.status === 'COMPLETED' ? 'success' : 'default'} className="mt-1 text-[10px]">
+                    <Badge variant={getStatusBadgeVariant(order.status)} className="mt-1 text-[10px]">
                       {order.status || 'PENDING'}
                     </Badge>
                   </div>
