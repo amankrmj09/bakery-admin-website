@@ -4,7 +4,8 @@ import {
   fetchProducts, fetchCategories, fetchInventory,
   createCategory, updateCategory, deleteCategory,
   createProduct, updateProduct, deleteProduct,
-  updateInventory, addStock
+  updateInventory, addStock,
+  setTheme, fetchStoreSettings, updateStoreSettings
 } from '../store/slices/dashboardSlice';
 import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/Card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/Table';
@@ -659,9 +660,105 @@ function InventoryManager() {
   );
 }
 
+function GeneralSettingsManager() {
+  const dispatch = useDispatch();
+  const { theme, settings } = useSelector((state) => state.dashboard);
+  const [isAcceptingOrders, setIsAcceptingOrders] = useState(true);
+
+  useEffect(() => {
+    dispatch(fetchStoreSettings());
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (settings.data) {
+      setIsAcceptingOrders(settings.data.isAcceptingOrders);
+    }
+  }, [settings.data]);
+
+  const handleThemeChange = (newTheme) => {
+    dispatch(setTheme(newTheme));
+  };
+
+  const handleToggleOrders = async () => {
+    const newValue = !isAcceptingOrders;
+    setIsAcceptingOrders(newValue);
+    try {
+      await dispatch(updateStoreSettings({
+        id: settings.data?.id,
+        isAcceptingOrders: newValue
+      })).unwrap();
+      toast.success(newValue ? 'Store is now accepting orders' : 'Order taking paused');
+    } catch (e) {
+      toast.error('Failed to update store settings');
+      setIsAcceptingOrders(!newValue);
+    }
+  };
+
+  return (
+    <div className="space-y-6 max-w-2xl">
+      <Card>
+        <CardHeader>
+          <CardTitle>Appearance</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-col space-y-4">
+            <div>
+              <label className="text-sm font-medium mb-2 block">Theme Preference</label>
+              <div className="flex space-x-2 bg-muted p-1 rounded-lg w-fit border border-border">
+                {['light', 'dark', 'system'].map((t) => (
+                  <button
+                    key={t}
+                    onClick={() => handleThemeChange(t)}
+                    className={`px-4 py-2 text-sm font-medium rounded-md capitalize transition-colors ${
+                      theme === t 
+                        ? 'bg-background shadow text-foreground' 
+                        : 'text-muted-foreground hover:text-foreground'
+                    }`}
+                  >
+                    {t}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Store Status</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center justify-between p-4 border border-border rounded-lg">
+            <div>
+              <h4 className="font-medium">Accepting Orders</h4>
+              <p className="text-sm text-muted-foreground mt-1">
+                Toggle whether customers can place new orders on the bakery frontend.
+              </p>
+            </div>
+            <button
+              onClick={handleToggleOrders}
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${
+                isAcceptingOrders ? 'bg-primary-500' : 'bg-muted-foreground'
+              }`}
+            >
+              <span className="sr-only">Toggle order taking</span>
+              <span
+                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                  isAcceptingOrders ? 'translate-x-6' : 'translate-x-1'
+                }`}
+              />
+            </button>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
 export default function BakerySettings() {
   const dispatch = useDispatch();
-  const [activeTab, setActiveTab] = useState('products');
+  const [activeTab, setActiveTab] = useState('general');
 
   useEffect(() => {
     dispatch(fetchCategories());
@@ -674,13 +771,13 @@ export default function BakerySettings() {
       <div className="flex justify-between items-center">
         <div>
           <h2 className="text-2xl font-bold tracking-tight text-foreground">Bakery Settings</h2>
-          <p className="text-muted-foreground">Manage your products, categories, and inventory.</p>
+          <p className="text-muted-foreground">Manage your store, products, categories, and inventory.</p>
         </div>
       </div>
 
       <div className="border-b border-border">
         <nav className="-mb-px flex space-x-8">
-          {['products', 'categories', 'inventory'].map((tab) => (
+          {['general', 'products', 'categories', 'inventory'].map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
@@ -697,6 +794,7 @@ export default function BakerySettings() {
       </div>
 
       <div className="mt-6">
+        {activeTab === 'general' && <GeneralSettingsManager />}
         {activeTab === 'categories' && <CategoryManager />}
         {activeTab === 'products' && <ProductManager />}
         {activeTab === 'inventory' && <InventoryManager />}

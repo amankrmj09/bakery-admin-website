@@ -8,23 +8,19 @@ export default function AdminLayout() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { user } = useSelector((state) => state.auth);
-
-  // Initialize theme from localStorage or default to dark
-  const [isDarkMode, setIsDarkMode] = useState(() => {
-    const saved = localStorage.getItem('theme');
-    return saved ? saved === 'dark' : true;
-  });
+  const { theme } = useSelector((state) => state.dashboard);
 
   useEffect(() => {
     const root = window.document.documentElement;
-    if (isDarkMode) {
-      root.classList.add('dark');
-      localStorage.setItem('theme', 'dark');
+    root.classList.remove('light', 'dark');
+    
+    if (theme === 'system') {
+      const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      root.classList.add(systemTheme);
     } else {
-      root.classList.remove('dark');
-      localStorage.setItem('theme', 'light');
+      root.classList.add(theme);
     }
-  }, [isDarkMode]);
+  }, [theme]);
 
   const handleLogout = () => {
     dispatch(logout());
@@ -65,30 +61,6 @@ export default function AdminLayout() {
               </NavLink>
             ))}
           </nav>
-        </div>
-        
-        {/* Sidebar Footer / Theme Toggle */}
-        <div className="p-4 border-t border-border">
-          <div className="flex items-center justify-between p-2 rounded-lg bg-muted/50 border border-border">
-            <span className="text-sm font-medium text-muted-foreground px-2">Theme</span>
-            <button
-              onClick={() => setIsDarkMode(!isDarkMode)}
-              className="relative inline-flex h-8 w-14 items-center rounded-full bg-background border border-border p-1 transition-colors hover:border-primary-500 focus:outline-none"
-            >
-              <span className="sr-only">Toggle Theme</span>
-              <div
-                className={`flex h-6 w-6 items-center justify-center rounded-full bg-card shadow-sm ring-1 ring-border transition-transform ${
-                  isDarkMode ? 'translate-x-6' : 'translate-x-0'
-                }`}
-              >
-                {isDarkMode ? (
-                  <Moon className="h-3.5 w-3.5 text-primary-500" />
-                ) : (
-                  <Sun className="h-3.5 w-3.5 text-amber-500" />
-                )}
-              </div>
-            </button>
-          </div>
         </div>
       </aside>
 

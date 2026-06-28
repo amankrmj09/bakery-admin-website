@@ -3,12 +3,38 @@ import api from '../../api/axiosConfig';
 
 export const fetchDashboardStats = createAsyncThunk(
   'dashboard/fetchStats',
-  async (_, { rejectWithValue }) => {
+  async (timeframe = '1m', { rejectWithValue }) => {
     try {
-      const response = await api.get('/api/users/admin/dashboard-stats');
+      const response = await api.get('/api/users/admin/dashboard-stats', {
+        params: { timeframe }
+      });
       return response.data;
     } catch (error) {
       return rejectWithValue('Failed to fetch dashboard statistics');
+    }
+  }
+);
+
+export const fetchStoreSettings = createAsyncThunk(
+  'dashboard/fetchStoreSettings',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await api.get('/api/store/settings');
+      return response.data;
+    } catch (error) {
+      return rejectWithValue('Failed to fetch store settings');
+    }
+  }
+);
+
+export const updateStoreSettings = createAsyncThunk(
+  'dashboard/updateStoreSettings',
+  async (data, { rejectWithValue }) => {
+    try {
+      const response = await api.put('/api/store/settings', data);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue('Failed to update store settings');
     }
   }
 );
@@ -220,53 +246,67 @@ export const deleteCategory = createAsyncThunk(
 );
 
 const initialState = {
-  stats: {
-    users: {},
-    orders: {},
-    payments: {},
+  theme: localStorage.getItem('theme') || 'system',
+  settings: {
+    data: null,
     loading: false,
-    error: null
+    error: null,
+  },
+  stats: {
+    loading: false,
+    error: null,
+    users: 0,
+    orders: 0,
+    payments: { currentMonth: 0, lastMonth: 0 }
   },
   orders: {
     data: [],
     loading: false,
-    error: null
+    error: null,
+    totalCount: 0,
+    page: 1,
   },
   users: {
     data: [],
     loading: false,
-    error: null
-  },
-  products: {
-    data: [],
-    loading: false,
-    error: null
+    error: null,
   },
   categories: {
     data: [],
     loading: false,
-    error: null
+    error: null,
+  },
+  products: {
+    data: [],
+    loading: false,
+    error: null,
   },
   inventory: {
     data: [],
     loading: false,
-    error: null
+    error: null,
   }
 };
 
 const dashboardSlice = createSlice({
   name: 'dashboard',
   initialState,
-  reducers: {},
+  reducers: {
+    setTheme: (state, action) => {
+      state.theme = action.payload;
+      localStorage.setItem('theme', action.payload);
+    }
+  },
   extraReducers: (builder) => {
     builder
       // Stats
       .addCase(fetchDashboardStats.pending, (state) => { state.stats.loading = true; })
       .addCase(fetchDashboardStats.fulfilled, (state, action) => {
-        state.stats.loading = false;
-        state.stats.users = action.payload.users;
-        state.stats.orders = action.payload.orders;
-        state.stats.payments = action.payload.payments;
+        state.stats = {
+          ...state.stats,
+          ...action.payload,
+          loading: false
+        };
       })
       .addCase(fetchDashboardStats.rejected, (state, action) => {
         state.stats.loading = false;
@@ -378,8 +418,22 @@ const dashboardSlice = createSlice({
         if (index !== -1) {
           state.inventory.data[index] = action.payload;
         }
+      })
+      // Store Settings
+      .addCase(fetchStoreSettings.pending, (state) => { state.settings.loading = true; })
+      .addCase(fetchStoreSettings.fulfilled, (state, action) => {
+        state.settings.loading = false;
+        state.settings.data = action.payload;
+      })
+      .addCase(fetchStoreSettings.rejected, (state, action) => {
+        state.settings.loading = false;
+        state.settings.error = action.payload;
+      })
+      .addCase(updateStoreSettings.fulfilled, (state, action) => {
+        state.settings.data = action.payload;
       });
   },
 });
 
+export const { setTheme } = dashboardSlice.actions;
 export default dashboardSlice.reducer;

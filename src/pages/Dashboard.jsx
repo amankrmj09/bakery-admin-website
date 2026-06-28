@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchDashboardStats, fetchOrders } from '../store/slices/dashboardSlice';
 import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/Card';
@@ -9,29 +9,28 @@ import { Badge } from '../components/ui/Badge';
 
 export default function Dashboard() {
   const dispatch = useDispatch();
+  const [timeframe, setTimeframe] = useState('1m');
   const { stats } = useSelector((state) => state.dashboard);
   const { data: ordersData } = useSelector((state) => state.dashboard.orders);
 
   useEffect(() => {
-    dispatch(fetchDashboardStats());
+    dispatch(fetchDashboardStats(timeframe));
+  }, [dispatch, timeframe]);
+
+  useEffect(() => {
     dispatch(fetchOrders());
   }, [dispatch]);
 
   const calculateGrowth = () => {
-    if (stats.payments?.currentMonth && stats.payments?.lastMonth) {
-      const growth = ((stats.payments.currentMonth - stats.payments.lastMonth) / stats.payments.lastMonth) * 100;
+    if (stats.growthRate !== undefined) {
+      const growth = stats.growthRate;
       return `${growth > 0 ? '+' : ''}${growth.toFixed(1)}%`;
     }
-    return '+12.5%';
+    return '0.0%';
   };
 
-  const chartData = [
-    { name: 'Jan', revenue: 4000 },
-    { name: 'Feb', revenue: 3000 },
-    { name: 'Mar', revenue: 5000 },
-    { name: 'Apr', revenue: 4500 },
-    { name: 'May', revenue: 6000 },
-    { name: 'Jun', revenue: 5500 },
+  const chartData = stats.chartData && stats.chartData.length > 0 ? stats.chartData : [
+    { name: 'No Data', revenue: 0 }
   ];
 
   const recentOrders = [...(ordersData || [])]
@@ -74,6 +73,7 @@ export default function Dashboard() {
       icon: TrendingUp,
       color: 'text-purple-600',
       bg: 'bg-purple-100',
+      isGrowthCard: true,
     },
   ];
 
@@ -93,16 +93,39 @@ export default function Dashboard() {
             transition={{ delay: index * 0.1 }}
           >
             <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative">
                 <CardTitle className="text-sm font-medium">
                   {stat.title}
                 </CardTitle>
-                <div className={`p-2 rounded-full ${stat.bg}`}>
-                  <stat.icon className={`h-4 w-4 ${stat.color}`} />
-                </div>
+                {stat.isGrowthCard ? (
+                  <div className="absolute top-4 right-4 flex items-center bg-muted rounded-lg p-0.5 border border-border text-xs">
+                    <button
+                      onClick={() => setTimeframe('7d')}
+                      className={`px-2 py-1 rounded-md transition-colors ${timeframe === '7d' ? 'bg-background shadow text-foreground font-semibold' : 'text-muted-foreground hover:text-foreground'}`}
+                    >
+                      7D
+                    </button>
+                    <button
+                      onClick={() => setTimeframe('1m')}
+                      className={`px-2 py-1 rounded-md transition-colors ${timeframe === '1m' ? 'bg-background shadow text-foreground font-semibold' : 'text-muted-foreground hover:text-foreground'}`}
+                    >
+                      1M
+                    </button>
+                  </div>
+                ) : (
+                  <div className={`p-2 rounded-full ${stat.bg}`}>
+                    <stat.icon className={`h-4 w-4 ${stat.color}`} />
+                  </div>
+                )}
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{stat.value}</div>
+                {stat.isGrowthCard && (
+                  <div className="flex items-center text-xs text-muted-foreground mt-1">
+                    <TrendingUp className={`mr-1 h-3 w-3 ${stat.color}`} />
+                    vs last {timeframe === '7d' ? '7 days' : 'month'}
+                  </div>
+                )}
               </CardContent>
             </Card>
           </motion.div>
