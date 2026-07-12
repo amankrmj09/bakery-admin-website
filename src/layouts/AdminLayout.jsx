@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout } from '../store/slices/authSlice';
-import { LayoutDashboard, ShoppingCart, Users, LogOut, Store, Moon, Sun } from 'lucide-react';
+import { LayoutDashboard, ShoppingCart, Users, LogOut, Store, Moon, Sun, LayoutTemplate } from 'lucide-react';
 
 export default function AdminLayout() {
   const dispatch = useDispatch();
@@ -31,6 +31,7 @@ export default function AdminLayout() {
     { to: '/', label: 'Dashboard', icon: LayoutDashboard },
     { to: '/orders', label: 'Orders', icon: ShoppingCart },
     { to: '/bakery-settings', label: 'Bakery & Products', icon: Store },
+    { to: '/site-config', label: 'Site Config', icon: LayoutTemplate },
     { to: '/users', label: 'Users', icon: Users },
   ];
 

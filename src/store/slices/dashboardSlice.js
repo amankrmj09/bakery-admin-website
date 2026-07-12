@@ -39,6 +39,30 @@ export const updateStoreSettings = createAsyncThunk(
   }
 );
 
+export const fetchSiteConfig = createAsyncThunk(
+  'dashboard/fetchSiteConfig',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await api.get('/api/site-config/frontpage');
+      return response.data;
+    } catch (error) {
+      return rejectWithValue('Failed to fetch site config');
+    }
+  }
+);
+
+export const updateSiteConfig = createAsyncThunk(
+  'dashboard/updateSiteConfig',
+  async (data, { rejectWithValue }) => {
+    try {
+      const response = await api.put('/api/site-config/frontpage', data);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue('Failed to update site config');
+    }
+  }
+);
+
 export const fetchOrders = createAsyncThunk(
   'dashboard/fetchOrders',
   async (params, { rejectWithValue }) => {
@@ -252,6 +276,11 @@ const initialState = {
     loading: false,
     error: null,
   },
+  siteConfig: {
+    data: null,
+    loading: false,
+    error: null,
+  },
   stats: {
     loading: false,
     error: null,
@@ -431,6 +460,19 @@ const dashboardSlice = createSlice({
       })
       .addCase(updateStoreSettings.fulfilled, (state, action) => {
         state.settings.data = action.payload;
+      })
+      // Site Config
+      .addCase(fetchSiteConfig.pending, (state) => { state.siteConfig.loading = true; })
+      .addCase(fetchSiteConfig.fulfilled, (state, action) => {
+        state.siteConfig.loading = false;
+        state.siteConfig.data = action.payload;
+      })
+      .addCase(fetchSiteConfig.rejected, (state, action) => {
+        state.siteConfig.loading = false;
+        state.siteConfig.error = action.payload;
+      })
+      .addCase(updateSiteConfig.fulfilled, (state, action) => {
+        state.siteConfig.data = action.payload;
       });
   },
 });

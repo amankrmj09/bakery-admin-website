@@ -9,6 +9,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 const Login = React.lazy(() => import('./pages/Login'));
 const Dashboard = React.lazy(() => import('./pages/Dashboard'));
 const BakerySettings = React.lazy(() => import('./pages/BakerySettings'));
+const SiteConfig = React.lazy(() => import('./pages/SiteConfig'));
 const Orders = React.lazy(() => import('./pages/Orders'));
 const Users = React.lazy(() => import('./pages/Users'));
 
@@ -41,6 +42,7 @@ function App() {
               <Route index element={<Dashboard />} />
               <Route path="orders" element={<Orders />} />
               <Route path="bakery-settings" element={<BakerySettings />} />
+              <Route path="site-config" element={<SiteConfig />} />
               <Route path="users" element={<Users />} />
             </Route>
             <Route path="*" element={<Navigate to="/" replace />} />
