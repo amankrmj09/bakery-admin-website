@@ -1,16 +1,50 @@
-# React + Vite
+# 🧁 Shah's Bakery - Admin Portal
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+![React](https://img.shields.io/badge/React-18-61DAFB.svg?logo=react)
+![Vite](https://img.shields.io/badge/Vite-Enabled-646CFF.svg?logo=vite)
 
-Currently, two official plugins are available:
+Welcome to the **Admin Portal** for the Shah's Bakery Microservice Platform. This web application provides a comprehensive dashboard for bakery administrators to manage products, view incoming orders, and configure platform settings.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## ✨ Features
+- **Product Management:** Add, update, and remove items from the bakery catalogue.
+- **Order Tracking:** Monitor and update the status of customer orders.
+- **Analytics:** View sales and customer engagement metrics.
 
-## React Compiler
+## 📁 Folder Structure
+The main `src/` directory is organized as follows:
+```text
+src/
+├── api/        # Axios instances and API endpoint definitions.
+├── assets/     # Static assets like images and global CSS.
+├── components/ # Reusable React UI components (buttons, tables).
+├── layouts/    # Page layout wrappers (e.g., Sidebar, Navbar).
+├── pages/      # Top-level route components representing full views.
+└── store/      # Global state management (Zustand/Redux).
+```
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## 🚀 Getting Started
 
-## Expanding the Oxlint configuration
+### Prerequisites
+- [Node.js](https://nodejs.org/) (v16 or higher)
+- NPM or Yarn
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+### Installation
+
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/amankrmj09/bakery-admin-website.git
+   cd bakery-admin
+   ```
+
+2. **Install dependencies:**
+   ```bash
+   npm install
+   ```
+
+3. **Run the development server:**
+   ```bash
+   npm run dev
+   ```
+
+## 🔗 Related Links
+- [Main Platform README](../../README.md)
