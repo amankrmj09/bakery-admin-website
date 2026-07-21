@@ -21,12 +21,16 @@ export default defineConfig({
                 maxAgeSeconds: 30 * 24 * 60 * 60, // 30 Days
               },
               cacheableResponse: {
-                statuses: [0, 200]
-              }
-            }
-          }
-        ]
-      }
-    })
+                statuses: [0, 200],
+              },
+            },
+          },
+        ],
+      },
+    }),
   ],
+  server: {
+    port: 3004,
+    open: true,
+  },
 })
