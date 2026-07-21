@@ -2,13 +2,16 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchDashboardStats, fetchOrders } from '../store/slices/dashboardSlice';
 import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/Card';
-import { Users, ShoppingCart, CreditCard, TrendingUp } from 'lucide-react';
+import { Users, ShoppingCart, CreditCard, TrendingUp, LayoutDashboard } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { Badge } from '../components/ui/Badge';
+import { cn } from '../lib/utils';
+import { useScrollTop } from '../hooks/useScrollTop';
 
 export default function Dashboard() {
   const dispatch = useDispatch();
+  const isScrolled = useScrollTop();
   const [timeframe, setTimeframe] = useState('1m');
   const { stats } = useSelector((state) => state.dashboard);
   const { data: ordersData } = useSelector((state) => state.dashboard.orders);
@@ -78,10 +81,20 @@ export default function Dashboard() {
   ];
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold tracking-tight">Dashboard Overview</h2>
-        <p className="text-muted-foreground">Here's what's happening in your bakery today.</p>
+    <div className="flex flex-col min-h-full gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500 w-full pb-8">
+      <div className={cn(
+        "sticky top-0 z-30 flex justify-between items-center flex-wrap gap-4 transition-all duration-300",
+        isScrolled 
+          ? "bg-[var(--bg-panel)]/80 backdrop-blur-xl border border-[var(--border-color)] shadow-md rounded-2xl px-6 py-4 mt-2" 
+          : "bg-transparent border-transparent py-2"
+      )}>
+        <div>
+          <h1 className="text-3xl font-bold text-[var(--text-main)] mb-1 flex items-center gap-2">
+            <LayoutDashboard className="text-[var(--color-primary)] h-6 w-6" />
+            Dashboard Overview
+          </h1>
+          <p className="text-[var(--text-muted)] text-sm">Here's what's happening in your bakery today.</p>
+        </div>
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">

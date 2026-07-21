@@ -3,23 +3,18 @@ import { useForm, useFieldArray } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchSiteConfig, updateSiteConfig } from '../store/slices/dashboardSlice';
 import { Button } from '../components/ui/Button';
+import ActionButton from '../components/ui/ActionButton';
 import { toast } from 'sonner';
-import { Loader2, Plus, Trash2, Settings, Save, LayoutTemplate, Store, Info, Briefcase, Tag, MessageSquare } from 'lucide-react';
-import { cn } from '../lib/utils'; // Assuming this exists or I'll just use standard template literals if it doesn't, but I'll use standard classes to be safe
+import { Loader2, Plus, Trash2, SettingsIcon, Save, LayoutTemplate, Store, Info, Briefcase, Tag, MessageSquare } from 'lucide-react';
+import { cn } from '../lib/utils';
+import { useScrollTop } from '../hooks/useScrollTop';
 
-export default function SiteConfig() {
+
+export default function Storefront() {
   const dispatch = useDispatch();
   const { siteConfig } = useSelector((state) => state.dashboard);
+  const isScrolled = useScrollTop();
   const [isSaving, setIsSaving] = useState(false);
-  const [isScrolled, setIsScrolled] = useState(false);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
 
   const {
     register,
@@ -73,35 +68,41 @@ export default function SiteConfig() {
     );
   }
 
-  const inputClasses = "w-full text-sm p-3 rounded-xl border border-border bg-background text-foreground outline-none focus:border-primary-500 transition-colors mt-1.5";
-  const labelClasses = "text-xs font-semibold text-muted-foreground tracking-wide";
-  const sectionHeaderClasses = "font-bold text-sm uppercase tracking-wider text-foreground border-b border-border/50 pb-3 mb-4 flex items-center gap-2";
+  const inputClasses = "w-full text-sm p-3 rounded-xl border border-[var(--border-color)] bg-black/5 dark:bg-white/5 text-[var(--text-main)] outline-none focus:border-[var(--color-primary)] transition-colors mt-1.5";
+  const labelClasses = "text-xs font-semibold text-[var(--text-muted)] tracking-wide";
+  const sectionHeaderClasses = "font-bold text-sm uppercase tracking-wider text-[var(--text-main)] border-b border-[var(--border-color)]/50 pb-3 mb-4 flex items-center gap-2";
 
   return (
-    <div className="flex flex-col min-h-full gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500 max-w-5xl mx-auto pb-12 w-full">
+    <div className="flex flex-col min-h-full gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500 w-full pb-8">
       
       {/* Sticky Header */}
-      <div className={`sticky top-0 z-30 flex flex-col md:flex-row md:items-center justify-between gap-4 transition-all duration-300 ${
+      <div className={cn(
+        "sticky top-0 z-30 flex justify-between items-center flex-wrap gap-4 transition-all duration-300",
         isScrolled 
-          ? "bg-card/80 backdrop-blur-xl border border-border shadow-md rounded-2xl px-6 py-4 mt-2" 
+          ? "bg-[var(--bg-panel)]/80 backdrop-blur-xl border border-[var(--border-color)] shadow-md rounded-2xl px-6 py-4 mt-2" 
           : "bg-transparent border-transparent py-2"
-      }`}>
+      )}>
         <div>
-          <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
-            <LayoutTemplate className="text-primary-500 h-6 w-6" />
-            Site Configuration
+          <h1 className="text-3xl font-bold text-[var(--text-main)] mb-1 flex items-center gap-2">
+            <LayoutTemplate className="text-[var(--color-primary)] h-6 w-6" />
+            Storefront Content
           </h1>
-          <p className="text-muted-foreground text-sm mt-1">Manage the content displayed on the customer frontend.</p>
+          <p className="text-[var(--text-muted)] text-sm">Manage the content displayed on the customer frontend.</p>
         </div>
-        <div className="min-w-[150px] flex justify-end">
-          <Button onClick={handleSubmit(onSubmit)} disabled={isSaving || (!isDirty && false)} className="px-6 h-[42px] rounded-xl font-semibold shadow-sm">
-            {isSaving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
-            {isSaving ? "Saving..." : "Save Config"}
-          </Button>
+        <div className="min-w-[150px] flex sm:justify-end">
+          {isDirty && (
+            <ActionButton 
+              text={isSaving ? "Saving..." : "Save Config"}
+              onClick={handleSubmit(onSubmit)} 
+              disabled={isSaving}
+              icon={isSaving ? Loader2 : Save}
+              className="px-6 h-[42px]"
+            />
+          )}
         </div>
       </div>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-10 p-8 rounded-3xl bg-card border border-border shadow-sm">
+      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-10 p-8 rounded-3xl glass-panel border border-[var(--border-color)] shadow-sm text-[var(--text-main)]">
         
         {/* HERO SECTION */}
         <div className="flex flex-col gap-5">
@@ -128,9 +129,9 @@ export default function SiteConfig() {
             <input {...register('heroSection.heroImageUrl')} placeholder="/images/hero_burger.png" className={inputClasses} />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-6 mt-2 border-t border-border/40">
-            <div className="space-y-4 bg-muted/20 p-5 rounded-2xl border border-border/50">
-              <h4 className="font-bold text-sm text-foreground flex items-center gap-2 mb-2">Side Card 1</h4>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-6 mt-2 border-t border-[var(--border-color)]/40">
+            <div className="space-y-4 bg-[var(--bg-panel-hover)] p-5 rounded-2xl border border-[var(--border-color)]/50">
+              <h4 className="font-bold text-sm text-[var(--text-main)] flex items-center gap-2 mb-2">Side Card 1</h4>
               <div>
                 <label className={labelClasses}>Subtitle</label>
                 <input {...register('heroSection.sideCard1.subtitle')} className={inputClasses} />
@@ -148,8 +149,8 @@ export default function SiteConfig() {
                 <input {...register('heroSection.sideCard1.imageUrl')} className={inputClasses} />
               </div>
             </div>
-            <div className="space-y-4 bg-muted/20 p-5 rounded-2xl border border-border/50">
-              <h4 className="font-bold text-sm text-foreground flex items-center gap-2 mb-2">Side Card 2</h4>
+            <div className="space-y-4 bg-[var(--bg-panel-hover)] p-5 rounded-2xl border border-[var(--border-color)]/50">
+              <h4 className="font-bold text-sm text-[var(--text-main)] flex items-center gap-2 mb-2">Side Card 2</h4>
               <div>
                 <label className={labelClasses}>Subtitle</label>
                 <input {...register('heroSection.sideCard2.subtitle')} className={inputClasses} />
@@ -203,8 +204,8 @@ export default function SiteConfig() {
 
         {/* HOW WE WORK SECTION */}
         <div className="flex flex-col gap-5 mt-4">
-          <div className="flex flex-row items-center justify-between border-b border-border/50 pb-3 mb-4">
-            <h3 className="font-bold text-sm uppercase tracking-wider text-foreground flex items-center gap-2">
+          <div className="flex flex-row items-center justify-between border-b border-[var(--border-color)]/50 pb-3 mb-4">
+            <h3 className="font-bold text-sm uppercase tracking-wider text-[var(--text-main)] flex items-center gap-2">
               <Briefcase className="h-4 w-4 text-primary-500" /> How We Work Steps
             </h3>
             <Button type="button" variant="outline" size="sm" onClick={() => appendHowWeWork({ title: '', description: '', iconName: '' })} className="rounded-xl h-8">
@@ -214,7 +215,7 @@ export default function SiteConfig() {
           
           <div className="space-y-4">
             {howWeWorkFields.map((field, index) => (
-              <div key={field.id} className="flex gap-4 items-start border border-border/60 p-5 rounded-2xl bg-muted/10 transition-all hover:bg-muted/30">
+              <div key={field.id} className="flex gap-4 items-start border border-[var(--border-color)]/60 p-5 rounded-2xl bg-[var(--bg-panel-hover)] transition-all">
                 <div className="flex-1 space-y-4">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     <div>
@@ -237,7 +238,7 @@ export default function SiteConfig() {
               </div>
             ))}
             {howWeWorkFields.length === 0 && (
-              <p className="text-sm text-muted-foreground italic text-center py-4 bg-muted/20 rounded-2xl border border-dashed border-border">No steps added yet.</p>
+              <p className="text-sm text-[var(--text-muted)] italic text-center py-4 bg-[var(--bg-panel-hover)] rounded-2xl border border-dashed border-[var(--border-color)]">No steps added yet.</p>
             )}
           </div>
         </div>
