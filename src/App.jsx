@@ -3,15 +3,20 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchCurrentUser } from './store/slices/authSlice';
 
-import AdminLayout from './layouts/AdminLayout';
+import { ThemeProvider } from './app/ThemeContext';
+import { AuraBackground } from './components/ui/AuraBackground';
+import { IslandLayout } from './components/layout/IslandLayout';
 import ProtectedRoute from './components/ProtectedRoute';
 
 const Login = React.lazy(() => import('./pages/Login'));
 const Dashboard = React.lazy(() => import('./pages/Dashboard'));
-const BakerySettings = React.lazy(() => import('./pages/BakerySettings'));
-const SiteConfig = React.lazy(() => import('./pages/SiteConfig'));
+const Storefront = React.lazy(() => import('./pages/Storefront'));
+const Products = React.lazy(() => import('./pages/Products'));
+const Categories = React.lazy(() => import('./pages/Categories'));
+const Inventory = React.lazy(() => import('./pages/Inventory'));
 const Orders = React.lazy(() => import('./pages/Orders'));
 const Users = React.lazy(() => import('./pages/Users'));
+const Settings = React.lazy(() => import('./pages/Settings'));
 
 const PageLoader = () => (
   <div className="flex items-center justify-center min-h-screen">
@@ -32,24 +37,28 @@ function App() {
   }, [dispatch, token]);
 
   return (
-    <>
+    <ThemeProvider>
       <Toaster richColors position="top-right" />
+      <AuraBackground />
       <BrowserRouter>
         <React.Suspense fallback={<PageLoader />}>
           <Routes>
             <Route path="/login" element={isAuthenticated ? <Navigate to="/" replace /> : <Login />} />
-            <Route path="/" element={<ProtectedRoute><AdminLayout /></ProtectedRoute>}>
+            <Route path="/" element={<ProtectedRoute><IslandLayout /></ProtectedRoute>}>
               <Route index element={<Dashboard />} />
               <Route path="orders" element={<Orders />} />
-              <Route path="bakery-settings" element={<BakerySettings />} />
-              <Route path="site-config" element={<SiteConfig />} />
+              <Route path="products" element={<Products />} />
+              <Route path="categories" element={<Categories />} />
+              <Route path="inventory" element={<Inventory />} />
+              <Route path="storefront" element={<Storefront />} />
               <Route path="users" element={<Users />} />
+              <Route path="settings" element={<Settings />} />
             </Route>
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </React.Suspense>
       </BrowserRouter>
-    </>
+    </ThemeProvider>
   );
 }
 
