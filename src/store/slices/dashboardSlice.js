@@ -137,11 +137,9 @@ export const updateUserStatus = createAsyncThunk(
   }
 );
 
-export const fetchProducts = createAsyncThunk(
-  'dashboard/fetchProducts',
-  async (_, { rejectWithValue }) => {
+export const fetchProducts = createAsyncThunk('dashboard/fetchProducts', async (params, { rejectWithValue }) => {
     try {
-      const response = await api.get('/api/products');
+      const response = await api.get('/api/products', { params });
       return response.data;
     } catch (error) {
       return rejectWithValue('Failed to fetch products');
@@ -185,11 +183,9 @@ export const deleteProduct = createAsyncThunk(
   }
 );
 
-export const fetchInventory = createAsyncThunk(
-  'dashboard/fetchInventory',
-  async (_, { rejectWithValue }) => {
+export const fetchInventory = createAsyncThunk('dashboard/fetchInventory', async (params, { rejectWithValue }) => {
     try {
-      const response = await api.get('/api/inventory');
+      const response = await api.get('/api/inventory', { params });
       return response.data;
     } catch (error) {
       return rejectWithValue('Failed to fetch inventory');
@@ -288,13 +284,7 @@ const initialState = {
     orders: 0,
     payments: { currentMonth: 0, lastMonth: 0 }
   },
-  orders: {
-    data: [],
-    loading: false,
-    error: null,
-    totalCount: 0,
-    page: 1,
-  },
+  orders: { data: [], loading: false, error: null, totalElements: 0 },
   users: {
     data: [],
     loading: false,
@@ -305,16 +295,8 @@ const initialState = {
     loading: false,
     error: null,
   },
-  products: {
-    data: [],
-    loading: false,
-    error: null,
-  },
-  inventory: {
-    data: [],
-    loading: false,
-    error: null,
-  }
+  products: { data: [], loading: false, error: null, totalElements: 0 },
+  inventory: { data: [], loading: false, error: null, totalElements: 0 }
 };
 
 const dashboardSlice = createSlice({
@@ -365,7 +347,7 @@ const dashboardSlice = createSlice({
       .addCase(fetchUsers.pending, (state) => { state.users.loading = true; })
       .addCase(fetchUsers.fulfilled, (state, action) => {
         state.users.loading = false;
-        state.users.data = action.payload || [];
+        state.users.data = action.payload?.content || action.payload || [];
       })
       .addCase(fetchUsers.rejected, (state, action) => {
         state.users.loading = false;
@@ -384,7 +366,8 @@ const dashboardSlice = createSlice({
       .addCase(fetchProducts.pending, (state) => { state.products.loading = true; })
       .addCase(fetchProducts.fulfilled, (state, action) => {
         state.products.loading = false;
-        state.products.data = action.payload || [];
+        state.products.data = action.payload?.content || action.payload || [];
+        state.products.totalElements = action.payload?.totalElements || (action.payload?.length) || 0;
       })
       .addCase(fetchProducts.rejected, (state, action) => {
         state.products.loading = false;
@@ -407,7 +390,7 @@ const dashboardSlice = createSlice({
       .addCase(fetchCategories.pending, (state) => { state.categories.loading = true; })
       .addCase(fetchCategories.fulfilled, (state, action) => {
         state.categories.loading = false;
-        state.categories.data = action.payload || [];
+        state.categories.data = action.payload?.content || action.payload || [];
       })
       .addCase(fetchCategories.rejected, (state, action) => {
         state.categories.loading = false;
@@ -430,7 +413,8 @@ const dashboardSlice = createSlice({
       .addCase(fetchInventory.pending, (state) => { state.inventory.loading = true; })
       .addCase(fetchInventory.fulfilled, (state, action) => {
         state.inventory.loading = false;
-        state.inventory.data = action.payload || [];
+        state.inventory.data = action.payload?.content || action.payload || [];
+        state.inventory.totalElements = action.payload?.totalElements || (action.payload?.length) || 0;
       })
       .addCase(fetchInventory.rejected, (state, action) => {
         state.inventory.loading = false;
@@ -479,3 +463,5 @@ const dashboardSlice = createSlice({
 
 export const { setTheme } = dashboardSlice.actions;
 export default dashboardSlice.reducer;
+
+
