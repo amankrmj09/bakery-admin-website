@@ -53,8 +53,8 @@ export default function Products() {
           <motion.div 
             key="list"
             initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -15 }}
+            animate={{ opacity: 1, y: 0, transitionEnd: { transform: 'none' } }}
+            exit={{ opacity: 0, y: -15, transitionEnd: { transform: 'none' } }}
             transition={{ duration: 0.3, ease: 'easeOut' }}
             className="flex flex-col gap-6 w-full"
           >
@@ -145,8 +145,8 @@ export default function Products() {
           <motion.div
             key="form"
             initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -15 }}
+            animate={{ opacity: 1, y: 0, transitionEnd: { transform: 'none' } }}
+            exit={{ opacity: 0, y: -15, transitionEnd: { transform: 'none' } }}
             transition={{ duration: 0.3, ease: 'easeOut' }}
             className="w-full flex flex-col gap-6"
           >

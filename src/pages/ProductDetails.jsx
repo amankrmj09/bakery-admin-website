@@ -13,6 +13,7 @@ import { useScrollTop } from '../hooks/useScrollTop';
 import { cn } from '../lib/utils';
 import { Input } from '../components/ui/Input';
 import { Select } from '../components/ui/Select';
+import { Textarea } from '../components/ui/Textarea';
 
 const getImageUrl = (url) => url?.startsWith('/') ? `${import.meta.env.VITE_API_BASE_URL?.replace(/\/$/, '')}${url}` : url;
 
@@ -316,15 +317,13 @@ export default function ProductDetails({ product, categories, onClose }) {
               </div>
               
               <Input label="Short Description" value={form.shortDescription} onChange={e => setForm({...form, shortDescription: e.target.value})} disabled={isSaving} />
-              <div>
-                <label className="block text-sm font-medium text-[var(--text-main)] mb-1">Full Description</label>
-                <textarea
-                  className="w-full bg-[var(--bg-input)] text-[var(--text-main)] border border-[var(--border-color)] rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent transition-all outline-none min-h-[100px]"
-                  value={form.description}
-                  onChange={e => setForm({...form, description: e.target.value})}
-                  disabled={isSaving}
-                />
-              </div>
+              <Textarea
+                label="Full Description"
+                className="min-h-[100px]"
+                value={form.description}
+                onChange={e => setForm({...form, description: e.target.value})}
+                disabled={isSaving}
+              />
             </div>
           )}
 

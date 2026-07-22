@@ -25,13 +25,13 @@ export const IslandLayout = () => {
         </div>
 
         <main id="main-scroll-container" className="flex-1 overflow-auto p-4 md:p-6 lg:p-8 pt-16 md:pt-6 lg:pt-8">
-          <div className="mx-auto max-w-7xl min-h-full flex flex-col gap-6 overflow-hidden">
+          <div className="mx-auto max-w-7xl min-h-full flex flex-col gap-6">
             <AnimatePresence mode="wait">
               <motion.div
                 key={location.pathname}
                 initial={{ opacity: 0, y: 15 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -15 }}
+                animate={{ opacity: 1, y: 0, transitionEnd: { transform: 'none' } }}
+                exit={{ opacity: 0, y: -15, transitionEnd: { transform: 'none' } }}
                 transition={{ duration: 0.3, ease: 'easeOut' }}
                 className="w-full min-h-full flex flex-col gap-6"
               >
