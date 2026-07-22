@@ -4,7 +4,7 @@ import { createProduct, updateProduct, deleteProduct } from '../store/slices/das
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import ActionButton from '../components/ui/ActionButton';
-import { Trash2, Loader2, Save } from 'lucide-react';
+import { Trash2, Loader2, Save, Package } from 'lucide-react';
 import { ProductMediaUploader } from '../components/shared/ProductMediaUploader';
 import CategoryDropdown from '../components/shared/CategoryDropdown';
 import { toast } from 'sonner';
@@ -243,17 +243,25 @@ export default function ProductDetails({ product, categories, onClose }) {
           : "bg-transparent border-transparent py-2"
       )}>
         <div>
-          <h2 className="text-2xl font-bold text-[var(--text-main)] mb-1 flex items-center gap-2">
+          <h1 className="text-3xl font-bold text-[var(--text-main)] mb-1 flex items-center gap-2">
+            <Package className="text-[var(--color-primary)] h-6 w-6" />
             {isEditing ? "Edit Product" : "Add Product"}
-          </h2>
+          </h1>
           <p className="text-[var(--text-muted)] text-sm">
             {isEditing ? "Update existing product details and pricing." : "Create a new product for your catalog."}
           </p>
         </div>
-        <div className="min-w-[150px] flex sm:justify-end">
-          <Button variant="ghost" onClick={() => !isSaving && onClose()} className="h-[42px]">
+        <div className="min-w-[150px] flex justify-end gap-2">
+          <Button type="button" variant="ghost" onClick={() => !isSaving && onClose()} className="h-[42px]">
             Cancel
           </Button>
+          <ActionButton 
+            onClick={handleSave}
+            text={isSaving ? 'Saving...' : 'Save'}
+            disabled={isSaving}
+            icon={isSaving ? Loader2 : Save}
+            className="px-6 h-[42px]"
+          />
         </div>
       </div>
 
@@ -409,16 +417,6 @@ export default function ProductDetails({ product, categories, onClose }) {
                 <Trash2 className="w-4 h-4 mr-2" /> Delete
               </Button>
             ) : <div />}
-            <div className="flex space-x-2">
-              <Button type="button" variant="outline" onClick={() => onClose()} disabled={isSaving}>Cancel</Button>
-              <ActionButton 
-                type="submit" 
-                text={isSaving ? 'Saving...' : 'Save Product'}
-                disabled={isSaving}
-                icon={isSaving ? Loader2 : Save}
-                className="px-4 h-10"
-              />
-            </div>
           </div>
         </form>
       </Card>

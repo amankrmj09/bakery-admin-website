@@ -46,7 +46,7 @@ export default function Products() {
   };
 
   return (
-    <div className="flex flex-col min-h-full w-full pb-8 overflow-x-hidden">
+    <div className="flex flex-col min-h-full w-full pb-8">
       {!showForm ? (
         <div className="flex flex-col gap-6 animate-in slide-in-from-left-4 fade-in duration-500 w-full">
           {/* Sticky Header */}
