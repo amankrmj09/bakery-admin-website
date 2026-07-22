@@ -14,7 +14,9 @@ import { useScrollTop } from '../hooks/useScrollTop';
 import { cn } from '../lib/utils';
 import { Input } from '../components/ui/Input';
 import { Textarea } from '../components/ui/Textarea';
+import { SearchableSelect } from '../components/ui/SearchableSelect';
 import SingleImageUploader from '../components/shared/SingleImageUploader';
+import { FolderTree } from 'lucide-react';
 
 export default function Categories() {
   const dispatch = useDispatch();
@@ -33,11 +35,16 @@ export default function Categories() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
-  const [form, setForm] = useState({ name: '', description: '', displayOrder: 0, active: true, mediaUrls: [] });
+  const [form, setForm] = useState({ name: '', description: '', parentId: '', displayOrder: 0, active: true, mediaUrls: [] });
+
+  const categoryOptions = React.useMemo(() => [
+    { value: '', label: 'None (Top Level Category)' },
+    ...(categories || []).filter(c => c.id !== editingCategory?.id).map(c => ({ value: c.id, label: c.name }))
+  ], [categories, editingCategory]);
 
   const handleAddClick = () => {
     setEditingCategory(null);
-    setForm({ name: '', description: '', displayOrder: 0, active: true, mediaUrls: [] });
+    setForm({ name: '', description: '', parentId: '', displayOrder: 0, active: true, mediaUrls: [] });
     setIsModalOpen(true);
   };
 
@@ -46,6 +53,7 @@ export default function Categories() {
     setForm({ 
       name: category.name, 
       description: category.description || '', 
+      parentId: category.parentId || '',
       displayOrder: category.displayOrder || 0, 
       active: category.active !== false,
       mediaUrls: category.mediaUrls || []
@@ -188,6 +196,15 @@ export default function Categories() {
             value={form.name} 
             onChange={e => setForm({...form, name: e.target.value})} 
             disabled={isSaving} 
+          />
+
+          <SearchableSelect
+            label="Parent Category"
+            icon={FolderTree}
+            options={categoryOptions}
+            value={form.parentId}
+            onChange={val => setForm({...form, parentId: val})}
+            disabled={isSaving}
           />
           
           <Textarea 
