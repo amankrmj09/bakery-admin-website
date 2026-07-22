@@ -38,7 +38,7 @@ function App() {
 
   return (
     <ThemeProvider>
-      <Toaster richColors position="top-right" />
+      <Toaster richColors position="top-right" style={{ zIndex: 999999 }} />
       <AuraBackground />
       <BrowserRouter>
         <React.Suspense fallback={<PageLoader />}>
