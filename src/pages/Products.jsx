@@ -35,7 +35,7 @@ export default function Products() {
   const totalPages = Math.ceil((totalElements || products?.length || 0) / ITEMS_PER_PAGE);
   const paginatedProducts = products || [];
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [showForm, setShowForm] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
@@ -70,7 +70,7 @@ export default function Products() {
     setThumbnailIndex(0);
     setActiveTab('basic');
     setForm({ ...initialFormState, categoryId: categories[0]?.id || '' });
-    setIsModalOpen(true);
+    setShowForm(true);
   };
 
   const handleEditClick = (product) => {
@@ -117,7 +117,7 @@ export default function Products() {
       mediaUrls: mediaUrls,
       videoUrl: product.videoUrl || ''
     });
-    setIsModalOpen(true);
+    setShowForm(true);
   };
 
   const handleScreenshotSelect = (e) => {
@@ -247,7 +247,7 @@ export default function Products() {
         await dispatch(createProduct(payload)).unwrap();
         toast.success('Product created successfully');
       }
-      setIsModalOpen(false);
+      setShowForm(false);
     } catch (error) { 
       console.error('Failed to save product', error); 
       toast.error('Failed to save product');
@@ -260,7 +260,7 @@ export default function Products() {
       try {
         await dispatch(deleteProduct(productId)).unwrap();
         toast.success('Product deleted successfully');
-        setIsModalOpen(false);
+        setShowForm(false);
       } catch (error) {
         console.error('Failed to delete product', error);
         toast.error('Failed to delete product');
@@ -269,10 +269,12 @@ export default function Products() {
   };
 
   return (
-    <div className="flex flex-col min-h-full gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500 w-full pb-8">
+    <div className="flex flex-col min-h-full w-full pb-8 overflow-x-hidden">
       
-      {/* Sticky Header */}
-      <div className={cn(
+      {!showForm ? (
+        <div className="flex flex-col gap-6 animate-in slide-in-from-left-4 fade-in duration-500 w-full">
+          {/* Sticky Header */}
+          <div className={cn(
         "sticky top-0 z-30 flex justify-between items-center flex-wrap gap-4 transition-all duration-300",
         isScrolled 
           ? "bg-[var(--bg-panel)]/80 backdrop-blur-xl border border-[var(--border-color)] shadow-md rounded-2xl px-6 py-4 mt-2" 
@@ -353,11 +355,25 @@ export default function Products() {
           </div>
         )}
       </Card>
+        </div>
+      ) : (
+        <div className="flex flex-col gap-6 animate-in slide-in-from-right-8 fade-in duration-500 w-full">
+          {/* Form Header */}
+          <div className="sticky top-0 z-30 flex justify-between items-center bg-[var(--bg-panel)]/80 backdrop-blur-xl border border-[var(--border-color)] shadow-md rounded-2xl px-6 py-4 mt-2">
+            <div>
+              <h2 className="text-2xl font-bold text-[var(--text-main)] mb-1">
+                {editingProduct ? "Edit Product" : "Add Product"}
+              </h2>
+            </div>
+            <Button variant="ghost" onClick={() => !isSaving && setShowForm(false)}>
+              Cancel
+            </Button>
+          </div>
 
-      <Modal isOpen={isModalOpen} onClose={() => !isSaving && setIsModalOpen(false)} title={editingProduct ? "Edit Product" : "Add Product"} maxWidth="max-w-4xl">
-        {/* Custom Tabs Navigation */}
-        <div className="flex border-b border-border mb-4 overflow-x-auto hide-scrollbar">
-          {['basic', 'inventory', 'details', 'media'].map(tab => (
+          <Card className="p-6 md:p-8">
+            {/* Custom Tabs Navigation */}
+            <div className="flex border-b border-border mb-6 overflow-x-auto hide-scrollbar">
+              {['basic', 'inventory', 'details', 'media'].map(tab => (
             <button
               key={tab}
               type="button"
@@ -500,14 +516,14 @@ export default function Products() {
             </div>
           )}
 
-          <div className="pt-4 flex justify-between items-center border-t border-border mt-6">
+          <div className="pt-4 flex justify-between items-center border-t border-border mt-8">
             {editingProduct ? (
               <Button type="button" variant="ghost" className="text-red-500 hover:text-red-700 hover:bg-red-50" onClick={() => handleDeleteClick(editingProduct.id)} disabled={isSaving}>
                 <Trash2 className="w-4 h-4 mr-2" /> Delete
               </Button>
             ) : <div />}
             <div className="flex space-x-2">
-              <Button type="button" variant="outline" onClick={() => setIsModalOpen(false)} disabled={isSaving}>Cancel</Button>
+              <Button type="button" variant="outline" onClick={() => setShowForm(false)} disabled={isSaving}>Cancel</Button>
               <ActionButton 
                 type="submit" 
                 text={isSaving ? 'Saving...' : 'Save Product'}
@@ -518,7 +534,9 @@ export default function Products() {
             </div>
           </div>
         </form>
-      </Modal>
+          </Card>
+        </div>
+      )}
     </div>
   );
 }
