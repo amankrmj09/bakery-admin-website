@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { useForm, useFieldArray } from 'react-hook-form';
+import { useForm, useFieldArray, Controller } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchSiteConfig, updateSiteConfig } from '../store/slices/dashboardSlice';
+import { fetchStorefront, updateStorefront } from '../store/slices/dashboardSlice';
 import { Button } from '../components/ui/Button';
 import ActionButton from '../components/ui/ActionButton';
+import SingleImageUploader from '../components/shared/SingleImageUploader';
 import { toast } from 'sonner';
 import { Loader2, Plus, Trash2, SettingsIcon, Save, LayoutTemplate, Store, Info, Briefcase, Tag, MessageSquare } from 'lucide-react';
 import { cn } from '../lib/utils';
@@ -12,7 +13,7 @@ import { useScrollTop } from '../hooks/useScrollTop';
 
 export default function Storefront() {
   const dispatch = useDispatch();
-  const { siteConfig } = useSelector((state) => state.dashboard);
+  const { storefront } = useSelector((state) => state.dashboard);
   const isScrolled = useScrollTop();
   const [isSaving, setIsSaving] = useState(false);
 
@@ -26,10 +27,16 @@ export default function Storefront() {
     defaultValues: {
       heroSection: {},
       aboutSection: {},
+      heroSection: { campaigns: [{}, {}, {}] },
       howWeWorkSection: [],
       specialOfferSection: {},
       testimonialSection: {}
     }
+  });
+
+  const { fields: campaignFields, append: appendCampaign, remove: removeCampaign } = useFieldArray({
+    control,
+    name: 'heroSection.campaigns'
   });
 
   const { fields: howWeWorkFields, append: appendHowWeWork, remove: removeHowWeWork } = useFieldArray({
@@ -38,19 +45,19 @@ export default function Storefront() {
   });
 
   useEffect(() => {
-    dispatch(fetchSiteConfig());
+    dispatch(fetchStorefront());
   }, [dispatch]);
 
   useEffect(() => {
-    if (siteConfig.data) {
-      reset(siteConfig.data);
+    if (storefront.data) {
+      reset(storefront.data);
     }
-  }, [siteConfig.data, reset]);
+  }, [storefront.data, reset]);
 
   const onSubmit = async (data) => {
     setIsSaving(true);
     try {
-      await dispatch(updateSiteConfig(data)).unwrap();
+      await dispatch(updateStorefront(data)).unwrap();
       toast.success('Site configuration saved successfully!');
       reset(data);
     } catch (err) {
@@ -60,7 +67,7 @@ export default function Storefront() {
     }
   };
 
-  if (siteConfig.loading && !siteConfig.data) {
+  if (storefront.loading && !storefront.data) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <Loader2 className="h-8 w-8 animate-spin text-primary-500" />
@@ -68,7 +75,7 @@ export default function Storefront() {
     );
   }
 
-  const inputClasses = "w-full text-sm p-3 rounded-xl border border-[var(--border-color)] bg-black/5 dark:bg-white/5 text-[var(--text-main)] outline-none focus:border-[var(--color-primary)] transition-colors mt-1.5";
+  const inputClasses = "w-full text-sm p-3 rounded-xl border border-[var(--border-color)] bg-transparent dark:bg-white/5 text-[var(--text-main)] outline-none focus:border-[var(--color-primary)] transition-colors mt-1.5";
   const labelClasses = "text-xs font-semibold text-[var(--text-muted)] tracking-wide";
   const sectionHeaderClasses = "font-bold text-sm uppercase tracking-wider text-[var(--text-main)] border-b border-[var(--border-color)]/50 pb-3 mb-4 flex items-center gap-2";
 
@@ -104,66 +111,41 @@ export default function Storefront() {
 
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-10 p-8 rounded-3xl glass-panel border border-[var(--border-color)] shadow-sm text-[var(--text-main)]">
         
-        {/* HERO SECTION */}
+        {/* HERO CAROUSEL SECTION */}
         <div className="flex flex-col gap-5">
-          <h3 className={sectionHeaderClasses}>
-            <Store className="h-4 w-4 text-primary-500" /> Hero Section
-          </h3>
+          <div className="flex flex-row items-center justify-between border-b border-[var(--border-color)]/50 pb-3 mb-4">
+            <h3 className="font-bold text-sm uppercase tracking-wider text-[var(--text-main)] flex items-center gap-2">
+              <Store className="h-4 w-4 text-primary-500" /> Hero Carousel Campaigns
+            </h3>
+            <Button type="button" variant="outline" size="sm" onClick={() => { if(campaignFields.length < 5) appendCampaign({ largeImageUrl: '', smallImageUrl: '' }) }} disabled={campaignFields.length >= 5} className="rounded-xl h-8">
+              <Plus className="mr-2 h-3 w-3" /> Add Campaign
+            </Button>
+          </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label className={labelClasses}>Tag</label>
-              <input {...register('heroSection.tag')} placeholder="E.g. Artisanal Bakery" className={inputClasses} />
-            </div>
-            <div>
-              <label className={labelClasses}>Subtitle</label>
-              <input {...register('heroSection.subtitle')} placeholder="E.g. Sale 20% every Monday" className={inputClasses} />
-            </div>
-          </div>
-          <div>
-            <label className={labelClasses}>Headline</label>
-            <textarea {...register('heroSection.headline')} rows={2} placeholder="Main headline text..." className={inputClasses} />
-          </div>
-          <div>
-            <label className={labelClasses}>Hero Image URL</label>
-            <input {...register('heroSection.heroImageUrl')} placeholder="/images/hero_burger.png" className={inputClasses} />
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-6 mt-2 border-t border-[var(--border-color)]/40">
-            <div className="space-y-4 bg-[var(--bg-panel-hover)] p-5 rounded-2xl border border-[var(--border-color)]/50">
-              <h4 className="font-bold text-sm text-[var(--text-main)] flex items-center gap-2 mb-2">Side Card 1</h4>
-              <div>
-                <label className={labelClasses}>Subtitle</label>
-                <input {...register('heroSection.sideCard1.subtitle')} className={inputClasses} />
+          <div className="space-y-4">
+            {campaignFields.map((field, index) => (
+              <div key={field.id} className="flex gap-4 items-start border border-[var(--border-color)]/60 p-5 rounded-2xl bg-[var(--bg-panel-hover)] transition-all">
+                <div className="flex-1 space-y-4">
+                  <h4 className="font-bold text-sm text-[var(--text-main)] mb-2">Campaign {index + 1}</h4>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <div>
+                      <label className={labelClasses}>Large Image (3:2 ratio)</label>
+                      <Controller name={"heroSection.campaigns.${index}.largeImageUrl"} control={control} render={({ field }) => <SingleImageUploader value={field.value} onChange={field.onChange} />} />
+                    </div>
+                    <div>
+                      <label className={labelClasses}>Small Image (1:1 ratio)</label>
+                      <Controller name={"heroSection.campaigns.${index}.smallImageUrl"} control={control} render={({ field }) => <SingleImageUploader value={field.value} onChange={field.onChange} />} />
+                    </div>
+                  </div>
+                </div>
+                <Button type="button" variant="ghost" size="sm" onClick={() => removeCampaign(index)} disabled={campaignFields.length <= 3} className="text-destructive mt-6 rounded-xl hover:bg-destructive/10 h-10 w-10 p-0 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed">
+                  <Trash2 className="h-4 w-4" />
+                </Button>
               </div>
-              <div>
-                <label className={labelClasses}>Title</label>
-                <input {...register('heroSection.sideCard1.title')} className={inputClasses} />
-              </div>
-              <div>
-                <label className={labelClasses}>Price</label>
-                <input {...register('heroSection.sideCard1.price')} className={inputClasses} />
-              </div>
-              <div>
-                <label className={labelClasses}>Image URL</label>
-                <input {...register('heroSection.sideCard1.imageUrl')} className={inputClasses} />
-              </div>
-            </div>
-            <div className="space-y-4 bg-[var(--bg-panel-hover)] p-5 rounded-2xl border border-[var(--border-color)]/50">
-              <h4 className="font-bold text-sm text-[var(--text-main)] flex items-center gap-2 mb-2">Side Card 2</h4>
-              <div>
-                <label className={labelClasses}>Subtitle</label>
-                <input {...register('heroSection.sideCard2.subtitle')} className={inputClasses} />
-              </div>
-              <div>
-                <label className={labelClasses}>Title</label>
-                <input {...register('heroSection.sideCard2.title')} className={inputClasses} />
-              </div>
-              <div>
-                <label className={labelClasses}>Image URL</label>
-                <input {...register('heroSection.sideCard2.imageUrl')} className={inputClasses} />
-              </div>
-            </div>
+            ))}
+            {campaignFields.length < 3 && (
+              <p className="text-sm text-red-500 italic text-center py-4 bg-red-500/10 rounded-2xl border border-dashed border-red-500/30">You must add at least 3 campaigns to enable the carousel rotation.</p>
+            )}
           </div>
         </div>
 
@@ -189,15 +171,15 @@ export default function Storefront() {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
             <div>
               <label className={labelClasses}>Image 1 URL</label>
-              <input {...register('aboutSection.image1Url')} className={inputClasses} />
+              <Controller name='aboutSection.image1Url' control={control} render={({ field }) => <SingleImageUploader value={field.value} onChange={field.onChange} />} />
             </div>
             <div>
               <label className={labelClasses}>Image 2 URL</label>
-              <input {...register('aboutSection.image2Url')} className={inputClasses} />
+              <Controller name='aboutSection.image2Url' control={control} render={({ field }) => <SingleImageUploader value={field.value} onChange={field.onChange} />} />
             </div>
             <div>
               <label className={labelClasses}>Image 3 URL</label>
-              <input {...register('aboutSection.image3Url')} className={inputClasses} />
+              <Controller name='aboutSection.image3Url' control={control} render={({ field }) => <SingleImageUploader value={field.value} onChange={field.onChange} />} />
             </div>
           </div>
         </div>
@@ -264,7 +246,7 @@ export default function Storefront() {
           </div>
           <div>
             <label className={labelClasses}>Image URL</label>
-            <input {...register('specialOfferSection.imageUrl')} className={inputClasses} />
+            <Controller name='specialOfferSection.imageUrl' control={control} render={({ field }) => <SingleImageUploader value={field.value} onChange={field.onChange} />} />
           </div>
         </div>
 
@@ -288,7 +270,7 @@ export default function Storefront() {
             </div>
             <div>
               <label className={labelClasses}>Author Image URL</label>
-              <input {...register('testimonialSection.authorImageUrl')} className={inputClasses} />
+              <Controller name='testimonialSection.authorImageUrl' control={control} render={({ field }) => <SingleImageUploader value={field.value} onChange={field.onChange} />} />
             </div>
           </div>
         </div>
@@ -296,3 +278,7 @@ export default function Storefront() {
     </div>
   );
 }
+
+
+
+

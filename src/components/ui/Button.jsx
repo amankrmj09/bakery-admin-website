@@ -2,10 +2,10 @@ import React from 'react';
 import { motion } from 'framer-motion';
 
 export const Button = React.forwardRef(({ className = '', variant = 'primary', size = 'md', children, isLoading, ...props }, ref) => {
-  const baseStyles = 'inline-flex items-center justify-center rounded-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 disabled:opacity-50 disabled:pointer-events-none ring-offset-background';
+  const baseStyles = 'inline-flex items-center justify-center rounded-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] disabled:opacity-50 disabled:pointer-events-none ring-offset-background';
   
   const variants = {
-    primary: 'bg-primary-600 text-white hover:bg-primary-700 shadow-sm',
+    primary: 'bg-[var(--color-primary)] text-white hover:opacity-90 shadow-sm',
     secondary: 'bg-muted text-foreground hover:bg-muted/80',
     outline: 'border border-border hover:bg-muted',
     ghost: 'hover:bg-muted hover:text-foreground',
@@ -39,3 +39,4 @@ export const Button = React.forwardRef(({ className = '', variant = 'primary', s
   );
 });
 Button.displayName = 'Button';
+

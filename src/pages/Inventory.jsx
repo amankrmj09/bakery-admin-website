@@ -163,7 +163,7 @@ export default function Inventory() {
         <form onSubmit={handleSaveStock} className="space-y-4 pt-2">
           <div>
             <label className="text-xs font-semibold text-[var(--text-muted)] tracking-wide">Quantity to Add</label>
-            <input type="number" min="1" required className="w-full text-sm p-3 rounded-xl border border-[var(--border-color)] bg-black/5 dark:bg-white/5 text-[var(--text-main)] outline-none focus:border-[var(--color-primary)] transition-colors mt-1.5" value={stockForm.quantity} onChange={e => setStockForm({...stockForm, quantity: parseInt(e.target.value) || 1})} disabled={isSaving} />
+            <input type="number" min="1" required className="w-full text-sm p-3 rounded-xl border border-[var(--border-color)] bg-transparent dark:bg-white/5 text-[var(--text-main)] outline-none focus:border-[var(--color-primary)] transition-colors mt-1.5" value={stockForm.quantity} onChange={e => setStockForm({...stockForm, quantity: parseInt(e.target.value) || 1})} disabled={isSaving} />
           </div>
           <div className="pt-4 flex justify-end space-x-2 border-t border-border mt-6">
             <Button type="button" variant="outline" onClick={() => setIsStockModalOpen(false)} disabled={isSaving}>Cancel</Button>
@@ -183,11 +183,11 @@ export default function Inventory() {
           <div className="flex space-x-4">
             <div className="flex-1">
               <label className="text-xs font-semibold text-[var(--text-muted)] tracking-wide">Min Stock</label>
-              <input type="number" min="0" required className="w-full text-sm p-3 rounded-xl border border-[var(--border-color)] bg-black/5 dark:bg-white/5 text-[var(--text-main)] outline-none focus:border-[var(--color-primary)] transition-colors mt-1.5" value={rulesForm.minimumStock} onChange={e => setRulesForm({...rulesForm, minimumStock: parseInt(e.target.value) || 0})} disabled={isSaving} />
+              <input type="number" min="0" required className="w-full text-sm p-3 rounded-xl border border-[var(--border-color)] bg-transparent dark:bg-white/5 text-[var(--text-main)] outline-none focus:border-[var(--color-primary)] transition-colors mt-1.5" value={rulesForm.minimumStock} onChange={e => setRulesForm({...rulesForm, minimumStock: parseInt(e.target.value) || 0})} disabled={isSaving} />
             </div>
             <div className="flex-1">
               <label className="text-xs font-semibold text-[var(--text-muted)] tracking-wide">Reorder Lvl</label>
-              <input type="number" min="0" required className="w-full text-sm p-3 rounded-xl border border-[var(--border-color)] bg-black/5 dark:bg-white/5 text-[var(--text-main)] outline-none focus:border-[var(--color-primary)] transition-colors mt-1.5" value={rulesForm.reorderLevel} onChange={e => setRulesForm({...rulesForm, reorderLevel: parseInt(e.target.value) || 0})} disabled={isSaving} />
+              <input type="number" min="0" required className="w-full text-sm p-3 rounded-xl border border-[var(--border-color)] bg-transparent dark:bg-white/5 text-[var(--text-main)] outline-none focus:border-[var(--color-primary)] transition-colors mt-1.5" value={rulesForm.reorderLevel} onChange={e => setRulesForm({...rulesForm, reorderLevel: parseInt(e.target.value) || 0})} disabled={isSaving} />
             </div>
           </div>
           <div className="pt-4 flex justify-end space-x-2 border-t border-border mt-6">
@@ -205,3 +205,4 @@ export default function Inventory() {
     </div>
   );
 }
+

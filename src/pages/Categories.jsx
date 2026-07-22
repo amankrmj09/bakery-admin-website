@@ -225,7 +225,7 @@ export default function Categories() {
         <form onSubmit={handleSave} className="space-y-4 pt-2">
           <div>
             <label className="text-xs font-semibold text-[var(--text-muted)] tracking-wide">Name</label>
-            <input type="text" required className="w-full text-sm p-3 rounded-xl border border-[var(--border-color)] bg-black/5 dark:bg-white/5 text-[var(--text-main)] outline-none focus:border-[var(--color-primary)] transition-colors mt-1.5" value={form.name} onChange={e => setForm({...form, name: e.target.value})} disabled={isSaving} />
+            <input type="text" required className="w-full text-sm p-3 rounded-xl border border-[var(--border-color)] bg-transparent dark:bg-white/5 text-[var(--text-main)] outline-none focus:border-[var(--color-primary)] transition-colors mt-1.5" value={form.name} onChange={e => setForm({...form, name: e.target.value})} disabled={isSaving} />
           </div>
 
           <div>
@@ -301,3 +301,4 @@ export default function Categories() {
     </div>
   );
 }
+

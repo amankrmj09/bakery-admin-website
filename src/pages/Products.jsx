@@ -272,16 +272,16 @@ export default function Products() {
           <div className="flex space-x-4">
             <div className="flex-1">
               <label className="text-xs font-semibold text-[var(--text-muted)] tracking-wide">SKU</label>
-              <input type="text" required className="w-full text-sm p-3 rounded-xl border border-[var(--border-color)] bg-black/5 dark:bg-white/5 text-[var(--text-main)] outline-none focus:border-[var(--color-primary)] transition-colors mt-1.5" value={form.sku} onChange={e => setForm({...form, sku: e.target.value})} disabled={isSaving || editingProduct} />
+              <input type="text" required className="w-full text-sm p-3 rounded-xl border border-[var(--border-color)] bg-transparent dark:bg-white/5 text-[var(--text-main)] outline-none focus:border-[var(--color-primary)] transition-colors mt-1.5" value={form.sku} onChange={e => setForm({...form, sku: e.target.value})} disabled={isSaving || editingProduct} />
             </div>
             <div className="flex-1">
               <label className="text-xs font-semibold text-[var(--text-muted)] tracking-wide">Price</label>
-              <input type="number" step="0.01" required className="w-full text-sm p-3 rounded-xl border border-[var(--border-color)] bg-black/5 dark:bg-white/5 text-[var(--text-main)] outline-none focus:border-[var(--color-primary)] transition-colors mt-1.5" value={form.price} onChange={e => setForm({...form, price: e.target.value})} disabled={isSaving} />
+              <input type="number" step="0.01" required className="w-full text-sm p-3 rounded-xl border border-[var(--border-color)] bg-transparent dark:bg-white/5 text-[var(--text-main)] outline-none focus:border-[var(--color-primary)] transition-colors mt-1.5" value={form.price} onChange={e => setForm({...form, price: e.target.value})} disabled={isSaving} />
             </div>
           </div>
           <div>
             <label className="text-xs font-semibold text-[var(--text-muted)] tracking-wide">Name</label>
-            <input type="text" required className="w-full text-sm p-3 rounded-xl border border-[var(--border-color)] bg-black/5 dark:bg-white/5 text-[var(--text-main)] outline-none focus:border-[var(--color-primary)] transition-colors mt-1.5" value={form.name} onChange={e => setForm({...form, name: e.target.value})} disabled={isSaving} />
+            <input type="text" required className="w-full text-sm p-3 rounded-xl border border-[var(--border-color)] bg-transparent dark:bg-white/5 text-[var(--text-main)] outline-none focus:border-[var(--color-primary)] transition-colors mt-1.5" value={form.name} onChange={e => setForm({...form, name: e.target.value})} disabled={isSaving} />
           </div>
 
           <ProductMediaUploader
@@ -322,4 +322,5 @@ export default function Products() {
     </div>
   );
 }
+
 

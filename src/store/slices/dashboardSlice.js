@@ -39,11 +39,11 @@ export const updateStoreSettings = createAsyncThunk(
   }
 );
 
-export const fetchSiteConfig = createAsyncThunk(
-  'dashboard/fetchSiteConfig',
+export const fetchstorefront = createAsyncThunk(
+  'dashboard/fetchstorefront',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await api.get('/api/site-config/frontpage');
+      const response = await api.get('/api/storefront/frontpage');
       return response.data;
     } catch (error) {
       return rejectWithValue('Failed to fetch site config');
@@ -51,11 +51,11 @@ export const fetchSiteConfig = createAsyncThunk(
   }
 );
 
-export const updateSiteConfig = createAsyncThunk(
-  'dashboard/updateSiteConfig',
+export const updatestorefront = createAsyncThunk(
+  'dashboard/updatestorefront',
   async (data, { rejectWithValue }) => {
     try {
-      const response = await api.put('/api/site-config/frontpage', data);
+      const response = await api.put('/api/storefront/frontpage', data);
       return response.data;
     } catch (error) {
       return rejectWithValue('Failed to update site config');
@@ -272,7 +272,7 @@ const initialState = {
     loading: false,
     error: null,
   },
-  siteConfig: {
+  storefront: {
     data: null,
     loading: false,
     error: null,
@@ -446,22 +446,23 @@ const dashboardSlice = createSlice({
         state.settings.data = action.payload;
       })
       // Site Config
-      .addCase(fetchSiteConfig.pending, (state) => { state.siteConfig.loading = true; })
-      .addCase(fetchSiteConfig.fulfilled, (state, action) => {
-        state.siteConfig.loading = false;
-        state.siteConfig.data = action.payload;
+      .addCase(fetchstorefront.pending, (state) => { state.storefront.loading = true; })
+      .addCase(fetchstorefront.fulfilled, (state, action) => {
+        state.storefront.loading = false;
+        state.storefront.data = action.payload;
       })
-      .addCase(fetchSiteConfig.rejected, (state, action) => {
-        state.siteConfig.loading = false;
-        state.siteConfig.error = action.payload;
+      .addCase(fetchstorefront.rejected, (state, action) => {
+        state.storefront.loading = false;
+        state.storefront.error = action.payload;
       })
-      .addCase(updateSiteConfig.fulfilled, (state, action) => {
-        state.siteConfig.data = action.payload;
+      .addCase(updatestorefront.fulfilled, (state, action) => {
+        state.storefront.data = action.payload;
       });
   },
 });
 
 export const { setTheme } = dashboardSlice.actions;
 export default dashboardSlice.reducer;
+
 
 
