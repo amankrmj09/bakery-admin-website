@@ -30,62 +30,81 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-muted/30 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-zinc-950 via-primary-950 to-zinc-950 relative overflow-hidden px-4">
+      {/* Dynamic Background Elements */}
+      <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
+        <motion.div 
+          animate={{ scale: [1, 1.2, 1], rotate: [0, 90, 0] }}
+          transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+          className="absolute -top-[20%] -left-[10%] w-[50%] h-[50%] rounded-full bg-primary-600/10 blur-[120px]" 
+        />
+        <motion.div 
+          animate={{ scale: [1, 1.5, 1], rotate: [0, -90, 0] }}
+          transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
+          className="absolute top-[60%] -right-[10%] w-[60%] h-[60%] rounded-full bg-purple-600/10 blur-[120px]" 
+        />
+      </div>
+
       <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="w-full max-w-md"
+        initial={{ opacity: 0, y: 30, scale: 0.95 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ duration: 0.6, type: "spring", bounce: 0.4 }}
+        className="w-full max-w-md relative z-10"
       >
-        <Card className="shadow-xl border-t-4 border-t-primary-600">
-          <CardHeader className="space-y-2 text-center pb-8">
+        <Card className="shadow-2xl border border-white/10 bg-zinc-950/50 backdrop-blur-xl overflow-hidden">
+          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary-500 to-purple-500" />
+          <CardHeader className="space-y-2 text-center pb-8 pt-8">
             <div className="flex justify-center mb-4">
-              <div className="h-16 w-16 bg-primary-100 rounded-full flex items-center justify-center">
-                <Store className="h-8 w-8 text-primary-600" />
-              </div>
+              <motion.div 
+                whileHover={{ scale: 1.05, rotate: 5 }}
+                className="h-16 w-16 bg-primary-500/10 rounded-2xl flex items-center justify-center ring-1 ring-primary-500/30 shadow-[0_0_30px_rgba(var(--primary-500),0.15)] backdrop-blur-md"
+              >
+                <Store className="h-8 w-8 text-primary-400" />
+              </motion.div>
             </div>
-            <CardTitle className="text-2xl font-bold tracking-tight">Admin Portal</CardTitle>
-            <CardDescription className="text-base">
-              Sign in to manage your bakery
+            <CardTitle className="text-3xl font-bold tracking-tight text-white font-outfit">Admin Portal</CardTitle>
+            <CardDescription className="text-zinc-400 text-sm font-medium">
+              Secure access to bakery management
             </CardDescription>
           </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-5">
+          <CardContent className="px-8 pb-8">
+            <form onSubmit={handleSubmit} className="space-y-6">
               {error && (
-                <div className="bg-red-50 text-red-600 p-3 rounded-md text-sm font-medium">
+                <motion.div 
+                  initial={{ opacity: 0, height: 0 }} 
+                  animate={{ opacity: 1, height: 'auto' }} 
+                  className="bg-red-500/10 border border-red-500/20 text-red-400 p-3 rounded-xl text-sm font-medium flex items-center gap-2"
+                >
+                  <div className="w-1.5 h-1.5 rounded-full bg-red-400 animate-pulse" />
                   {error}
-                </div>
+                </motion.div>
               )}
-              <div className="space-y-2">
-                <label className="text-sm font-medium leading-none">Username or Email</label>
-                <div className="relative">
-                  <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                  <Input 
-                    className="pl-10" 
-                    placeholder="admin@bakery.com"
-                    name="usernameOrEmail"
-                    value={credentials.usernameOrEmail}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium leading-none">Password</label>
-                <div className="relative">
-                  <KeyRound className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                  <Input 
-                    type="password" 
-                    className="pl-10" 
-                    placeholder="••••••••"
-                    name="password"
-                    value={credentials.password}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
-              </div>
-              <Button type="submit" className="w-full" isLoading={loading}>
+              <Input 
+                label="Username or Email"
+                icon={User}
+                className="bg-zinc-900/50 border-zinc-800 text-white placeholder:text-zinc-600 focus:border-primary-500 rounded-xl" 
+                placeholder="admin@bakery.com"
+                name="usernameOrEmail"
+                value={credentials.usernameOrEmail}
+                onChange={handleChange}
+                required
+              />
+              <Input 
+                label="Password"
+                type="password"
+                icon={KeyRound}
+                className="bg-zinc-900/50 border-zinc-800 text-white placeholder:text-zinc-600 focus:border-primary-500 rounded-xl" 
+                placeholder="••••••••"
+                name="password"
+                value={credentials.password}
+                onChange={handleChange}
+                required
+              />
+              <Button 
+                type="submit" 
+                className="w-full h-12 rounded-xl bg-primary-600 hover:bg-primary-500 text-white font-semibold shadow-lg shadow-primary-900/20 transition-all active:scale-[0.98]" 
+                isLoading={loading}
+              >
                 Sign In
               </Button>
             </form>

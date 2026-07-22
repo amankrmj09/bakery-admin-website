@@ -1,20 +1,32 @@
-import React from 'react';
+import React, { forwardRef } from 'react';
 import { cn } from '../../lib/utils';
 
-export const Input = React.forwardRef(({ className = '', type = 'text', ...props }, ref) => {
+export const Input = forwardRef(({ className, label, error, icon: Icon, wrapperClassName, ...props }, ref) => {
   return (
-    <input
-      type={type}
-      className={cn(
-        "flex h-10 w-full rounded-md border border-[var(--border-color)] bg-transparent dark:bg-white/5 px-3 py-2 text-sm text-[var(--text-main)] ring-offset-background",
-        "file:border-0 file:bg-transparent file:text-sm file:font-medium",
-        "placeholder:text-[var(--text-muted)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] disabled:cursor-not-allowed disabled:opacity-50 transition-shadow",
-        className
+    <div className={cn("flex flex-col gap-1.5 relative group", wrapperClassName)}>
+      {label && (
+        <label className="text-[10px] uppercase font-bold tracking-wider text-[var(--text-muted)] ml-1 group-focus-within:text-[var(--color-primary)] transition-colors">
+          {label}
+        </label>
       )}
-      ref={ref}
-      {...props}
-    />
+      <div className="relative">
+        {Icon && (
+          <Icon size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)] group-focus-within:text-[var(--color-primary)] transition-colors" />
+        )}
+        <input
+          ref={ref}
+          className={cn(
+            "w-full text-sm p-3.5 rounded-xl border bg-transparent dark:bg-white/5 text-[var(--text-main)] outline-none transition-all shadow-sm focus:shadow-md focus:-translate-y-0.5",
+            Icon ? "pl-10" : "px-4",
+            error ? "border-[var(--color-danger)] focus:border-[var(--color-danger)]" : "border-[var(--border-color)] focus:border-[var(--color-primary)]",
+            className
+          )}
+          {...props}
+        />
+      </div>
+      {error && <span className="text-xs text-[var(--color-danger)] ml-1">{error}</span>}
+    </div>
   );
 });
-Input.displayName = 'Input';
 
+Input.displayName = 'Input';
