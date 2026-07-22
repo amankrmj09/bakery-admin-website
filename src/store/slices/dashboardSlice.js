@@ -103,9 +103,9 @@ export const cancelOrder = createAsyncThunk(
 
 export const fetchUsers = createAsyncThunk(
   'dashboard/fetchUsers',
-  async (_, { rejectWithValue }) => {
+  async (params, { rejectWithValue }) => {
     try {
-      const response = await api.get('/api/users/admin/all');
+      const response = await api.get('/api/users/admin/all', { params });
       return response.data;
     } catch (error) {
       return rejectWithValue('Failed to fetch users');
@@ -289,6 +289,7 @@ const initialState = {
     data: [],
     loading: false,
     error: null,
+    totalElements: 0
   },
   categories: {
     data: [],
@@ -349,6 +350,7 @@ const dashboardSlice = createSlice({
       .addCase(fetchUsers.fulfilled, (state, action) => {
         state.users.loading = false;
         state.users.data = action.payload?.content || action.payload || [];
+        state.users.totalElements = action.payload?.page?.totalElements || action.payload?.totalElements || (action.payload?.length) || 0;
       })
       .addCase(fetchUsers.rejected, (state, action) => {
         state.users.loading = false;
