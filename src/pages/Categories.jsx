@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchCategories, createCategory, updateCategory, deleteCategory } from '../store/slices/dashboardSlice';
 import { Card, CardContent } from '../components/ui/Card';
@@ -6,14 +6,15 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '.
 import { Badge } from '../components/ui/Badge';
 import { Button } from '../components/ui/Button';
 import ActionButton from '../components/ui/ActionButton';
-import { Plus, Upload, X, Trash2, Tags, Loader2, Save } from 'lucide-react';
+import { Plus, Trash2, Tags, Loader2, Save } from 'lucide-react';
 import { Modal } from '../components/ui/Modal';
 import { toast } from 'sonner';
 import api from '../api/axiosConfig';
 import { useScrollTop } from '../hooks/useScrollTop';
 import { cn } from '../lib/utils';
-
-const getImageUrl = (url) => url?.startsWith('/') ? `${import.meta.env.VITE_API_BASE_URL?.replace(/\/$/, '')}${url}` : url;
+import { Input } from '../components/ui/Input';
+import { Textarea } from '../components/ui/Textarea';
+import SingleImageUploader from '../components/shared/SingleImageUploader';
 
 export default function Categories() {
   const dispatch = useDispatch();
@@ -32,20 +33,16 @@ export default function Categories() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
-  const [isUploading, setIsUploading] = useState(false);
-  const [pendingFiles, setPendingFiles] = useState([]);
   const [form, setForm] = useState({ name: '', description: '', displayOrder: 0, active: true, mediaUrls: [] });
 
   const handleAddClick = () => {
     setEditingCategory(null);
-    setPendingFiles([]);
     setForm({ name: '', description: '', displayOrder: 0, active: true, mediaUrls: [] });
     setIsModalOpen(true);
   };
 
   const handleEditClick = (category) => {
     setEditingCategory(category);
-    setPendingFiles([]);
     setForm({ 
       name: category.name, 
       description: category.description || '', 
@@ -56,48 +53,11 @@ export default function Categories() {
     setIsModalOpen(true);
   };
 
-  const handleFileUpload = (e) => {
-    const files = Array.from(e.target.files);
-    if (files.length === 0) return;
-    
-    const newPending = files.map(file => ({
-      file,
-      previewUrl: URL.createObjectURL(file)
-    }));
-    
-    setPendingFiles(prev => [...prev, ...newPending]);
-    e.target.value = ''; 
-  };
-
-  const handleRemoveMedia = (url) => {
-    setForm(prev => ({
-      ...prev,
-      mediaUrls: (prev.mediaUrls || []).filter(u => u !== url)
-    }));
-  };
-
-  const handleRemovePendingMedia = (previewUrl) => {
-    setPendingFiles(prev => prev.filter(p => p.previewUrl !== previewUrl));
-    URL.revokeObjectURL(previewUrl);
-  };
-
   const handleSave = async (e) => {
     e.preventDefault();
     setIsSaving(true);
     try {
-      let uploadedUrls = [];
-      if (pendingFiles.length > 0) {
-        setIsUploading(true);
-        const formData = new FormData();
-        pendingFiles.forEach(pf => formData.append('media', pf.file));
-        const response = await api.post('/api/uploads/media', formData, {
-          headers: { 'Content-Type': 'multipart/form-data' }
-        });
-        uploadedUrls = response.data.urls || [];
-        setIsUploading(false);
-      }
-      
-      const payload = { ...form, mediaUrls: [...(form.mediaUrls || []), ...uploadedUrls] };
+      const payload = { ...form };
 
       if (editingCategory) {
         await dispatch(updateCategory({ categoryId: editingCategory.id, data: payload })).unwrap();
@@ -110,7 +70,6 @@ export default function Categories() {
     } catch (error) { 
       console.error('Failed to save category', error); 
       toast.error('Failed to save category');
-      setIsUploading(false);
     } finally { setIsSaving(false); }
   };
 
@@ -223,60 +182,28 @@ export default function Categories() {
 
       <Modal isOpen={isModalOpen} onClose={() => !isSaving && setIsModalOpen(false)} title={editingCategory ? "Edit Category" : "Add Category"}>
         <form onSubmit={handleSave} className="space-y-4 pt-2">
-          <div>
-            <label className="text-xs font-semibold text-[var(--text-muted)] tracking-wide">Name</label>
-            <input type="text" required className="w-full text-sm p-3 rounded-xl border border-[var(--border-color)] bg-transparent dark:bg-white/5 text-[var(--text-main)] outline-none focus:border-[var(--color-primary)] transition-colors mt-1.5" value={form.name} onChange={e => setForm({...form, name: e.target.value})} disabled={isSaving} />
-          </div>
+          <Input 
+            label="Name" 
+            required 
+            value={form.name} 
+            onChange={e => setForm({...form, name: e.target.value})} 
+            disabled={isSaving} 
+          />
+          
+          <Textarea 
+            label="Description" 
+            rows={3} 
+            value={form.description} 
+            onChange={e => setForm({...form, description: e.target.value})} 
+            disabled={isSaving} 
+          />
 
           <div>
-            <label className="text-xs font-semibold text-[var(--text-muted)] tracking-wide mb-2 block">Media / Images</label>
-            <div className="flex flex-col space-y-4">
-              <div className="flex items-center justify-center w-full">
-                <label className={`flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-xl cursor-pointer hover:bg-[var(--color-primary)]/10 transition-colors ${isUploading ? 'opacity-50 cursor-not-allowed' : 'border-[var(--color-primary)]/50 bg-[var(--bg-base)] text-[var(--color-primary)]'}`}>
-                  <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                    <Upload className="w-8 h-8 mb-3" />
-                    <p className="mb-2 text-sm text-muted-foreground">
-                      <span className="font-semibold">Click to upload</span> or drag and drop
-                    </p>
-                    <p className="text-xs text-muted-foreground">PNG, JPG, WEBP (Max multiple)</p>
-                  </div>
-                  <input type="file" className="hidden" multiple accept="image/*" onChange={handleFileUpload} disabled={isUploading || isSaving} />
-                </label>
-              </div>
-              
-              {((form.mediaUrls && form.mediaUrls.length > 0) || pendingFiles.length > 0) && (
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-4">
-                  {form.mediaUrls?.map((url, idx) => (
-                    <div key={`remote-${idx}`} className="relative group aspect-square rounded-lg border border-border overflow-hidden">
-                      <img src={getImageUrl(url)} alt={`Preview ${idx}`} className="w-full h-full object-cover" />
-                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-between p-2">
-                        <button 
-                          type="button" 
-                          onClick={() => handleRemoveMedia(url)}
-                          className="self-end bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors"
-                        >
-                          <X className="w-4 h-4" />
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                  {pendingFiles.map((pf, idx) => (
-                    <div key={`pending-${idx}`} className="relative group aspect-square rounded-lg border border-border overflow-hidden">
-                      <img src={pf.previewUrl} alt={`Pending Preview ${idx}`} className="w-full h-full object-cover" />
-                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-between p-2">
-                        <button 
-                          type="button" 
-                          onClick={() => handleRemovePendingMedia(pf.previewUrl)}
-                          className="self-end bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors"
-                        >
-                          <X className="w-4 h-4" />
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
+            <label className="text-xs font-semibold text-[var(--text-muted)] tracking-wide mb-2 block">Category Image</label>
+            <SingleImageUploader 
+               value={form.mediaUrls?.[0] || ''}
+               onChange={(url) => setForm({...form, mediaUrls: url ? [url] : []})}
+            />
           </div>
 
           <div className="pt-4 flex justify-between items-center border-t border-border mt-6">
