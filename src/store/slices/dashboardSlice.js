@@ -328,7 +328,8 @@ const dashboardSlice = createSlice({
       .addCase(fetchOrders.pending, (state) => { state.orders.loading = true; })
       .addCase(fetchOrders.fulfilled, (state, action) => {
         state.orders.loading = false;
-        state.orders.data = action.payload.content || action.payload || [];
+        state.orders.data = action.payload?.content || action.payload || [];
+        state.orders.totalElements = action.payload?.page?.totalElements || action.payload?.totalElements || (action.payload?.length) || 0;
       })
       .addCase(fetchOrders.rejected, (state, action) => {
         state.orders.loading = false;
@@ -367,7 +368,7 @@ const dashboardSlice = createSlice({
       .addCase(fetchProducts.fulfilled, (state, action) => {
         state.products.loading = false;
         state.products.data = action.payload?.content || action.payload || [];
-        state.products.totalElements = action.payload?.totalElements || (action.payload?.length) || 0;
+        state.products.totalElements = action.payload?.page?.totalElements || action.payload?.totalElements || (action.payload?.length) || 0;
       })
       .addCase(fetchProducts.rejected, (state, action) => {
         state.products.loading = false;
@@ -414,7 +415,7 @@ const dashboardSlice = createSlice({
       .addCase(fetchInventory.fulfilled, (state, action) => {
         state.inventory.loading = false;
         state.inventory.data = action.payload?.content || action.payload || [];
-        state.inventory.totalElements = action.payload?.totalElements || (action.payload?.length) || 0;
+        state.inventory.totalElements = action.payload?.page?.totalElements || action.payload?.totalElements || (action.payload?.length) || 0;
       })
       .addCase(fetchInventory.rejected, (state, action) => {
         state.inventory.loading = false;
