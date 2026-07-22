@@ -39,8 +39,8 @@ export const updateStoreSettings = createAsyncThunk(
   }
 );
 
-export const fetchstorefront = createAsyncThunk(
-  'dashboard/fetchstorefront',
+export const fetchStorefront = createAsyncThunk(
+  'dashboard/fetchStorefront',
   async (_, { rejectWithValue }) => {
     try {
       const response = await api.get('/api/storefront/frontpage');
@@ -51,8 +51,8 @@ export const fetchstorefront = createAsyncThunk(
   }
 );
 
-export const updatestorefront = createAsyncThunk(
-  'dashboard/updatestorefront',
+export const updateStorefront = createAsyncThunk(
+  'dashboard/updateStorefront',
   async (data, { rejectWithValue }) => {
     try {
       const response = await api.put('/api/storefront/frontpage', data);
@@ -446,16 +446,16 @@ const dashboardSlice = createSlice({
         state.settings.data = action.payload;
       })
       // Site Config
-      .addCase(fetchstorefront.pending, (state) => { state.storefront.loading = true; })
-      .addCase(fetchstorefront.fulfilled, (state, action) => {
+      .addCase(fetchStorefront.pending, (state) => { state.storefront.loading = true; })
+      .addCase(fetchStorefront.fulfilled, (state, action) => {
         state.storefront.loading = false;
         state.storefront.data = action.payload;
       })
-      .addCase(fetchstorefront.rejected, (state, action) => {
+      .addCase(fetchStorefront.rejected, (state, action) => {
         state.storefront.loading = false;
         state.storefront.error = action.payload;
       })
-      .addCase(updatestorefront.fulfilled, (state, action) => {
+      .addCase(updateStorefront.fulfilled, (state, action) => {
         state.storefront.data = action.payload;
       });
   },
@@ -463,6 +463,7 @@ const dashboardSlice = createSlice({
 
 export const { setTheme } = dashboardSlice.actions;
 export default dashboardSlice.reducer;
+
 
 
 
