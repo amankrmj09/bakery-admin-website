@@ -15,6 +15,7 @@ import api from '../api/axiosConfig';
 import { useScrollTop } from '../hooks/useScrollTop';
 import { cn } from '../lib/utils';
 import { Input } from '../components/ui/Input';
+import { Select } from '../components/ui/Select';
 
 const getImageUrl = (url) => url?.startsWith('/') ? `${import.meta.env.VITE_API_BASE_URL?.replace(/\/$/, '')}${url}` : url;
 
@@ -384,18 +385,15 @@ export default function Products() {
                 <Input label="Price ($)" type="number" step="0.01" required value={form.price} onChange={e => setForm({...form, price: e.target.value})} disabled={isSaving} />
                 <Input label="Discount Price ($)" type="number" step="0.01" value={form.discountPrice} onChange={e => setForm({...form, discountPrice: e.target.value})} disabled={isSaving} />
                 <Input label="Cost Price ($)" type="number" step="0.01" value={form.costPrice} onChange={e => setForm({...form, costPrice: e.target.value})} disabled={isSaving} />
-                <div>
-                  <label className="block text-sm font-medium text-[var(--text-main)] mb-1">Tax Class</label>
-                  <select
-                    className="w-full bg-[var(--bg-input)] text-[var(--text-main)] border border-[var(--border-color)] rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent transition-all outline-none"
-                    value={form.taxClass}
-                    onChange={e => setForm({...form, taxClass: e.target.value})}
-                    disabled={isSaving}
-                  >
-                    <option value="STANDARD">Standard</option>
-                    <option value="EXEMPT">Exempt</option>
-                  </select>
-                </div>
+                <Select
+                  label="Tax Class"
+                  value={form.taxClass}
+                  onChange={e => setForm({...form, taxClass: e.target.value})}
+                  disabled={isSaving}
+                >
+                  <option value="STANDARD">Standard</option>
+                  <option value="EXEMPT">Exempt</option>
+                </Select>
               </div>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -430,19 +428,16 @@ export default function Products() {
                 <Input label="Minimum Stock (Alert Level)" type="number" value={form.minimumStock} onChange={e => setForm({...form, minimumStock: e.target.value})} disabled={isSaving || editingProduct} />
                 <Input label="Reorder Level (Auto-purchase)" type="number" value={form.reorderLevel} onChange={e => setForm({...form, reorderLevel: e.target.value})} disabled={isSaving || editingProduct} />
               </div>
-              <div>
-                <label className="block text-sm font-medium text-[var(--text-main)] mb-1">Product Status</label>
-                <select
-                  className="w-full bg-[var(--bg-input)] text-[var(--text-main)] border border-[var(--border-color)] rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent transition-all outline-none"
-                  value={form.status}
-                  onChange={e => setForm({...form, status: e.target.value})}
-                  disabled={isSaving}
-                >
-                  <option value="ACTIVE">Active</option>
-                  <option value="INACTIVE">Inactive</option>
-                  <option value="DISCONTINUED">Discontinued</option>
-                </select>
-              </div>
+              <Select
+                label="Product Status"
+                value={form.status}
+                onChange={e => setForm({...form, status: e.target.value})}
+                disabled={isSaving}
+              >
+                <option value="ACTIVE">Active</option>
+                <option value="INACTIVE">Inactive</option>
+                <option value="DISCONTINUED">Discontinued</option>
+              </Select>
             </div>
           )}
 
@@ -450,20 +445,17 @@ export default function Products() {
           {activeTab === 'details' && (
             <div className="space-y-4 animate-in fade-in">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-[var(--text-main)] mb-1">Unit Type</label>
-                  <select
-                    className="w-full bg-[var(--bg-input)] text-[var(--text-main)] border border-[var(--border-color)] rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent transition-all outline-none"
-                    value={form.unit}
-                    onChange={e => setForm({...form, unit: e.target.value})}
-                    disabled={isSaving}
-                  >
-                    <option value="piece">Piece (ea)</option>
-                    <option value="gram">Grams (g)</option>
-                    <option value="slice">Slice</option>
-                    <option value="box">Box</option>
-                  </select>
-                </div>
+                <Select
+                  label="Unit Type"
+                  value={form.unit}
+                  onChange={e => setForm({...form, unit: e.target.value})}
+                  disabled={isSaving}
+                >
+                  <option value="piece">Piece (ea)</option>
+                  <option value="gram">Grams (g)</option>
+                  <option value="slice">Slice</option>
+                  <option value="box">Box</option>
+                </Select>
                 <Input label="Weight (grams)" type="number" value={form.weightGrams} onChange={e => setForm({...form, weightGrams: e.target.value})} disabled={isSaving} />
                 <Input label="Calories (per unit)" type="number" value={form.caloriesPerUnit} onChange={e => setForm({...form, caloriesPerUnit: e.target.value})} disabled={isSaving} />
               </div>

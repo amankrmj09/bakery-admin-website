@@ -10,7 +10,8 @@ import { toast } from 'sonner';
 import api from '../api/axiosConfig';
 import { cn } from '../lib/utils';
 import { useScrollTop } from '../hooks/useScrollTop';
-import { ShoppingCart } from 'lucide-react';
+import { Select } from '../components/ui/Select';
+import { Package, Truck, CheckCircle2, Clock, XCircle, Search, Eye, Download, SearchX, Coffee, ShoppingCart } from 'lucide-react';
 
 export default function Orders() {
   const dispatch = useDispatch();
@@ -325,8 +326,8 @@ export default function Orders() {
             <div className="mt-6 flex justify-between items-center border-t border-border pt-4">
               <div className="flex items-center space-x-3">
                 <label className="text-sm font-medium text-foreground">Update Status:</label>
-                <select 
-                  className="h-9 rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary-500"
+                <Select 
+                  className="w-48"
                   value={selectedOrder.status}
                   onChange={(e) => {
                     handleStatusChange(selectedOrder.id, e.target.value);
@@ -340,7 +341,7 @@ export default function Orders() {
                   <option value="OUT_FOR_DELIVERY">Out for Delivery</option>
                   <option value="DELIVERED">Delivered / Completed</option>
                   <option value="CANCELLED">Cancelled</option>
-                </select>
+                </Select>
               </div>
               {selectedOrder.status !== 'CANCELLED' && (
                 <Button 

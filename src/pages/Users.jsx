@@ -4,6 +4,7 @@ import { fetchUsers, updateUserRole, updateUserStatus } from '../store/slices/da
 import { Card, CardContent } from '../components/ui/Card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/Table';
 import { Badge } from '../components/ui/Badge';
+import { Select } from '../components/ui/Select';
 import { Button } from '../components/ui/Button';
 import { Modal } from '../components/ui/Modal';
 import { toast } from 'sonner';
@@ -172,37 +173,27 @@ export default function Users() {
       >
         {selectedUser && (
           <div className="space-y-4">
-            <div>
-              <label className="text-xs font-semibold text-[var(--text-muted)] tracking-wide">
-                Role
-              </label>
-              <select
-                className="w-full text-sm p-3 rounded-xl border border-[var(--border-color)] bg-[var(--bg-base)] text-[var(--text-main)] outline-none focus:border-[var(--color-primary)] transition-colors mt-1.5"
-                value={editForm.role}
-                onChange={(e) => setEditForm({ ...editForm, role: e.target.value })}
-                disabled={isSaving}
-              >
-                <option value="USER">User</option>
-                <option value="STAFF">Staff</option>
-                <option value="ADMIN">Admin</option>
-              </select>
-            </div>
+            <Select
+              label="Role"
+              value={editForm.role}
+              onChange={(e) => setEditForm({ ...editForm, role: e.target.value })}
+              disabled={isSaving}
+            >
+              <option value="USER">User</option>
+              <option value="STAFF">Staff</option>
+              <option value="ADMIN">Admin</option>
+            </Select>
             
-            <div>
-              <label className="text-xs font-semibold text-[var(--text-muted)] tracking-wide">
-                Status
-              </label>
-              <select
-                className="w-full text-sm p-3 rounded-xl border border-[var(--border-color)] bg-[var(--bg-base)] text-[var(--text-main)] outline-none focus:border-[var(--color-primary)] transition-colors mt-1.5"
-                value={editForm.status}
-                onChange={(e) => setEditForm({ ...editForm, status: e.target.value })}
-                disabled={isSaving}
-              >
-                <option value="ACTIVE">Active</option>
-                <option value="INACTIVE">Inactive</option>
-                <option value="LOCKED">Locked</option>
-              </select>
-            </div>
+            <Select
+              label="Status"
+              value={editForm.status}
+              onChange={(e) => setEditForm({ ...editForm, status: e.target.value })}
+              disabled={isSaving}
+            >
+              <option value="ACTIVE">Active</option>
+              <option value="INACTIVE">Inactive</option>
+              <option value="LOCKED">Locked</option>
+            </Select>
 
             <div className="pt-4 flex justify-end space-x-2 border-t border-border mt-6">
               <Button 
