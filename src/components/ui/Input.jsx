@@ -16,7 +16,7 @@ export const Input = forwardRef(({ className, label, error, icon: Icon, wrapperC
         <input
           ref={ref}
           className={cn(
-            "w-full text-sm p-3.5 rounded-xl border bg-transparent dark:bg-white/5 text-[var(--text-main)] outline-none transition-all shadow-sm focus:shadow-md focus:-translate-y-0.5",
+            "w-full text-sm p-3.5 rounded-xl border bg-white dark:bg-slate-900 text-[var(--text-main)] outline-none transition-all shadow-sm focus:shadow-md focus:-translate-y-0.5",
             Icon ? "pl-10" : "px-4",
             error ? "border-[var(--color-danger)] focus:border-[var(--color-danger)]" : "border-[var(--border-color)] focus:border-[var(--color-primary)]",
             className

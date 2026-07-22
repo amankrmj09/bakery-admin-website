@@ -63,7 +63,7 @@ export const SearchableSelect = ({
         )}
         
         <div className={cn(
-          "w-full text-sm p-3.5 rounded-xl border bg-transparent dark:bg-white/5 text-[var(--text-main)] outline-none transition-all shadow-sm flex items-center justify-between",
+          "w-full text-sm p-3.5 rounded-xl border bg-white dark:bg-slate-900 text-[var(--text-main)] outline-none transition-all shadow-sm flex items-center justify-between",
           Icon ? "pl-10" : "px-4",
           error ? "border-[var(--color-danger)]" : isOpen ? "border-[var(--color-primary)] shadow-md -translate-y-0.5" : "border-[var(--border-color)] hover:border-[var(--border-color)]",
           disabled && "opacity-50 cursor-not-allowed",
