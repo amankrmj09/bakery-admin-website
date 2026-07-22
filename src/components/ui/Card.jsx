@@ -7,7 +7,7 @@ export function Card({ className = '', ...props }) {
   return (
     <div 
       className={cn(
-        "rounded-2xl border border-[var(--border-color)] text-[var(--text-main)] shadow-sm",
+        "rounded-2xl border border-[var(--border-color)] text-[var(--text-main)] shadow-sm overflow-hidden",
         glass ? "glass-panel" : "bg-[var(--bg-panel)]",
         className
       )} 
