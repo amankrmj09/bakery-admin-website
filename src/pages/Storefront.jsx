@@ -113,14 +113,11 @@ export default function Storefront() {
         
         {/* HERO CAROUSEL SECTION */}
         <div className="flex flex-col gap-5">
-          <div className="flex flex-row items-center justify-between border-b border-[var(--border-color)]/50 pb-3 mb-4">
-            <h3 className="font-bold text-sm uppercase tracking-wider text-[var(--text-main)] flex items-center gap-2">
-              <Store className="h-4 w-4 text-primary-500" /> Hero Carousel Campaigns
-            </h3>
-            <Button type="button" variant="outline" size="sm" onClick={() => { if(campaignFields.length < 5) appendCampaign({ largeImageUrl: '', smallImageUrl: '' }) }} disabled={campaignFields.length >= 5} className="rounded-xl h-8">
-              <Plus className="mr-2 h-3 w-3" /> Add Campaign
-            </Button>
-          </div>
+            <div className="flex flex-row items-center justify-between border-b border-[var(--border-color)]/50 pb-3 mb-4">
+              <h3 className="font-bold text-sm uppercase tracking-wider text-[var(--text-main)] flex items-center gap-2">
+                <Store className="h-4 w-4 text-primary-500" /> Hero Carousel Campaigns
+              </h3>
+            </div>
           
           <div className="space-y-4">
             {campaignFields.map((field, index) => (
@@ -130,11 +127,11 @@ export default function Storefront() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     <div>
                       <label className={labelClasses}>Large Image (3:2 ratio)</label>
-                      <Controller name={"heroSection.campaigns.${index}.largeImageUrl"} control={control} render={({ field }) => <SingleImageUploader value={field.value} onChange={field.onChange} />} />
+                      <Controller name={`heroSection.campaigns.${index}.largeImageUrl`} control={control} render={({ field }) => <SingleImageUploader value={field.value} onChange={field.onChange} />} />
                     </div>
                     <div>
                       <label className={labelClasses}>Small Image (1:1 ratio)</label>
-                      <Controller name={"heroSection.campaigns.${index}.smallImageUrl"} control={control} render={({ field }) => <SingleImageUploader value={field.value} onChange={field.onChange} />} />
+                      <Controller name={`heroSection.campaigns.${index}.smallImageUrl`} control={control} render={({ field }) => <SingleImageUploader value={field.value} onChange={field.onChange} />} />
                     </div>
                   </div>
                 </div>
@@ -143,10 +140,20 @@ export default function Storefront() {
                 </Button>
               </div>
             ))}
-            {campaignFields.length < 3 && (
-              <p className="text-sm text-red-500 italic text-center py-4 bg-red-500/10 rounded-2xl border border-dashed border-red-500/30">You must add at least 3 campaigns to enable the carousel rotation.</p>
-            )}
-          </div>
+              {campaignFields.length < 5 && (
+                <button type="button" onClick={() => appendCampaign({ largeImageUrl: '', smallImageUrl: '' })} className="self-start flex items-center gap-2 text-sm font-semibold px-4 py-2 border-2 border-dashed border-primary-500/50 text-primary-500 rounded-xl hover:bg-primary-500/10 transition-colors mt-2">
+                  <Plus size={16} /> Add Campaign
+                </button>
+              )}
+              {campaignFields.length >= 5 && (
+                <p className="text-xs text-primary-500/70 italic flex items-center gap-2 mt-2">
+                  <SettingsIcon size={14} /> Maximum of 5 campaigns reached.
+                </p>
+              )}
+              {campaignFields.length < 3 && (
+                <p className="text-sm text-red-500 italic text-center py-4 bg-red-500/10 rounded-2xl border border-dashed border-red-500/30">You must add at least 3 campaigns to enable the carousel rotation.</p>
+              )}
+            </div>
         </div>
 
         {/* ABOUT SECTION */}
@@ -186,14 +193,11 @@ export default function Storefront() {
 
         {/* HOW WE WORK SECTION */}
         <div className="flex flex-col gap-5 mt-4">
-          <div className="flex flex-row items-center justify-between border-b border-[var(--border-color)]/50 pb-3 mb-4">
-            <h3 className="font-bold text-sm uppercase tracking-wider text-[var(--text-main)] flex items-center gap-2">
-              <Briefcase className="h-4 w-4 text-primary-500" /> How We Work Steps
-            </h3>
-            <Button type="button" variant="outline" size="sm" onClick={() => appendHowWeWork({ title: '', description: '', iconName: '' })} className="rounded-xl h-8">
-              <Plus className="mr-2 h-3 w-3" /> Add Step
-            </Button>
-          </div>
+            <div className="flex flex-row items-center justify-between border-b border-[var(--border-color)]/50 pb-3 mb-4">
+              <h3 className="font-bold text-sm uppercase tracking-wider text-[var(--text-main)] flex items-center gap-2">
+                <Briefcase className="h-4 w-4 text-primary-500" /> How We Work Steps
+              </h3>
+            </div>
           
           <div className="space-y-4">
             {howWeWorkFields.map((field, index) => (
@@ -219,10 +223,13 @@ export default function Storefront() {
                 </Button>
               </div>
             ))}
-            {howWeWorkFields.length === 0 && (
-              <p className="text-sm text-[var(--text-muted)] italic text-center py-4 bg-[var(--bg-panel-hover)] rounded-2xl border border-dashed border-[var(--border-color)]">No steps added yet.</p>
-            )}
-          </div>
+              {howWeWorkFields.length === 0 && (
+                <p className="text-sm text-[var(--text-muted)] italic text-center py-4 bg-[var(--bg-panel-hover)] rounded-2xl border border-dashed border-[var(--border-color)]">No steps added yet.</p>
+              )}
+              <button type="button" onClick={() => appendHowWeWork({ title: '', description: '', iconName: '' })} className="self-start flex items-center gap-2 text-sm font-semibold px-4 py-2 border-2 border-dashed border-primary-500/50 text-primary-500 rounded-xl hover:bg-primary-500/10 transition-colors mt-2">
+                <Plus size={16} /> Add Step
+              </button>
+            </div>
         </div>
 
         {/* SPECIAL OFFER SECTION */}
