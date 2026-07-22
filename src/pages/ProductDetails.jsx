@@ -234,7 +234,7 @@ export default function ProductDetails({ product, categories, onClose }) {
   };
 
   return (
-    <div className="flex flex-col gap-6 animate-in slide-in-from-right-8 fade-in duration-500 w-full">
+    <div className="flex flex-col gap-6 w-full">
       {/* Form Header with same UI as list view */}
       <div className={cn(
         "sticky top-0 z-30 flex justify-between items-center flex-wrap gap-4 transition-all duration-300",

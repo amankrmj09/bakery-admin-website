@@ -11,6 +11,7 @@ import { toast } from 'sonner';
 import { useScrollTop } from '../hooks/useScrollTop';
 import { cn } from '../lib/utils';
 import ProductDetails from './ProductDetails';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export default function Products() {
   const dispatch = useDispatch();
@@ -47,9 +48,17 @@ export default function Products() {
 
   return (
     <div className="flex flex-col min-h-full w-full pb-8">
-      {!showForm ? (
-        <div className="flex flex-col gap-6 animate-in slide-in-from-left-4 fade-in duration-500 w-full">
-          {/* Sticky Header */}
+      <AnimatePresence mode="wait">
+        {!showForm ? (
+          <motion.div 
+            key="list"
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -15 }}
+            transition={{ duration: 0.3, ease: 'easeOut' }}
+            className="flex flex-col gap-6 w-full"
+          >
+            {/* Sticky Header */}
           <div className={cn(
             "sticky top-0 z-30 flex justify-between items-center flex-wrap gap-4 transition-all duration-300",
             isScrolled 
@@ -131,14 +140,24 @@ export default function Products() {
               </div>
             )}
           </Card>
-        </div>
-      ) : (
-        <ProductDetails 
-          product={editingProduct} 
-          categories={categories} 
-          onClose={() => setShowForm(false)} 
-        />
-      )}
+          </motion.div>
+        ) : (
+          <motion.div
+            key="form"
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -15 }}
+            transition={{ duration: 0.3, ease: 'easeOut' }}
+            className="w-full flex flex-col gap-6"
+          >
+            <ProductDetails 
+              product={editingProduct} 
+              categories={categories} 
+              onClose={() => setShowForm(false)} 
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
