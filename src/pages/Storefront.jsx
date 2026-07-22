@@ -132,6 +132,10 @@ export default function Storefront() {
               <div key={field.id} className="flex gap-4 items-start border border-[var(--border-color)]/60 p-5 rounded-2xl bg-[var(--bg-panel-hover)] transition-all">
                 <div className="flex-1 space-y-4">
                   <h4 className="font-bold text-sm text-[var(--text-main)] mb-2">Campaign {index + 1}</h4>
+                  <div className="grid grid-cols-1 gap-4 mb-4">
+                    <Input label="Campaign Title" {...register(`heroSection.campaigns.${index}.title`)} />
+                    <Textarea label="Campaign Description" rows={2} {...register(`heroSection.campaigns.${index}.description`)} />
+                  </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     <div>
                       <Controller name={`heroSection.campaigns.${index}.largeImageUrl`} control={control} render={({ field }) => (
@@ -149,10 +153,6 @@ export default function Storefront() {
                         </div>
                       )} />
                     </div>
-                  </div>
-                  <div className="grid grid-cols-1 gap-4">
-                    <Input label="Campaign Title" {...register(`heroSection.campaigns.${index}.title`)} />
-                    <Textarea label="Campaign Description" rows={2} {...register(`heroSection.campaigns.${index}.description`)} />
                   </div>
                 </div>
                 <Button type="button" variant="ghost" size="sm" onClick={() => removeCampaign(index)} disabled={campaignFields.length <= 3} className="text-destructive mt-6 rounded-xl hover:bg-destructive/10 h-10 w-10 p-0 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed">
@@ -224,16 +224,16 @@ export default function Storefront() {
             {specialOfferImageFields.map((field, index) => (
               <div key={field.id} className="flex gap-4 items-start border border-[var(--border-color)]/60 p-5 rounded-2xl bg-[var(--bg-panel-hover)] transition-all">
                 <div className="flex-1 space-y-4">
+                  <div className="grid grid-cols-1 gap-4 mb-4">
+                    <Input label="Offer Title" {...register(`specialOfferSection.offers.${index}.title`)} />
+                    <Textarea label="Offer Description" rows={2} {...register(`specialOfferSection.offers.${index}.description`)} />
+                  </div>
                   <Controller name={`specialOfferSection.offers.${index}.imageUrl`} control={control} render={({ field: imgField }) => (
                       <div className="space-y-1.5">
                         <label className="text-[10px] uppercase font-bold tracking-wider text-[var(--text-muted)] ml-1">Offer Image (4:1 ratio)</label>
                         <SingleImageUploader value={imgField.value} onChange={imgField.onChange} />
                       </div>
                   )} />
-                  <div className="grid grid-cols-1 gap-4">
-                    <Input label="Offer Title" {...register(`specialOfferSection.offers.${index}.title`)} />
-                    <Textarea label="Offer Description" rows={2} {...register(`specialOfferSection.offers.${index}.description`)} />
-                  </div>
                 </div>
                 <Button type="button" variant="ghost" size="sm" onClick={() => removeSpecialOfferImage(index)} disabled={specialOfferImageFields.length <= 1} className="text-destructive mt-6 rounded-xl hover:bg-destructive/10 h-10 w-10 p-0 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed">
                   <Trash2 className="h-4 w-4" />
