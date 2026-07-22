@@ -43,7 +43,7 @@ export default function Storefront() {
 
   const { fields: specialOfferImageFields, append: appendSpecialOfferImage, remove: removeSpecialOfferImage } = useFieldArray({
     control,
-    name: 'specialOfferSection.images'
+    name: 'specialOfferSection.offers'
   });
 
   useEffect(() => {
@@ -53,10 +53,6 @@ export default function Storefront() {
   useEffect(() => {
     if (storefront.data) {
       const d = JSON.parse(JSON.stringify(storefront.data));
-      // Map images string array to object array for react-hook-form
-      if (d.specialOfferSection && d.specialOfferSection.images) {
-        d.specialOfferSection.images = d.specialOfferSection.images.map(img => ({ url: img }));
-      }
       reset(d);
     }
   }, [storefront.data, reset]);
@@ -64,7 +60,6 @@ export default function Storefront() {
   const onSubmit = async (data) => {
     setIsSaving(true);
     try {
-      // Map images object array back to string array
       const payload = JSON.parse(JSON.stringify(data));
       
       // Preserve howWeWorkSection since it was removed from Admin UI
@@ -72,9 +67,6 @@ export default function Storefront() {
         payload.howWeWorkSection = storefront.data.howWeWorkSection;
       }
 
-      if (payload.specialOfferSection && payload.specialOfferSection.images) {
-        payload.specialOfferSection.images = payload.specialOfferSection.images.map(img => img.url).filter(Boolean);
-      }
       await dispatch(updateStorefront(payload)).unwrap();
       toast.success('Site configuration saved successfully!');
       reset(data);
@@ -158,6 +150,10 @@ export default function Storefront() {
                       )} />
                     </div>
                   </div>
+                  <div className="grid grid-cols-1 gap-4">
+                    <Input label="Campaign Title" {...register(`heroSection.campaigns.${index}.title`)} />
+                    <Textarea label="Campaign Description" rows={2} {...register(`heroSection.campaigns.${index}.description`)} />
+                  </div>
                 </div>
                 <Button type="button" variant="ghost" size="sm" onClick={() => removeCampaign(index)} disabled={campaignFields.length <= 3} className="text-destructive mt-6 rounded-xl hover:bg-destructive/10 h-10 w-10 p-0 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed">
                   <Trash2 className="h-4 w-4" />
@@ -227,13 +223,17 @@ export default function Storefront() {
           <div className="space-y-4">
             {specialOfferImageFields.map((field, index) => (
               <div key={field.id} className="flex gap-4 items-start border border-[var(--border-color)]/60 p-5 rounded-2xl bg-[var(--bg-panel-hover)] transition-all">
-                <div className="flex-1">
-                  <Controller name={`specialOfferSection.images.${index}.url`} control={control} render={({ field: imgField }) => (
+                <div className="flex-1 space-y-4">
+                  <Controller name={`specialOfferSection.offers.${index}.imageUrl`} control={control} render={({ field: imgField }) => (
                       <div className="space-y-1.5">
                         <label className="text-[10px] uppercase font-bold tracking-wider text-[var(--text-muted)] ml-1">Offer Image (4:1 ratio)</label>
                         <SingleImageUploader value={imgField.value} onChange={imgField.onChange} />
                       </div>
                   )} />
+                  <div className="grid grid-cols-1 gap-4">
+                    <Input label="Offer Title" {...register(`specialOfferSection.offers.${index}.title`)} />
+                    <Textarea label="Offer Description" rows={2} {...register(`specialOfferSection.offers.${index}.description`)} />
+                  </div>
                 </div>
                 <Button type="button" variant="ghost" size="sm" onClick={() => removeSpecialOfferImage(index)} disabled={specialOfferImageFields.length <= 1} className="text-destructive mt-6 rounded-xl hover:bg-destructive/10 h-10 w-10 p-0 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed">
                   <Trash2 className="h-4 w-4" />
@@ -241,7 +241,7 @@ export default function Storefront() {
               </div>
             ))}
             {specialOfferImageFields.length < 5 && (
-              <button type="button" onClick={() => appendSpecialOfferImage({ url: '' })} className="self-start flex items-center gap-2 text-sm font-semibold px-4 py-2 border-2 border-dashed border-primary-500/50 text-primary-500 rounded-xl hover:bg-primary-500/10 transition-colors mt-2">
+              <button type="button" onClick={() => appendSpecialOfferImage({ imageUrl: '', title: '', description: '' })} className="self-start flex items-center gap-2 text-sm font-semibold px-4 py-2 border-2 border-dashed border-primary-500/50 text-primary-500 rounded-xl hover:bg-primary-500/10 transition-colors mt-2">
                 <Plus size={16} /> Add Image
               </button>
             )}
