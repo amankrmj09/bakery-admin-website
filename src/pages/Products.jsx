@@ -9,10 +9,12 @@ import ActionButton from '../components/ui/ActionButton';
 import { Plus, Upload, X, Star, Trash2, Package, Loader2, Save } from 'lucide-react';
 import { Modal } from '../components/ui/Modal';
 import { ProductMediaUploader } from '../components/shared/ProductMediaUploader';
+import CategoryDropdown from '../components/shared/CategoryDropdown';
 import { toast } from 'sonner';
 import api from '../api/axiosConfig';
 import { useScrollTop } from '../hooks/useScrollTop';
 import { cn } from '../lib/utils';
+import { Input } from '../components/ui/Input';
 
 const getImageUrl = (url) => url?.startsWith('/') ? `${import.meta.env.VITE_API_BASE_URL?.replace(/\/$/, '')}${url}` : url;
 
@@ -46,6 +48,10 @@ export default function Products() {
     ...pendingScreenshots.map((p, i) => ({ type: 'pending', url: p.previewUrl, index: (form.mediaUrls?.length || 0) + i }))
   ];
   const handleAddClick = () => {
+    if (!categories || categories.length === 0) {
+      toast.error('No categories found. Please add a category first.');
+      return;
+    }
     setEditingProduct(null);
     setPendingScreenshots([]);
     setPendingVideo(null);
@@ -77,7 +83,23 @@ export default function Products() {
 
   const handleScreenshotSelect = (e) => {
     const files = Array.from(e.target.files);
-    const newPending = files.map(file => ({
+    const validFiles = [];
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/jpg'];
+    const MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5MB
+
+    for (const file of files) {
+      if (!allowedTypes.includes(file.type)) {
+        toast.error(`Invalid format for ${file.name}. Only JPG, PNG, and WebP are allowed.`);
+        continue;
+      }
+      if (file.size > MAX_IMAGE_SIZE) {
+        toast.error(`File ${file.name} exceeds 5MB limit. Please use a smaller file.`);
+        continue;
+      }
+      validFiles.push(file);
+    }
+
+    const newPending = validFiles.map(file => ({
       file,
       previewUrl: URL.createObjectURL(file)
     }));
@@ -88,6 +110,17 @@ export default function Products() {
   const handleVideoSelect = (e) => {
     const file = e.target.files[0];
     if (file) {
+      if (file.type !== 'video/mp4') {
+        toast.error(`Invalid format for ${file.name}. Only MP4 videos are allowed.`);
+        e.target.value = '';
+        return;
+      }
+      const MAX_VIDEO_SIZE = 50 * 1024 * 1024; // 50MB
+      if (file.size > MAX_VIDEO_SIZE) {
+        toast.error(`Video ${file.name} exceeds 50MB limit.`);
+        e.target.value = '';
+        return;
+      }
       if (pendingVideo) URL.revokeObjectURL(pendingVideo.previewUrl);
       setPendingVideo({ file, previewUrl: URL.createObjectURL(file) });
       setForm(prev => ({ ...prev, videoUrl: '' }));
@@ -271,18 +304,40 @@ export default function Products() {
         <form onSubmit={handleSave} className="space-y-4 pt-2">
           <div className="flex space-x-4">
             <div className="flex-1">
-              <label className="text-xs font-semibold text-[var(--text-muted)] tracking-wide">SKU</label>
-              <input type="text" required className="w-full text-sm p-3 rounded-xl border border-[var(--border-color)] bg-transparent dark:bg-white/5 text-[var(--text-main)] outline-none focus:border-[var(--color-primary)] transition-colors mt-1.5" value={form.sku} onChange={e => setForm({...form, sku: e.target.value})} disabled={isSaving || editingProduct} />
+              <Input 
+                label="SKU" 
+                required 
+                value={form.sku} 
+                onChange={e => setForm({...form, sku: e.target.value})} 
+                disabled={isSaving || editingProduct} 
+              />
             </div>
             <div className="flex-1">
-              <label className="text-xs font-semibold text-[var(--text-muted)] tracking-wide">Price</label>
-              <input type="number" step="0.01" required className="w-full text-sm p-3 rounded-xl border border-[var(--border-color)] bg-transparent dark:bg-white/5 text-[var(--text-main)] outline-none focus:border-[var(--color-primary)] transition-colors mt-1.5" value={form.price} onChange={e => setForm({...form, price: e.target.value})} disabled={isSaving} />
+              <Input 
+                label="Price" 
+                type="number" 
+                step="0.01" 
+                required 
+                value={form.price} 
+                onChange={e => setForm({...form, price: e.target.value})} 
+                disabled={isSaving} 
+              />
             </div>
           </div>
-          <div>
-            <label className="text-xs font-semibold text-[var(--text-muted)] tracking-wide">Name</label>
-            <input type="text" required className="w-full text-sm p-3 rounded-xl border border-[var(--border-color)] bg-transparent dark:bg-white/5 text-[var(--text-main)] outline-none focus:border-[var(--color-primary)] transition-colors mt-1.5" value={form.name} onChange={e => setForm({...form, name: e.target.value})} disabled={isSaving} />
-          </div>
+          <Input 
+            label="Name" 
+            required 
+            value={form.name} 
+            onChange={e => setForm({...form, name: e.target.value})} 
+            disabled={isSaving} 
+          />
+
+          <CategoryDropdown 
+            categories={categories}
+            value={form.categoryId}
+            onChange={(val) => setForm({...form, categoryId: val})}
+            disabled={isSaving}
+          />
 
           <ProductMediaUploader
             thumbnailIndex={thumbnailIndex}
