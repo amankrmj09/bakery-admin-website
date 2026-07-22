@@ -49,6 +49,8 @@ export default function CategoryDropdown({ categories, value, onChange, disabled
       noOptionsText="No categories found"
       headerNode={headerNode}
       footerNode={footerNode}
+      maxItemsEmpty={3}
+      maxItemsSearch={5}
     />
   );
 }

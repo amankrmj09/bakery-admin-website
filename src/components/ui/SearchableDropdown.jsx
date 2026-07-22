@@ -13,6 +13,8 @@ export default function SearchableDropdown({
   noOptionsText = 'No options found',
   footerNode = null,
   headerNode = null,
+  maxItemsEmpty = null,
+  maxItemsSearch = null,
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -28,9 +30,16 @@ export default function SearchableDropdown({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const filteredOptions = options.filter(opt => 
+  let filteredOptions = options.filter(opt => 
     opt.label.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const isSearching = searchTerm.trim().length > 0;
+  if (isSearching && maxItemsSearch) {
+    filteredOptions = filteredOptions.slice(0, maxItemsSearch);
+  } else if (!isSearching && maxItemsEmpty) {
+    filteredOptions = filteredOptions.slice(0, maxItemsEmpty);
+  }
 
   const selectedOption = options.find(o => o.value === value);
 
