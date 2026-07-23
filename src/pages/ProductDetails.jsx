@@ -26,7 +26,7 @@ const initialFormState = {
   mediaUrls: [], videoUrl: ''
 };
 
-export default function ProductDetails({ product, categories, onClose }) {
+export default function ProductDetails({ product, categories, taxRates, onClose }) {
   const dispatch = useDispatch();
   const isScrolled = useScrollTop();
   const isEditing = !!product;
@@ -183,11 +183,14 @@ export default function ProductDetails({ product, categories, onClose }) {
 
       const parseArray = (str) => str ? str.split(',').map(s => s.trim()).filter(Boolean) : [];
 
+      const selectedTax = taxRates?.find(t => t.taxClass === form.taxClass);
+      
       const payload = { 
         ...form, 
         price: parseFloat(form.price) || 0,
         discountPrice: form.discountPrice ? parseFloat(form.discountPrice) : null,
         costPrice: form.costPrice ? parseFloat(form.costPrice) : null,
+        taxRate: selectedTax ? selectedTax.rate : 0.08, // Default fallback
         weightGrams: form.weightGrams ? parseInt(form.weightGrams) : null,
         caloriesPerUnit: form.caloriesPerUnit ? parseInt(form.caloriesPerUnit) : null,
         preparationTimeMinutes: form.preparationTimeMinutes ? parseInt(form.preparationTimeMinutes) : null,
@@ -303,8 +306,18 @@ export default function ProductDetails({ product, categories, onClose }) {
                   onChange={e => setForm({...form, taxClass: e.target.value})}
                   disabled={isSaving}
                 >
-                  <option value="STANDARD">Standard</option>
-                  <option value="EXEMPT">Exempt</option>
+                  <option value="">Select Tax Class</option>
+                  {taxRates?.map(tax => (
+                    <option key={tax.id} value={tax.taxClass}>
+                      {tax.taxClass} ({(tax.rate * 100).toFixed(2)}%)
+                    </option>
+                  ))}
+                  {(!taxRates || taxRates.length === 0) && (
+                    <>
+                      <option value="STANDARD">Standard (8%)</option>
+                      <option value="EXEMPT">Exempt (0%)</option>
+                    </>
+                  )}
                 </Select>
               </div>
               

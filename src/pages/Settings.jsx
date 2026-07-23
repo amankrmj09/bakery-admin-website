@@ -6,6 +6,7 @@ import { useTheme } from '../app/ThemeContext';
 import { toast } from 'sonner';
 import { cn } from '../lib/utils';
 import { useScrollTop } from '../hooks/useScrollTop';
+import TaxSettings from '../components/settings/TaxSettings';
 
 export default function Settings() {
   const dispatch = useDispatch();
@@ -138,6 +139,8 @@ export default function Settings() {
           </CardContent>
         </Card>
       </div>
+
+      <TaxSettings />
     </div>
   );
 }

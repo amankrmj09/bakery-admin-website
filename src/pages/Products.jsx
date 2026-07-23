@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchProducts, fetchCategories } from '../store/slices/dashboardSlice';
+import { fetchTaxRates } from '../store/slices/taxSlice';
 import { Card, CardContent } from '../components/ui/Card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/Table';
 import { Badge } from '../components/ui/Badge';
@@ -17,6 +18,7 @@ export default function Products() {
   const dispatch = useDispatch();
   const { data: products, totalElements, loading } = useSelector((state) => state.dashboard.products);
   const { data: categories } = useSelector((state) => state.dashboard.categories);
+  const { taxRates } = useSelector((state) => state.tax);
   const isScrolled = useScrollTop();
   const [page, setPage] = useState(0);
   const ITEMS_PER_PAGE = 10;
@@ -24,6 +26,7 @@ export default function Products() {
   useEffect(() => {
     dispatch(fetchProducts({ page, size: ITEMS_PER_PAGE }));
     dispatch(fetchCategories());
+    dispatch(fetchTaxRates());
   }, [dispatch, page]);
   
   const totalPages = Math.ceil((totalElements || products?.length || 0) / ITEMS_PER_PAGE);
@@ -153,6 +156,7 @@ export default function Products() {
             <ProductDetails 
               product={editingProduct} 
               categories={categories} 
+              taxRates={taxRates}
               onClose={() => setShowForm(false)} 
             />
           </motion.div>
