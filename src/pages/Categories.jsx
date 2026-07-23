@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchCategories, createCategory, updateCategory, deleteCategory } from '../store/slices/dashboardSlice';
 import { Card, CardContent } from '../components/ui/Card';
@@ -37,7 +37,7 @@ export default function Categories() {
   const [isSaving, setIsSaving] = useState(false);
   const [form, setForm] = useState({ name: '', description: '', parentId: '', displayOrder: 0, active: true, mediaUrls: [] });
 
-  const categoryOptions = React.useMemo(() => [
+  const categoryOptions = useMemo(() => [
     { value: '', label: 'None (Top Level Category)' },
     ...(categories || []).filter(c => c.id !== editingCategory?.id).map(c => ({ value: c.id, label: c.name }))
   ], [categories, editingCategory]);

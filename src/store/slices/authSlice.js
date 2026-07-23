@@ -5,7 +5,7 @@ export const loginAdmin = createAsyncThunk(
   'auth/login',
   async (credentials, { rejectWithValue }) => {
     try {
-      const response = await api.post('/api/auth/login', credentials);
+      const response = await api.post('/api/auth/admin/login', credentials);
       // Ensure the user is an admin
       if (response.data.user.role !== 'ADMIN') {
         return rejectWithValue('Unauthorized: Admin access required');
