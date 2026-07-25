@@ -35,7 +35,7 @@ export default function Categories() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
-  const [form, setForm] = useState({ name: '', description: '', parentId: '', displayOrder: 0, active: true, mediaUrls: [] });
+  const [form, setForm] = useState({ name: '', description: '', parentId: '', displayOrder: 0, active: true, isTopCategory: false, mediaUrls: [] });
 
   const categoryOptions = useMemo(() => [
     { value: '', label: 'None (Top Level Category)' },
@@ -44,7 +44,7 @@ export default function Categories() {
 
   const handleAddClick = () => {
     setEditingCategory(null);
-    setForm({ name: '', description: '', parentId: '', displayOrder: 0, active: true, mediaUrls: [] });
+    setForm({ name: '', description: '', parentId: '', displayOrder: 0, active: true, isTopCategory: false, mediaUrls: [] });
     setIsModalOpen(true);
   };
 
@@ -56,6 +56,7 @@ export default function Categories() {
       parentId: category.parentId || '',
       displayOrder: category.displayOrder || 0, 
       active: category.active !== false,
+      isTopCategory: category.isTopCategory || false,
       mediaUrls: category.mediaUrls || []
     });
     setIsModalOpen(true);
@@ -137,6 +138,7 @@ export default function Categories() {
                 <TableHead>Name</TableHead>
                 <TableHead>Products</TableHead>
                 <TableHead>Status</TableHead>
+                <TableHead>Top Category</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -150,13 +152,14 @@ export default function Categories() {
                     <TableCell className="font-medium">{c.name}</TableCell>
                     <TableCell>{c.productCount || 0}</TableCell>
                     <TableCell><Badge variant={c.active ? 'success' : 'secondary'}>{c.active ? 'Active' : 'Inactive'}</Badge></TableCell>
+                    <TableCell><Badge variant={c.isTopCategory ? 'success' : 'secondary'}>{c.isTopCategory ? 'Yes' : 'No'}</Badge></TableCell>
                     <TableCell className="text-right space-x-2">
                       <Button variant="outline" size="sm" onClick={() => handleToggleStatus(c.id)}>Toggle</Button>
                       <Button variant="ghost" size="sm" onClick={() => handleEditClick(c)}>Edit</Button>
                     </TableCell>
                   </TableRow>
                 ))
-              ) : <TableRow><TableCell colSpan={5} className="h-24 text-center text-muted-foreground">No categories found.</TableCell></TableRow>}
+              ) : <TableRow><TableCell colSpan={6} className="h-24 text-center text-muted-foreground">No categories found.</TableCell></TableRow>}
             </TableBody>
           </Table>
         </CardContent>
@@ -214,6 +217,20 @@ export default function Categories() {
             onChange={e => setForm({...form, description: e.target.value})} 
             disabled={isSaving} 
           />
+          
+          <div className="flex items-center space-x-2">
+            <input 
+              type="checkbox" 
+              id="isTopCategory" 
+              checked={form.isTopCategory} 
+              onChange={e => setForm({...form, isTopCategory: e.target.checked})} 
+              disabled={isSaving}
+              className="w-4 h-4 text-[var(--color-primary)] border-[var(--border-color)] rounded focus:ring-[var(--color-primary)] bg-[var(--bg-panel)]"
+            />
+            <label htmlFor="isTopCategory" className="text-sm font-medium text-[var(--text-main)]">
+              Show as Top Category
+            </label>
+          </div>
 
           <div>
             <label className="text-xs font-semibold text-[var(--text-muted)] tracking-wide mb-2 block">Category Image</label>

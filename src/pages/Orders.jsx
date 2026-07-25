@@ -31,6 +31,7 @@ export default function Orders() {
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState('Loading...');
+  const [paymentId, setPaymentId] = useState(null);
 
   const handleStatusChange = async (orderId, newStatus) => {
     try {
@@ -58,9 +59,11 @@ export default function Orders() {
     setSelectedOrder(order);
     setIsViewModalOpen(true);
     setPaymentStatus('Loading...');
+    setPaymentId(null);
     try {
       const response = await api.get(`/api/payments/order/${order.id}`);
       setPaymentStatus(response.data.status);
+      setPaymentId(response.data.id);
     } catch (error) {
       if (error.response && error.response.status === 404) {
         setPaymentStatus('Not Paid');
@@ -70,9 +73,20 @@ export default function Orders() {
     }
   };
 
+  const handlePaymentStatusChange = async (newStatus) => {
+    if (!paymentId) return;
+    try {
+      await api.patch(`/api/payments/${paymentId}/status`, { status: newStatus });
+      setPaymentStatus(newStatus);
+      toast.success(`Payment status updated to ${newStatus}`);
+    } catch (error) {
+      console.error("Failed to update payment status:", error);
+      toast.error("Failed to update payment status.");
+    }
+  };
+
   const getStatusBadge = (status) => {
     switch (status) {
-      case 'COMPLETED':
       case 'DELIVERED':
         return 'success';
       case 'PENDING':
@@ -80,7 +94,9 @@ export default function Orders() {
       case 'CANCELLED':
         return 'destructive';
       case 'CONFIRMED':
-      case 'IN_PROGRESS':
+      case 'PREPARING':
+      case 'READY':
+      case 'OUT_FOR_DELIVERY':
         return 'default';
       default:
         return 'secondary';
@@ -323,37 +339,57 @@ export default function Orders() {
             )}
 
             {/* Admin Actions */}
-            <div className="mt-6 flex justify-between items-center border-t border-border pt-4">
-              <div className="flex items-center space-x-3">
-                <label className="text-sm font-medium text-foreground">Update Status:</label>
-                <Select 
-                  className="w-48"
-                  value={selectedOrder.status}
-                  onChange={(e) => {
-                    handleStatusChange(selectedOrder.id, e.target.value);
-                    setSelectedOrder({...selectedOrder, status: e.target.value});
-                  }}
-                >
-                  <option value="PENDING">Pending</option>
-                  <option value="CONFIRMED">Confirmed</option>
-                  <option value="PREPARING">Preparing</option>
-                  <option value="READY">Ready</option>
-                  <option value="OUT_FOR_DELIVERY">Out for Delivery</option>
-                  <option value="DELIVERED">Delivered / Completed</option>
-                  <option value="CANCELLED">Cancelled</option>
-                </Select>
+            <div className="mt-6 flex flex-col gap-4 border-t border-border pt-4">
+              <div className="flex justify-between items-center">
+                <div className="flex items-center space-x-3">
+                  <label className="text-sm font-medium text-foreground w-32">Update Status:</label>
+                  <Select 
+                    className="w-48"
+                    value={selectedOrder.status}
+                    onChange={(e) => {
+                      handleStatusChange(selectedOrder.id, e.target.value);
+                      setSelectedOrder({...selectedOrder, status: e.target.value});
+                    }}
+                  >
+                    <option value="PENDING">Pending</option>
+                    <option value="CONFIRMED">Confirmed</option>
+                    <option value="PREPARING">Preparing</option>
+                    <option value="READY">Ready</option>
+                    <option value="OUT_FOR_DELIVERY">Out for Delivery</option>
+                    <option value="DELIVERED">Delivered / Completed</option>
+                    <option value="CANCELLED">Cancelled</option>
+                  </Select>
+                </div>
+                {selectedOrder.status !== 'CANCELLED' && (
+                  <Button 
+                    variant="destructive" 
+                    size="sm"
+                    onClick={() => {
+                      handleDecline(selectedOrder.id);
+                      setIsViewModalOpen(false);
+                    }}
+                  >
+                    Cancel Order
+                  </Button>
+                )}
               </div>
-              {selectedOrder.status !== 'CANCELLED' && (
-                <Button 
-                  variant="destructive" 
-                  size="sm"
-                  onClick={() => {
-                    handleDecline(selectedOrder.id);
-                    setIsViewModalOpen(false);
-                  }}
-                >
-                  Cancel Order
-                </Button>
+              
+              {paymentId && (
+                <div className="flex items-center space-x-3">
+                  <label className="text-sm font-medium text-foreground w-32">Update Payment:</label>
+                  <Select 
+                    className="w-48"
+                    value={paymentStatus}
+                    onChange={(e) => handlePaymentStatusChange(e.target.value)}
+                  >
+                    <option value="PENDING">Pending</option>
+                    <option value="PROCESSING">Processing</option>
+                    <option value="COMPLETED">Completed</option>
+                    <option value="FAILED">Failed</option>
+                    <option value="CANCELLED">Cancelled</option>
+                    <option value="REFUNDED">Refunded</option>
+                  </Select>
+                </div>
               )}
             </div>
           </div>
