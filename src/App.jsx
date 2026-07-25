@@ -16,6 +16,8 @@ const Categories = React.lazy(() => import('./pages/Categories'));
 const Inventory = React.lazy(() => import('./pages/Inventory'));
 const Orders = React.lazy(() => import('./pages/Orders'));
 const Users = React.lazy(() => import('./pages/Users'));
+const Reviews = React.lazy(() => import('./pages/Reviews'));
+const EngagementsPage = React.lazy(() => import('./pages/EngagementsPage'));
 const Settings = React.lazy(() => import('./pages/Settings'));
 
 const PageLoader = () => (
@@ -52,6 +54,8 @@ function App() {
               <Route path="inventory" element={<Inventory />} />
               <Route path="storefront" element={<Storefront />} />
               <Route path="users" element={<Users />} />
+              <Route path="reviews" element={<Reviews />} />
+              <Route path="engagements" element={<EngagementsPage />} />
               <Route path="settings" element={<Settings />} />
             </Route>
             <Route path="*" element={<Navigate to="/" replace />} />

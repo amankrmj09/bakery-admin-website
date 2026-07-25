@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, ShoppingCart, Users, LogOut, Store, LayoutTemplate, Settings, X, Package, Tags, Archive } from 'lucide-react';
+import { LayoutDashboard, ShoppingCart, Users, LogOut, Store, LayoutTemplate, Settings, X, Package, Tags, Archive, MessageSquare, Star } from 'lucide-react';
 import { useDispatch } from 'react-redux';
 import { logout } from '../../store/slices/authSlice';
 import { cn } from '../../lib/utils';
@@ -14,6 +14,8 @@ const navItems = [
   { name: 'Inventory', path: '/inventory', icon: Archive },
   { name: 'Storefront', path: '/storefront', icon: Store },
   { name: 'Users', path: '/users', icon: Users },
+  { name: 'Reviews', path: '/reviews', icon: MessageSquare },
+  { name: 'Engagements', path: '/engagements', icon: Star },
 ];
 
 export const Sidebar = ({ isOpen, setIsOpen }) => {

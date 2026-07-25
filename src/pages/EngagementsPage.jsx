@@ -1,0 +1,251 @@
+import React, { useEffect, useState } from 'react';
+import { engagementsApi } from '../api/engagementsApi';
+import { toast } from 'sonner';
+import { MessageSquare, Star, Search, CheckCircle2, ShieldAlert, Users, Mail, MessageCircle, Loader2 } from 'lucide-react';
+
+export default function EngagementsPage() {
+  const [activeTab, setActiveTab] = useState('testimonials');
+  const [testimonials, setTestimonials] = useState([]);
+  const [feedbacks, setFeedbacks] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searching, setSearching] = useState(false);
+
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      if (activeTab === 'testimonials') {
+        const res = await engagementsApi.getTestimonials();
+        setTestimonials(res.data || []);
+      } else {
+        const res = await engagementsApi.getFeedbacks();
+        setFeedbacks(res.data || []);
+      }
+    } catch (error) {
+      toast.error('Failed to load engagement data');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, [activeTab]);
+
+  const handleSearch = async (e) => {
+    e?.preventDefault();
+    setSearching(true);
+    try {
+      if (activeTab === 'testimonials') {
+        const res = await engagementsApi.searchTestimonials(searchQuery);
+        setTestimonials(res.data || []);
+      } else {
+        const res = await engagementsApi.searchFeedbacks(searchQuery);
+        setFeedbacks(res.data || []);
+      }
+    } catch (error) {
+      toast.error('Search failed');
+    } finally {
+      setSearching(false);
+    }
+  };
+
+  const handleToggleFeature = async (id, currentFeatured) => {
+    const newFeatured = !currentFeatured;
+    try {
+      await engagementsApi.toggleFeatured(id, newFeatured);
+      toast.success(newFeatured ? 'Testimonial featured!' : 'Testimonial unfeatured');
+      setTestimonials(testimonials.map(t => t.id === id ? { ...t, isFeatured: newFeatured } : t));
+    } catch (error) {
+      const msg = error.response?.data?.error || 'Failed to update featured status';
+      toast.error(msg);
+    }
+  };
+
+  const featuredCount = testimonials.filter(t => t.isFeatured).length;
+
+  const getInitials = (name) => {
+    if (!name) return 'U';
+    const parts = name.trim().split(' ');
+    if (parts.length >= 2) {
+      return (parts[0][0] + parts[1][0]).toUpperCase();
+    }
+    return name.substring(0, 2).toUpperCase();
+  };
+
+  const filteredFeedbacks = activeTab === 'feedbacks' 
+    ? feedbacks.filter(f => f.type !== 'CONTACT_US') 
+    : feedbacks.filter(f => f.type === 'CONTACT_US' || f.type === 'GENERAL');
+
+  return (
+    <div className="p-8 max-w-7xl mx-auto">
+      {/* Header */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+        <div className="flex items-center gap-3">
+          <div className="p-3 bg-primary-100 text-primary-600 rounded-xl">
+            <Users className="w-6 h-6" />
+          </div>
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">Customer Engagements</h1>
+            <p className="text-gray-500 text-sm mt-1">Manage testimonials, community feedback, and contact inquiries</p>
+          </div>
+        </div>
+
+        {activeTab === 'testimonials' && (
+          <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-xl border border-gray-200 shadow-sm">
+            <span className="text-sm font-semibold text-gray-700">Featured on Storefront:</span>
+            <span className={`text-sm font-bold px-2 py-0.5 rounded-full ${featuredCount >= 5 ? 'bg-amber-100 text-amber-700' : 'bg-primary-50 text-primary-600'}`}>
+              {featuredCount} / 5
+            </span>
+          </div>
+        )}
+      </div>
+
+      {/* Tabs & Search Bar */}
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 mb-6 bg-white p-4 rounded-2xl border border-gray-100 shadow-sm">
+        <div className="flex bg-gray-100 p-1 rounded-xl">
+          <button
+            onClick={() => { setActiveTab('testimonials'); setSearchQuery(''); }}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all ${activeTab === 'testimonials' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900'}`}
+          >
+            <Star className="w-4 h-4 text-amber-500" /> Testimonials
+          </button>
+          <button
+            onClick={() => { setActiveTab('feedbacks'); setSearchQuery(''); }}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all ${activeTab === 'feedbacks' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900'}`}
+          >
+            <MessageCircle className="w-4 h-4 text-blue-500" /> Feedback
+          </button>
+          <button
+            onClick={() => { setActiveTab('contact'); setSearchQuery(''); }}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all ${activeTab === 'contact' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900'}`}
+          >
+            <Mail className="w-4 h-4 text-emerald-500" /> Contact Us
+          </button>
+        </div>
+
+        <form onSubmit={handleSearch} className="flex items-center gap-2 flex-1 max-w-md">
+          <div className="relative flex-1">
+            <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+            <input
+              type="text"
+              placeholder="Search by username via Elasticsearch..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-9 pr-4 py-2 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all"
+            />
+          </div>
+          <button
+            type="submit"
+            disabled={searching}
+            className="px-4 py-2 bg-gray-900 hover:bg-gray-800 text-white rounded-xl text-sm font-semibold transition-colors flex items-center gap-2"
+          >
+            {searching ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Search'}
+          </button>
+          {searchQuery && (
+            <button
+              type="button"
+              onClick={() => { setSearchQuery(''); fetchData(); }}
+              className="text-xs text-gray-500 hover:text-gray-700 underline"
+            >
+              Clear
+            </button>
+          )}
+        </form>
+      </div>
+
+      {/* Content Area */}
+      {loading ? (
+        <div className="flex flex-col items-center justify-center py-16 bg-white rounded-2xl border border-gray-100 shadow-sm">
+          <Loader2 className="w-8 h-8 text-primary-500 animate-spin mb-3" />
+          <p className="text-gray-500 text-sm font-medium">Loading engagement records...</p>
+        </div>
+      ) : activeTab === 'testimonials' ? (
+        testimonials.length === 0 ? (
+          <div className="text-center py-16 bg-white rounded-2xl border border-gray-100 shadow-sm">
+            <Star className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+            <h3 className="text-lg font-medium text-gray-900">No testimonials found</h3>
+            <p className="text-gray-500 text-sm mt-1">When users submit testimonials, they will appear here for curation.</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {testimonials.map((item) => (
+              <div
+                key={item.id}
+                className={`bg-white rounded-2xl border p-5 shadow-sm transition-all flex flex-col justify-between gap-4 ${item.isFeatured ? 'border-amber-400 ring-2 ring-amber-400/20 bg-amber-50/20' : 'border-gray-200 hover:border-gray-300'}`}
+              >
+                <div>
+                  <div className="flex items-start justify-between gap-3 mb-3">
+                    <div className="flex items-center gap-3">
+                      {item.profileImageUrl ? (
+                        <img src={item.profileImageUrl} alt={item.name} className="w-10 h-10 rounded-full object-cover border border-gray-200" />
+                      ) : (
+                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary-500 to-indigo-600 text-white font-bold flex items-center justify-center text-sm shadow-sm">
+                          {getInitials(item.name)}
+                        </div>
+                      )}
+                      <div>
+                        <h4 className="font-bold text-gray-900 text-sm">{item.name || 'Anonymous User'}</h4>
+                        <span className="text-xs text-gray-400">ID: {item.uid || item.id}</span>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-1 bg-amber-50 text-amber-700 px-2.5 py-1 rounded-lg text-xs font-bold border border-amber-200/60">
+                      <Star className="w-3.5 h-3.5 fill-amber-500 text-amber-500" />
+                      {item.rating || 5} / 5
+                    </div>
+                  </div>
+                  <p className="text-gray-700 text-sm italic line-clamp-3">"{item.message}"</p>
+                </div>
+
+                <div className="flex items-center justify-between pt-3 border-t border-gray-100">
+                  <span className="text-xs text-gray-400 font-medium">
+                    Status: <span className="text-emerald-600 font-semibold">{item.status || 'APPROVED'}</span>
+                  </span>
+
+                  <label className="flex items-center gap-2 cursor-pointer group">
+                    <input
+                      type="checkbox"
+                      checked={!!item.isFeatured}
+                      onChange={() => handleToggleFeature(item.id, item.isFeatured)}
+                      className="w-4 h-4 text-amber-500 rounded border-gray-300 focus:ring-amber-500 cursor-pointer"
+                    />
+                    <span className="text-sm font-semibold text-gray-700 group-hover:text-gray-900 transition-colors">
+                      Feature on Storefront
+                    </span>
+                  </label>
+                </div>
+              </div>
+            ))}
+          </div>
+        )
+      ) : (
+        filteredFeedbacks.length === 0 ? (
+          <div className="text-center py-16 bg-white rounded-2xl border border-gray-100 shadow-sm">
+            <MessageCircle className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+            <h3 className="text-lg font-medium text-gray-900">No messages found</h3>
+            <p className="text-gray-500 text-sm mt-1">Customer inquiries and feedback will appear here.</p>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {filteredFeedbacks.map((item) => (
+              <div key={item.id} className="bg-white rounded-2xl border border-gray-200 p-5 shadow-sm flex flex-col sm:flex-row justify-between gap-4">
+                <div className="flex-1">
+                  <div className="flex items-center gap-3 mb-2">
+                    <span className="font-bold text-gray-900 text-sm">{item.name || 'Anonymous'}</span>
+                    {item.email && <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-md font-mono">{item.email}</span>}
+                    <span className="text-xs bg-blue-50 text-blue-700 px-2 py-0.5 rounded font-semibold uppercase">{item.type || 'GENERAL'}</span>
+                  </div>
+                  <p className="text-gray-700 text-sm">{item.message}</p>
+                </div>
+                <div className="flex sm:flex-col justify-between sm:items-end text-xs text-gray-400 font-medium">
+                  <span>Status: <strong className="text-gray-700">{item.status || 'NEW'}</strong></span>
+                  <span>{item.createdAt ? new Date(item.createdAt).toLocaleDateString() : 'Recent'}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        )
+      )}
+    </div>
+  );
+}

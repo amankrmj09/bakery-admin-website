@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Outlet, useLocation } from 'react-router-dom';
+import { useOutlet, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Sidebar } from './Sidebar';
 import { Menu } from 'lucide-react';
@@ -9,6 +9,7 @@ export const IslandLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { user } = useSelector((state) => state.auth);
   const location = useLocation();
+  const outlet = useOutlet();
 
   return (
     <div className="flex h-screen w-screen overflow-hidden bg-transparent text-[var(--text-main)] transition-colors duration-300 font-['Outfit']">
@@ -35,7 +36,7 @@ export const IslandLayout = () => {
                 transition={{ duration: 0.3, ease: 'easeOut' }}
                 className="w-full min-h-full flex flex-col gap-6"
               >
-                <Outlet />
+                {outlet}
               </motion.div>
             </AnimatePresence>
           </div>

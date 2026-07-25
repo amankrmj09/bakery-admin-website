@@ -6,7 +6,7 @@ import { Button } from '../components/ui/Button';
 import ActionButton from '../components/ui/ActionButton';
 import SingleImageUploader from '../components/shared/SingleImageUploader';
 import { toast } from 'sonner';
-import { Loader2, Plus, Trash2, SettingsIcon, Save, LayoutTemplate, Store, Info, Briefcase, Tag, MessageSquare } from 'lucide-react';
+import { Loader2, Plus, Trash2, SettingsIcon, Save, LayoutTemplate, Store, Info, Briefcase, Tag } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { useScrollTop } from '../hooks/useScrollTop';
 import { Input } from '../components/ui/Input';
@@ -31,8 +31,7 @@ export default function Storefront() {
       aboutSection: {},
       heroSection: { campaigns: [{}, {}, {}] },
       
-      specialOfferSection: {},
-      testimonialSection: {}
+      specialOfferSection: {}
     }
   });
 
@@ -250,26 +249,6 @@ export default function Storefront() {
                 <SettingsIcon size={14} /> Maximum of 5 images reached.
               </p>
             )}
-          </div>
-        </div>
-
-        {/* TESTIMONIAL SECTION */}
-        <div className="flex flex-col gap-5 mt-4">
-          <h3 className={sectionHeaderClasses}>
-            <MessageSquare className="h-4 w-4 text-primary-500" /> Testimonial Section
-          </h3>
-          <Textarea label="Quote" rows={2} {...register('testimonialSection.quote')} />
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-            <Input label="Author Name" {...register('testimonialSection.author')} />
-            <Input label="Rating (1-5)" type="number" min="1" max="5" {...register('testimonialSection.rating', { valueAsNumber: true })} />
-            <div>
-              <Controller name='testimonialSection.authorImageUrl' control={control} render={({ field }) => (
-                <div className="space-y-1.5">
-                  <label className="text-[10px] uppercase font-bold tracking-wider text-[var(--text-muted)] ml-1">Author Image URL</label>
-                  <SingleImageUploader value={field.value} onChange={field.onChange} />
-                </div>
-              )} />
-            </div>
           </div>
         </div>
       </form>
