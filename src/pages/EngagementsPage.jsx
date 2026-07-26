@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { engagementsApi } from '../api/engagementsApi';
 import { toast } from 'sonner';
-import { MessageSquare, Star, Search, CheckCircle2, ShieldAlert, Users, Mail, MessageCircle, Loader2 } from 'lucide-react';
+import { MessageSquare, Star, Search, CheckCircle2, ShieldAlert, Users, Mail, MessageCircle, Loader2, MapPin, Save } from 'lucide-react';
 import SleekSearchDropdown from '../components/ui/SleekSearchDropdown';
 import Pagination from '../components/shared/Pagination';
 
@@ -20,6 +20,9 @@ export default function EngagementsPage() {
   const [pageSize, setPageSize] = useState(10);
   const [totalElements, setTotalElements] = useState(0);
 
+  const [contactInfo, setContactInfo] = useState({ address: '', phoneNumbers: ['', ''], emails: ['', ''] });
+  const [contactInfoSaving, setContactInfoSaving] = useState(false);
+
   const fetchData = async () => {
     setLoading(true);
     try {
@@ -27,6 +30,13 @@ export default function EngagementsPage() {
         const res = await engagementsApi.getTestimonials(page, pageSize);
         setTestimonials(res.data?.content || res.data || []);
         setTotalElements(res.data?.page?.totalElements || res.data?.totalElements || res.data?.length || 0);
+      } else if (activeTab === 'contact-info') {
+        const res = await engagementsApi.getContactDetails();
+        setContactInfo({
+          address: res.data.address || '',
+          phoneNumbers: [res.data.phoneNumbers?.[0] || '', res.data.phoneNumbers?.[1] || ''],
+          emails: [res.data.emails?.[0] || '', res.data.emails?.[1] || '']
+        });
       } else {
         const res = await engagementsApi.getFeedbacks(page, pageSize);
         setFeedbacks(res.data?.content || res.data || []);
@@ -116,6 +126,24 @@ export default function EngagementsPage() {
     }
   };
 
+  const handleSaveContactInfo = async (e) => {
+    e.preventDefault();
+    setContactInfoSaving(true);
+    try {
+      const payload = {
+        address: contactInfo.address,
+        phoneNumbers: contactInfo.phoneNumbers.filter(p => p.trim() !== ''),
+        emails: contactInfo.emails.filter(em => em.trim() !== '')
+      };
+      await engagementsApi.updateContactDetails(payload);
+      toast.success('Contact info updated successfully');
+    } catch (error) {
+      toast.error('Failed to update contact info');
+    } finally {
+      setContactInfoSaving(false);
+    }
+  };
+
   const featuredCount = testimonials.filter(t => t.isFeatured).length;
 
   const getInitials = (name) => {
@@ -175,6 +203,12 @@ export default function EngagementsPage() {
             className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all ${activeTab === 'contact' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900'}`}
           >
             <Mail className="w-4 h-4 text-emerald-500" /> Contact Us
+          </button>
+          <button
+            onClick={() => { setActiveTab('contact-info'); setSearchQuery(''); }}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all ${activeTab === 'contact-info' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900'}`}
+          >
+            <MapPin className="w-4 h-4 text-purple-500" /> Contact Info
           </button>
         </div>
 
@@ -293,7 +327,7 @@ export default function EngagementsPage() {
             loading={loading}
           />
         </div>
-      ) : (
+      ) : activeTab === 'feedbacks' || activeTab === 'contact' ? (
         <div className="bg-white rounded-2xl border border-gray-200 shadow-sm">
           {filteredFeedbacks.length === 0 ? (
             <div className="text-center py-16">
@@ -332,7 +366,80 @@ export default function EngagementsPage() {
             loading={loading}
           />
         </div>
-      )}
+      ) : activeTab === 'contact-info' ? (
+        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 max-w-3xl">
+          <h2 className="text-xl font-bold text-gray-900 mb-6">Storefront Contact Information</h2>
+          <form onSubmit={handleSaveContactInfo} className="space-y-6">
+            <div className="space-y-2">
+              <label className="text-sm font-bold text-gray-700">Location Address</label>
+              <textarea
+                rows="3"
+                value={contactInfo.address}
+                onChange={e => setContactInfo({ ...contactInfo, address: e.target.value })}
+                className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all resize-none"
+                placeholder="123 Bakery Street..."
+                required
+              />
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <label className="text-sm font-bold text-gray-700">Primary Phone</label>
+                <input
+                  type="text"
+                  value={contactInfo.phoneNumbers[0]}
+                  onChange={e => setContactInfo({ ...contactInfo, phoneNumbers: [e.target.value, contactInfo.phoneNumbers[1]] })}
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all"
+                  placeholder="+1 (555) 123-4567"
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-bold text-gray-700">Secondary Phone</label>
+                <input
+                  type="text"
+                  value={contactInfo.phoneNumbers[1]}
+                  onChange={e => setContactInfo({ ...contactInfo, phoneNumbers: [contactInfo.phoneNumbers[0], e.target.value] })}
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all"
+                  placeholder="+1 (555) 987-6543 (Optional)"
+                />
+              </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <label className="text-sm font-bold text-gray-700">Primary Email</label>
+                <input
+                  type="email"
+                  value={contactInfo.emails[0]}
+                  onChange={e => setContactInfo({ ...contactInfo, emails: [e.target.value, contactInfo.emails[1]] })}
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all"
+                  placeholder="hello@blubugbakery.com"
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-bold text-gray-700">Secondary Email</label>
+                <input
+                  type="email"
+                  value={contactInfo.emails[1]}
+                  onChange={e => setContactInfo({ ...contactInfo, emails: [contactInfo.emails[0], e.target.value] })}
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all"
+                  placeholder="support@blubugbakery.com (Optional)"
+                />
+              </div>
+            </div>
+            <div className="pt-4 flex justify-end">
+              <button
+                type="submit"
+                disabled={contactInfoSaving}
+                className="flex items-center gap-2 bg-primary-600 hover:bg-primary-700 text-white font-bold py-3 px-6 rounded-xl transition-colors shadow-sm disabled:opacity-70 disabled:cursor-not-allowed"
+              >
+                {contactInfoSaving ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />}
+                Save Changes
+              </button>
+            </div>
+          </form>
+        </div>
+      ) : null}
     </div>
   );
 }
