@@ -1,7 +1,7 @@
 import React from 'react';
 import { Plus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import SearchableDropdown from '../ui/SearchableDropdown';
+import SleekSearchDropdown from '../ui/SleekSearchDropdown';
 
 export default function CategoryDropdown({ categories, value, onChange, disabled }) {
   const navigate = useNavigate();
@@ -37,20 +37,18 @@ export default function CategoryDropdown({ categories, value, onChange, disabled
   );
 
   return (
-    <SearchableDropdown
-      label="Category"
-      required={true}
+    <SleekSearchDropdown
+      formLabel="Category"
       options={options}
       value={value}
-      onChange={onChange}
+      onChange={(val) => {
+        // Handle onChange to support both option object or string value depending on SleekSearchDropdown's output
+        onChange(typeof val === 'object' && val !== null ? val.value : val);
+      }}
       disabled={disabled}
-      placeholder="Select a category..."
-      searchPlaceholder="Search categories..."
-      noOptionsText="No categories found"
+      placeholder="Search categories..."
       headerNode={headerNode}
       footerNode={footerNode}
-      maxItemsEmpty={3}
-      maxItemsSearch={5}
     />
   );
 }

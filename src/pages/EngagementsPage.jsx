@@ -1,7 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { engagementsApi } from '../api/engagementsApi';
 import { toast } from 'sonner';
 import { MessageSquare, Star, Search, CheckCircle2, ShieldAlert, Users, Mail, MessageCircle, Loader2 } from 'lucide-react';
+import SleekSearchDropdown from '../components/ui/SleekSearchDropdown';
+import Pagination from '../components/shared/Pagination';
 
 export default function EngagementsPage() {
   const [activeTab, setActiveTab] = useState('testimonials');
@@ -10,16 +12,25 @@ export default function EngagementsPage() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [searching, setSearching] = useState(false);
+  const [searchOptions, setSearchOptions] = useState([]);
+  const [searchDropdownLoading, setSearchDropdownLoading] = useState(false);
+  const searchTimeoutRef = useRef(null);
+
+  const [page, setPage] = useState(0);
+  const [pageSize, setPageSize] = useState(10);
+  const [totalElements, setTotalElements] = useState(0);
 
   const fetchData = async () => {
     setLoading(true);
     try {
       if (activeTab === 'testimonials') {
-        const res = await engagementsApi.getTestimonials();
-        setTestimonials(res.data || []);
+        const res = await engagementsApi.getTestimonials(page, pageSize);
+        setTestimonials(res.data?.content || res.data || []);
+        setTotalElements(res.data?.page?.totalElements || res.data?.totalElements || res.data?.length || 0);
       } else {
-        const res = await engagementsApi.getFeedbacks();
-        setFeedbacks(res.data || []);
+        const res = await engagementsApi.getFeedbacks(page, pageSize);
+        setFeedbacks(res.data?.content || res.data || []);
+        setTotalElements(res.data?.page?.totalElements || res.data?.totalElements || res.data?.length || 0);
       }
     } catch (error) {
       toast.error('Failed to load engagement data');
@@ -30,19 +41,62 @@ export default function EngagementsPage() {
 
   useEffect(() => {
     fetchData();
+  }, [activeTab, page, pageSize]);
+
+  useEffect(() => {
+    setPage(0);
   }, [activeTab]);
+
+  const totalPages = Math.ceil(totalElements / pageSize) || 1;
+
+  const handleDropdownSearch = (query) => {
+    if (!query) {
+      setSearchOptions([]);
+      return;
+    }
+    
+    if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
+    
+    searchTimeoutRef.current = setTimeout(async () => {
+      setSearchDropdownLoading(true);
+      try {
+        if (activeTab === 'testimonials') {
+          const res = await engagementsApi.searchTestimonials(query);
+          const data = res.data?.content || res.data || [];
+          const opts = data.map(item => ({ value: item.id, label: item.name || 'Anonymous User' }));
+          setSearchOptions(opts);
+        } else {
+          const res = await engagementsApi.searchFeedbacks(query);
+          const data = res.data?.content || res.data || [];
+          const opts = data.map(item => ({ value: item.id, label: item.name || 'Anonymous' }));
+          setSearchOptions(opts);
+        }
+      } catch (error) {
+        console.error('Dropdown search failed:', error);
+      } finally {
+        setSearchDropdownLoading(false);
+      }
+    }, 300);
+  };
 
   const handleSearch = async (e) => {
     e?.preventDefault();
+    if (!searchQuery) {
+      fetchData();
+      return;
+    }
     setSearching(true);
     try {
       if (activeTab === 'testimonials') {
         const res = await engagementsApi.searchTestimonials(searchQuery);
-        setTestimonials(res.data || []);
+        setTestimonials(res.data?.content || res.data || []);
+        setTotalElements(res.data?.page?.totalElements || res.data?.totalElements || res.data?.content?.length || 0);
       } else {
         const res = await engagementsApi.searchFeedbacks(searchQuery);
-        setFeedbacks(res.data || []);
+        setFeedbacks(res.data?.content || res.data || []);
+        setTotalElements(res.data?.page?.totalElements || res.data?.totalElements || res.data?.content?.length || 0);
       }
+      setPage(0);
     } catch (error) {
       toast.error('Search failed');
     } finally {
@@ -75,10 +129,10 @@ export default function EngagementsPage() {
 
   const filteredFeedbacks = activeTab === 'feedbacks' 
     ? feedbacks.filter(f => f.type !== 'CONTACT_US') 
-    : feedbacks.filter(f => f.type === 'CONTACT_US' || f.type === 'GENERAL');
+    : feedbacks.filter(f => f.type === 'CONTACT_US');
 
   return (
-    <div className="p-8 max-w-7xl mx-auto">
+    <div className="p-8 max-w-7xl mx-auto flex flex-col min-h-full pb-8">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
         <div className="flex items-center gap-3">
@@ -126,13 +180,22 @@ export default function EngagementsPage() {
 
         <form onSubmit={handleSearch} className="flex items-center gap-2 flex-1 max-w-md">
           <div className="relative flex-1">
-            <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
-            <input
-              type="text"
-              placeholder="Search by username via Elasticsearch..."
+            <SleekSearchDropdown
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-4 py-2 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all"
+              onChange={(opt) => {
+                setSearchQuery(opt.label);
+              }}
+              onSearch={(val) => {
+                setSearchQuery(val);
+                handleDropdownSearch(val);
+              }}
+              onEnter={(val) => {
+                setSearchQuery(val);
+              }}
+              options={searchOptions}
+              isLoading={searchDropdownLoading}
+              placeholder="Search by username via Elasticsearch..."
+              headerTitle="SEARCH USERS"
             />
           </div>
           <button
@@ -145,7 +208,7 @@ export default function EngagementsPage() {
           {searchQuery && (
             <button
               type="button"
-              onClick={() => { setSearchQuery(''); fetchData(); }}
+              onClick={() => { setSearchQuery(''); fetchData(); setSearchOptions([]); }}
               className="text-xs text-gray-500 hover:text-gray-700 underline"
             >
               Clear
@@ -161,90 +224,114 @@ export default function EngagementsPage() {
           <p className="text-gray-500 text-sm font-medium">Loading engagement records...</p>
         </div>
       ) : activeTab === 'testimonials' ? (
-        testimonials.length === 0 ? (
-          <div className="text-center py-16 bg-white rounded-2xl border border-gray-100 shadow-sm">
-            <Star className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-            <h3 className="text-lg font-medium text-gray-900">No testimonials found</h3>
-            <p className="text-gray-500 text-sm mt-1">When users submit testimonials, they will appear here for curation.</p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {testimonials.map((item) => (
-              <div
-                key={item.id}
-                className={`bg-white rounded-2xl border p-5 shadow-sm transition-all flex flex-col justify-between gap-4 ${item.isFeatured ? 'border-amber-400 ring-2 ring-amber-400/20 bg-amber-50/20' : 'border-gray-200 hover:border-gray-300'}`}
-              >
-                <div>
-                  <div className="flex items-start justify-between gap-3 mb-3">
-                    <div className="flex items-center gap-3">
-                      {item.profileImageUrl ? (
-                        <img src={item.profileImageUrl} alt={item.name} className="w-10 h-10 rounded-full object-cover border border-gray-200" />
-                      ) : (
-                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary-500 to-indigo-600 text-white font-bold flex items-center justify-center text-sm shadow-sm">
-                          {getInitials(item.name)}
+        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm">
+          {testimonials.length === 0 ? (
+            <div className="text-center py-16">
+              <Star className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+              <h3 className="text-lg font-medium text-gray-900">No testimonials found</h3>
+              <p className="text-gray-500 text-sm mt-1">When users submit testimonials, they will appear here for curation.</p>
+            </div>
+          ) : (
+            <div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+              {testimonials.map((item) => (
+                <div
+                  key={item.id}
+                  className={`bg-white rounded-2xl border p-5 shadow-sm transition-all flex flex-col justify-between gap-4 ${item.isFeatured ? 'border-amber-400 ring-2 ring-amber-400/20 bg-amber-50/20' : 'border-gray-200 hover:border-gray-300'}`}
+                >
+                  <div>
+                    <div className="flex items-start justify-between gap-3 mb-3">
+                      <div className="flex items-center gap-3">
+                        {item.profileImageUrl ? (
+                          <img src={item.profileImageUrl} alt={item.name} className="w-10 h-10 rounded-full object-cover border border-gray-200" />
+                        ) : (
+                          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary-500 to-indigo-600 text-white font-bold flex items-center justify-center text-sm shadow-sm">
+                            {getInitials(item.name)}
+                          </div>
+                        )}
+                        <div>
+                          <h4 className="font-bold text-gray-900 text-sm">{item.name || 'Anonymous User'}</h4>
+                          <span className="text-xs text-gray-400">ID: {item.uid || item.id}</span>
                         </div>
-                      )}
-                      <div>
-                        <h4 className="font-bold text-gray-900 text-sm">{item.name || 'Anonymous User'}</h4>
-                        <span className="text-xs text-gray-400">ID: {item.uid || item.id}</span>
+                      </div>
+                      <div className="flex items-center gap-1 bg-amber-50 text-amber-700 px-2.5 py-1 rounded-lg text-xs font-bold border border-amber-200/60">
+                        <Star className="w-3.5 h-3.5 fill-amber-500 text-amber-500" />
+                        {item.rating || 5} / 5
                       </div>
                     </div>
-                    <div className="flex items-center gap-1 bg-amber-50 text-amber-700 px-2.5 py-1 rounded-lg text-xs font-bold border border-amber-200/60">
-                      <Star className="w-3.5 h-3.5 fill-amber-500 text-amber-500" />
-                      {item.rating || 5} / 5
-                    </div>
+                    <p className="text-gray-700 text-sm italic line-clamp-3">"{item.message}"</p>
                   </div>
-                  <p className="text-gray-700 text-sm italic line-clamp-3">"{item.message}"</p>
-                </div>
 
-                <div className="flex items-center justify-between pt-3 border-t border-gray-100">
-                  <span className="text-xs text-gray-400 font-medium">
-                    Status: <span className="text-emerald-600 font-semibold">{item.status || 'APPROVED'}</span>
-                  </span>
-
-                  <label className="flex items-center gap-2 cursor-pointer group">
-                    <input
-                      type="checkbox"
-                      checked={!!item.isFeatured}
-                      onChange={() => handleToggleFeature(item.id, item.isFeatured)}
-                      className="w-4 h-4 text-amber-500 rounded border-gray-300 focus:ring-amber-500 cursor-pointer"
-                    />
-                    <span className="text-sm font-semibold text-gray-700 group-hover:text-gray-900 transition-colors">
-                      Feature on Storefront
+                  <div className="flex items-center justify-between pt-3 border-t border-gray-100">
+                    <span className="text-xs text-gray-400 font-medium">
+                      Status: <span className="text-emerald-600 font-semibold">{item.status || 'APPROVED'}</span>
                     </span>
-                  </label>
-                </div>
-              </div>
-            ))}
-          </div>
-        )
-      ) : (
-        filteredFeedbacks.length === 0 ? (
-          <div className="text-center py-16 bg-white rounded-2xl border border-gray-100 shadow-sm">
-            <MessageCircle className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-            <h3 className="text-lg font-medium text-gray-900">No messages found</h3>
-            <p className="text-gray-500 text-sm mt-1">Customer inquiries and feedback will appear here.</p>
-          </div>
-        ) : (
-          <div className="space-y-3">
-            {filteredFeedbacks.map((item) => (
-              <div key={item.id} className="bg-white rounded-2xl border border-gray-200 p-5 shadow-sm flex flex-col sm:flex-row justify-between gap-4">
-                <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-2">
-                    <span className="font-bold text-gray-900 text-sm">{item.name || 'Anonymous'}</span>
-                    {item.email && <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-md font-mono">{item.email}</span>}
-                    <span className="text-xs bg-blue-50 text-blue-700 px-2 py-0.5 rounded font-semibold uppercase">{item.type || 'GENERAL'}</span>
+
+                    <label className="flex items-center gap-2 cursor-pointer group">
+                      <input
+                        type="checkbox"
+                        checked={!!item.isFeatured}
+                        onChange={() => handleToggleFeature(item.id, item.isFeatured)}
+                        className="w-4 h-4 text-amber-500 rounded border-gray-300 focus:ring-amber-500 cursor-pointer"
+                      />
+                      <span className="text-sm font-semibold text-gray-700 group-hover:text-gray-900 transition-colors">
+                        Feature on Storefront
+                      </span>
+                    </label>
                   </div>
-                  <p className="text-gray-700 text-sm">{item.message}</p>
                 </div>
-                <div className="flex sm:flex-col justify-between sm:items-end text-xs text-gray-400 font-medium">
-                  <span>Status: <strong className="text-gray-700">{item.status || 'NEW'}</strong></span>
-                  <span>{item.createdAt ? new Date(item.createdAt).toLocaleDateString() : 'Recent'}</span>
+              ))}
+            </div>
+          )}
+          {/* Pagination Controls */}
+          <Pagination
+            currentPage={page}
+            totalPages={totalPages}
+            totalElements={totalElements}
+            pageSize={pageSize}
+            onPageChange={setPage}
+            onPageSizeChange={(newSize) => { setPageSize(newSize); setPage(0); }}
+            loading={loading}
+          />
+        </div>
+      ) : (
+        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm">
+          {filteredFeedbacks.length === 0 ? (
+            <div className="text-center py-16">
+              <MessageCircle className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+              <h3 className="text-lg font-medium text-gray-900">No messages found</h3>
+              <p className="text-gray-500 text-sm mt-1">Customer inquiries and feedback will appear here.</p>
+            </div>
+          ) : (
+            <div className="p-4 space-y-3">
+              {filteredFeedbacks.map((item) => (
+                <div key={item.id} className="bg-white rounded-2xl border border-gray-200 p-5 shadow-sm flex flex-col sm:flex-row justify-between gap-4">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-3 mb-2">
+                      <span className="font-bold text-gray-900 text-sm">{item.name || 'Anonymous'}</span>
+                      {item.email && <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-md font-mono">{item.email}</span>}
+                      <span className="text-xs bg-blue-50 text-blue-700 px-2 py-0.5 rounded font-semibold uppercase">{item.type || 'GENERAL'}</span>
+                    </div>
+                    <p className="text-gray-700 text-sm">{item.message}</p>
+                  </div>
+                  <div className="flex sm:flex-col justify-between sm:items-end text-xs text-gray-400 font-medium">
+                    <span>Status: <strong className="text-gray-700">{item.status || 'NEW'}</strong></span>
+                    <span>{item.createdAt ? new Date(item.createdAt).toLocaleDateString() : 'Recent'}</span>
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        )
+              ))}
+            </div>
+          )}
+          {/* Pagination Controls */}
+          <Pagination
+            currentPage={page}
+            totalPages={totalPages}
+            totalElements={totalElements}
+            pageSize={pageSize}
+            onPageChange={setPage}
+            onPageSizeChange={(newSize) => { setPageSize(newSize); setPage(0); }}
+            loading={loading}
+          />
+        </div>
       )}
     </div>
   );

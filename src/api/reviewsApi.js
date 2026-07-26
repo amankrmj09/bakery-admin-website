@@ -1,10 +1,9 @@
 import api from './axiosConfig';
 
 export const reviewsApi = {
-  getReportedReviews: (params) => {
-    let url = '/api/admin/reviews/reported';
-    return api.get(url, { params });
-  },
-  dismissReport: (reviewId) => api.post(`/api/admin/reviews/${reviewId}/dismiss`),
-  deleteReportedReview: (reviewId, productId) => api.delete(`/api/admin/reviews/${reviewId}/product/${productId}`),
+  getReportedReviews: (params) => api.get('/api/v1/engagement/reviews/reported', { params }),
+  dismissReport: (reviewId) => api.post(`/api/v1/engagement/reviews/${reviewId}/dismiss-report`),
+  deleteReportedReview: (reviewId, productId) => api.delete(`/api/v1/engagement/reviews/product/${productId}/${reviewId}`),
+  getProductReviews: (productId, params) => api.get(`/api/v1/engagement/reviews/product/${productId}`, { params }),
+  deleteReview: (productId, reviewId) => api.delete(`/api/v1/engagement/reviews/product/${productId}/${reviewId}`)
 };

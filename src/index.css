@@ -25,6 +25,17 @@
   --color-border-color: var(--border-color);
   --color-text-main: var(--text-main);
   --color-text-muted: var(--text-muted);
+
+  /* Standardization mappings for cross-compatible components */
+  --color-background: var(--bg-base);
+  --color-foreground: var(--text-main);
+  --color-muted: var(--bg-panel-hover);
+  --color-muted-foreground: var(--text-muted);
+  --color-card: var(--bg-panel);
+  --color-card-foreground: var(--text-main);
+  --color-border: var(--border-color);
+  
+  --font-sans: 'Outfit', 'Inter', system-ui, -apple-system, sans-serif;
 }
 
 :root {
@@ -78,6 +89,10 @@ body {
   -moz-osx-font-smoothing: grayscale;
   line-height: 1.5;
   transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+input, textarea, select, button {
+  font-family: inherit;
 }
 
 /* Scrollbar styling */

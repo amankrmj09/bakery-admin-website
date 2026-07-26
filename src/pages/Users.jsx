@@ -4,23 +4,23 @@ import { fetchUsers, updateUserRole, updateUserStatus } from '../store/slices/da
 import { Card, CardContent } from '../components/ui/Card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/Table';
 import { Badge } from '../components/ui/Badge';
-import { Select } from '../components/ui/Select';
+import SleekDropdown from '../components/ui/SleekDropdown';
 import { Button } from '../components/ui/Button';
 import { Modal } from '../components/ui/Modal';
 import { toast } from 'sonner';
 import { cn } from '../lib/utils';
 import { useScrollTop } from '../hooks/useScrollTop';
 import { Users as UsersIcon } from 'lucide-react';
+import Pagination from '../components/shared/Pagination';
 
 export default function Users() {
   const dispatch = useDispatch();
   const isScrolled = useScrollTop();
-  const { data: users, loading } = useSelector((state) => state.dashboard.users);
+  const { data: users, totalElements, loading } = useSelector((state) => state.dashboard.users);
   
   const [page, setPage] = useState(0);
-  const ITEMS_PER_PAGE = 10;
-  const totalPages = Math.ceil((users?.length || 0) / ITEMS_PER_PAGE);
-  const paginatedUsers = users?.slice(page * ITEMS_PER_PAGE, (page + 1) * ITEMS_PER_PAGE) || [];
+  const [pageSize, setPageSize] = useState(10);
+  const totalPages = Math.ceil((totalElements || users?.length || 0) / pageSize) || 1;
 
   const [selectedUser, setSelectedUser] = useState(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -28,8 +28,8 @@ export default function Users() {
   const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
-    dispatch(fetchUsers());
-  }, [dispatch]);
+    dispatch(fetchUsers({ page, size: pageSize }));
+  }, [dispatch, page, pageSize]);
 
   const handleEditClick = (user) => {
     setSelectedUser(user);
@@ -104,8 +104,8 @@ export default function Users() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {paginatedUsers?.length > 0 ? (
-                  paginatedUsers.map((user) => (
+                {users?.length > 0 ? (
+                  users.map((user) => (
                     <TableRow key={user.id}>
                       <TableCell className="font-medium">
                         {user.firstName} {user.lastName}
@@ -141,29 +141,15 @@ export default function Users() {
           )}
         </CardContent>
         {/* Pagination Controls */}
-        {users?.length > ITEMS_PER_PAGE && (
-          <div className="flex justify-between items-center p-4 border-t border-[var(--border-color)]/50 bg-[var(--bg-panel-hover)]/30">
-            <span className="text-sm text-[var(--text-muted)]">
-              Showing Page <span className="font-medium text-[var(--text-main)]">{page + 1}</span> of <span className="font-medium text-[var(--text-main)]">{totalPages || 1}</span>
-            </span>
-            <div className="flex gap-2">
-              <button 
-                disabled={page === 0} 
-                onClick={() => setPage(p => p - 1)}
-                className="text-sm px-3 py-1.5 rounded-lg border border-[var(--border-color)] hover:bg-[var(--bg-panel-hover)] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              >
-                Previous
-              </button>
-              <button 
-                disabled={page >= totalPages - 1} 
-                onClick={() => setPage(p => p + 1)}
-                className="text-sm px-3 py-1.5 rounded-lg border border-[var(--border-color)] hover:bg-[var(--bg-panel-hover)] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              >
-                Next
-              </button>
-            </div>
-          </div>
-        )}
+        <Pagination
+          currentPage={page}
+          totalPages={totalPages}
+          totalElements={totalElements || users?.length || 0}
+          pageSize={pageSize}
+          onPageChange={setPage}
+          onPageSizeChange={(newSize) => { setPageSize(newSize); setPage(0); }}
+          loading={loading}
+        />
       </Card>
 
       <Modal
@@ -173,27 +159,31 @@ export default function Users() {
       >
         {selectedUser && (
           <div className="space-y-4">
-            <Select
-              label="Role"
+            <SleekDropdown
+              formLabel="Role"
               value={editForm.role}
-              onChange={(e) => setEditForm({ ...editForm, role: e.target.value })}
+              onChange={(val) => setEditForm({ ...editForm, role: val })}
               disabled={isSaving}
-            >
-              <option value="USER">User</option>
-              <option value="STAFF">Staff</option>
-              <option value="ADMIN">Admin</option>
-            </Select>
+              fullWidth
+              options={[
+                { value: "USER", label: "User" },
+                { value: "STAFF", label: "Staff" },
+                { value: "ADMIN", label: "Admin" }
+              ]}
+            />
             
-            <Select
-              label="Status"
+            <SleekDropdown
+              formLabel="Status"
               value={editForm.status}
-              onChange={(e) => setEditForm({ ...editForm, status: e.target.value })}
+              onChange={(val) => setEditForm({ ...editForm, status: val })}
               disabled={isSaving}
-            >
-              <option value="ACTIVE">Active</option>
-              <option value="INACTIVE">Inactive</option>
-              <option value="LOCKED">Locked</option>
-            </Select>
+              fullWidth
+              options={[
+                { value: "ACTIVE", label: "Active" },
+                { value: "INACTIVE", label: "Inactive" },
+                { value: "LOCKED", label: "Locked" }
+              ]}
+            />
 
             <div className="pt-4 flex justify-end space-x-2 border-t border-border mt-6">
               <Button 
@@ -216,3 +206,4 @@ export default function Users() {
     </div>
   );
 }
+

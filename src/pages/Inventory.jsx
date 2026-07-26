@@ -11,19 +11,20 @@ import { Modal } from '../components/ui/Modal';
 import { useScrollTop } from '../hooks/useScrollTop';
 import { cn } from '../lib/utils';
 import { Input } from '../components/ui/Input';
+import Pagination from '../components/shared/Pagination';
+
 export default function Inventory() {
   const dispatch = useDispatch();
   const { data: inventory, totalElements, loading } = useSelector((state) => state.dashboard.inventory);
   const isScrolled = useScrollTop();
   const [page, setPage] = useState(0);
-  const ITEMS_PER_PAGE = 10;
+  const [pageSize, setPageSize] = useState(10);
 
   useEffect(() => {
-    dispatch(fetchInventory({ page, size: ITEMS_PER_PAGE }));
-  }, [dispatch, page]);
+    dispatch(fetchInventory({ page, size: pageSize }));
+  }, [dispatch, page, pageSize]);
   
-  const totalPages = Math.ceil((totalElements || inventory?.length || 0) / ITEMS_PER_PAGE);
-  const paginatedInventory = inventory || [];
+  const totalPages = Math.ceil((totalElements || inventory?.length || 0) / pageSize) || 1;
 
   const [isStockModalOpen, setIsStockModalOpen] = useState(false);
   const [isRulesModalOpen, setIsRulesModalOpen] = useState(false);
@@ -32,10 +33,6 @@ export default function Inventory() {
   
   const [stockForm, setStockForm] = useState({ quantity: 1, notes: '' });
   const [rulesForm, setRulesForm] = useState({ minimumStock: 0, reorderLevel: 0, reorderQuantity: 0 });
-
-  useEffect(() => {
-    dispatch(fetchInventory());
-  }, [dispatch]);
 
   const handleAddStockClick = (item) => {
     setSelectedItem(item);
@@ -112,10 +109,10 @@ export default function Inventory() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {loading && inventory.length === 0 ? (
+              {loading && inventory?.length === 0 ? (
                 <TableRow><TableCell colSpan={5} className="h-24 text-center">Loading inventory...</TableCell></TableRow>
-              ) : paginatedInventory.length > 0 ? (
-                paginatedInventory.map((item) => (
+              ) : inventory?.length > 0 ? (
+                inventory.map((item) => (
                   <TableRow key={item.id}>
                     <TableCell className="text-muted-foreground">{item.productSku}</TableCell>
                     <TableCell className="font-medium">{item.productName}</TableCell>
@@ -132,31 +129,15 @@ export default function Inventory() {
           </Table>
         </CardContent>
         {/* Pagination Controls */}
-        {inventory?.length > ITEMS_PER_PAGE && (
-          <div className="flex justify-between items-center p-4 border-t border-[var(--border-color)]/50 bg-[var(--bg-panel-hover)]/30">
-            <span className="text-sm text-[var(--text-muted)]">
-              Showing Page <span className="font-medium text-[var(--text-main)]">{page + 1}</span> of <span className="font-medium text-[var(--text-main)]">{totalPages || 1}</span>
-            </span>
-            <div className="flex gap-2">
-              <button 
-                type="button"
-                disabled={page === 0} 
-                onClick={() => setPage(p => p - 1)}
-                className="text-sm px-3 py-1.5 rounded-lg border border-[var(--border-color)] hover:bg-[var(--bg-panel-hover)] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              >
-                Previous
-              </button>
-              <button 
-                type="button"
-                disabled={page >= totalPages - 1} 
-                onClick={() => setPage(p => p + 1)}
-                className="text-sm px-3 py-1.5 rounded-lg border border-[var(--border-color)] hover:bg-[var(--bg-panel-hover)] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              >
-                Next
-              </button>
-            </div>
-          </div>
-        )}
+        <Pagination
+          currentPage={page}
+          totalPages={totalPages}
+          totalElements={totalElements || inventory?.length || 0}
+          pageSize={pageSize}
+          onPageChange={setPage}
+          onPageSizeChange={(newSize) => { setPageSize(newSize); setPage(0); }}
+          loading={loading}
+        />
       </Card>
 
       <Modal isOpen={isStockModalOpen} onClose={() => !isSaving && setIsStockModalOpen(false)} title="Add Stock">

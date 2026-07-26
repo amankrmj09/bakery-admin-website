@@ -10,8 +10,9 @@ import { toast } from 'sonner';
 import api from '../api/axiosConfig';
 import { cn } from '../lib/utils';
 import { useScrollTop } from '../hooks/useScrollTop';
-import { Select } from '../components/ui/Select';
+import SleekDropdown from '../components/ui/SleekDropdown';
 import { Package, Truck, CheckCircle2, Clock, XCircle, Search, Eye, Download, SearchX, Coffee, ShoppingCart } from 'lucide-react';
+import Pagination from '../components/shared/Pagination';
 
 export default function Orders() {
   const dispatch = useDispatch();
@@ -19,14 +20,13 @@ export default function Orders() {
   const { data: orders, totalElements, loading } = useSelector((state) => state.dashboard.orders);
 
   const [page, setPage] = useState(0);
-  const ITEMS_PER_PAGE = 10;
+  const [pageSize, setPageSize] = useState(10);
   
   useEffect(() => {
-    dispatch(fetchOrders({ page, size: ITEMS_PER_PAGE }));
-  }, [dispatch, page]);
+    dispatch(fetchOrders({ page, size: pageSize }));
+  }, [dispatch, page, pageSize]);
   
-  const totalPages = Math.ceil((totalElements || orders?.length || 0) / ITEMS_PER_PAGE);
-  const paginatedOrders = orders || [];
+  const totalPages = Math.ceil((totalElements || orders?.length || 0) / pageSize) || 1;
 
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
@@ -122,7 +122,7 @@ export default function Orders() {
 
       <Card>
         <CardContent className="p-0">
-          {loading && orders.length === 0 ? (
+          {loading && orders?.length === 0 ? (
             <div className="py-6 text-center text-muted-foreground">Loading orders...</div>
           ) : (
             <Table>
@@ -137,8 +137,8 @@ export default function Orders() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {paginatedOrders?.length > 0 ? (
-                  paginatedOrders.map((order) => (
+                {orders?.length > 0 ? (
+                  orders.map((order) => (
                     <TableRow key={order.id}>
                       <TableCell className="font-medium text-muted-foreground">{order.orderNumber || order.id.slice(0,8)}</TableCell>
                       <TableCell>{order.customerName}</TableCell>
@@ -187,29 +187,15 @@ export default function Orders() {
           )}
         </CardContent>
         {/* Pagination Controls */}
-        {orders?.length > ITEMS_PER_PAGE && (
-          <div className="flex justify-between items-center p-4 border-t border-[var(--border-color)]/50 bg-[var(--bg-panel-hover)]/30">
-            <span className="text-sm text-[var(--text-muted)]">
-              Showing Page <span className="font-medium text-[var(--text-main)]">{page + 1}</span> of <span className="font-medium text-[var(--text-main)]">{totalPages || 1}</span>
-            </span>
-            <div className="flex gap-2">
-              <button 
-                disabled={page === 0} 
-                onClick={() => setPage(p => p - 1)}
-                className="text-sm px-3 py-1.5 rounded-lg border border-[var(--border-color)] hover:bg-[var(--bg-panel-hover)] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              >
-                Previous
-              </button>
-              <button 
-                disabled={page >= totalPages - 1} 
-                onClick={() => setPage(p => p + 1)}
-                className="text-sm px-3 py-1.5 rounded-lg border border-[var(--border-color)] hover:bg-[var(--bg-panel-hover)] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              >
-                Next
-              </button>
-            </div>
-          </div>
-        )}
+        <Pagination
+          currentPage={page}
+          totalPages={totalPages}
+          totalElements={totalElements || orders?.length || 0}
+          pageSize={pageSize}
+          onPageChange={setPage}
+          onPageSizeChange={(newSize) => { setPageSize(newSize); setPage(0); }}
+          loading={loading}
+        />
       </Card>
 
       <Modal 
@@ -343,22 +329,23 @@ export default function Orders() {
               <div className="flex justify-between items-center">
                 <div className="flex items-center space-x-3">
                   <label className="text-sm font-medium text-foreground w-32">Update Status:</label>
-                  <Select 
-                    className="w-48"
+                  <SleekDropdown 
+                    widthClass="w-48"
                     value={selectedOrder.status}
-                    onChange={(e) => {
-                      handleStatusChange(selectedOrder.id, e.target.value);
-                      setSelectedOrder({...selectedOrder, status: e.target.value});
+                    onChange={(val) => {
+                      handleStatusChange(selectedOrder.id, val);
+                      setSelectedOrder({...selectedOrder, status: val});
                     }}
-                  >
-                    <option value="PENDING">Pending</option>
-                    <option value="CONFIRMED">Confirmed</option>
-                    <option value="PREPARING">Preparing</option>
-                    <option value="READY">Ready</option>
-                    <option value="OUT_FOR_DELIVERY">Out for Delivery</option>
-                    <option value="DELIVERED">Delivered / Completed</option>
-                    <option value="CANCELLED">Cancelled</option>
-                  </Select>
+                    options={[
+                      { value: "PENDING", label: "Pending" },
+                      { value: "CONFIRMED", label: "Confirmed" },
+                      { value: "PREPARING", label: "Preparing" },
+                      { value: "READY", label: "Ready" },
+                      { value: "OUT_FOR_DELIVERY", label: "Out for Delivery" },
+                      { value: "DELIVERED", label: "Delivered / Completed" },
+                      { value: "CANCELLED", label: "Cancelled" },
+                    ]}
+                  />
                 </div>
                 {selectedOrder.status !== 'CANCELLED' && (
                   <Button 
@@ -377,18 +364,19 @@ export default function Orders() {
               {paymentId && (
                 <div className="flex items-center space-x-3">
                   <label className="text-sm font-medium text-foreground w-32">Update Payment:</label>
-                  <Select 
-                    className="w-48"
+                  <SleekDropdown 
+                    widthClass="w-48"
                     value={paymentStatus}
-                    onChange={(e) => handlePaymentStatusChange(e.target.value)}
-                  >
-                    <option value="PENDING">Pending</option>
-                    <option value="PROCESSING">Processing</option>
-                    <option value="COMPLETED">Completed</option>
-                    <option value="FAILED">Failed</option>
-                    <option value="CANCELLED">Cancelled</option>
-                    <option value="REFUNDED">Refunded</option>
-                  </Select>
+                    onChange={(val) => handlePaymentStatusChange(val)}
+                    options={[
+                      { value: "PENDING", label: "Pending" },
+                      { value: "PROCESSING", label: "Processing" },
+                      { value: "COMPLETED", label: "Completed" },
+                      { value: "FAILED", label: "Failed" },
+                      { value: "CANCELLED", label: "Cancelled" },
+                      { value: "REFUNDED", label: "Refunded" },
+                    ]}
+                  />
                 </div>
               )}
             </div>

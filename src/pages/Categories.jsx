@@ -6,7 +6,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '.
 import { Badge } from '../components/ui/Badge';
 import { Button } from '../components/ui/Button';
 import ActionButton from '../components/ui/ActionButton';
-import { Plus, Trash2, Tags, Loader2, Save } from 'lucide-react';
+import { Plus, Trash2, Tags, Loader2, Save, FolderTree } from 'lucide-react';
 import { Modal } from '../components/ui/Modal';
 import { toast } from 'sonner';
 import api from '../api/axiosConfig';
@@ -14,23 +14,23 @@ import { useScrollTop } from '../hooks/useScrollTop';
 import { cn } from '../lib/utils';
 import { Input } from '../components/ui/Input';
 import { Textarea } from '../components/ui/Textarea';
-import { SearchableSelect } from '../components/ui/SearchableSelect';
+import SleekSearchDropdown from '../components/ui/SleekSearchDropdown';
 import SingleImageUploader from '../components/shared/SingleImageUploader';
-import { FolderTree } from 'lucide-react';
+import Pagination from '../components/shared/Pagination';
 
 export default function Categories() {
   const dispatch = useDispatch();
-  const { data: categories, loading } = useSelector((state) => state.dashboard.categories);
+  const { data: categories, totalElements, loading } = useSelector((state) => state.dashboard.categories);
   const isScrolled = useScrollTop();
 
-  useEffect(() => {
-    dispatch(fetchCategories());
-  }, [dispatch]);
-  
   const [page, setPage] = useState(0);
-  const ITEMS_PER_PAGE = 10;
-  const totalPages = Math.ceil((categories?.length || 0) / ITEMS_PER_PAGE);
-  const paginatedCategories = categories?.slice(page * ITEMS_PER_PAGE, (page + 1) * ITEMS_PER_PAGE) || [];
+  const [pageSize, setPageSize] = useState(10);
+  
+  useEffect(() => {
+    dispatch(fetchCategories({ page, size: pageSize }));
+  }, [dispatch, page, pageSize]);
+  
+  const totalPages = Math.ceil((totalElements || categories?.length || 0) / pageSize) || 1;
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState(null);
@@ -85,7 +85,7 @@ export default function Categories() {
   const handleToggleStatus = async (categoryId) => {
     try {
       await api.post(`/api/categories/${categoryId}/toggle-status`);
-      dispatch(fetchCategories());
+      dispatch(fetchCategories({ page, size: pageSize }));
     } catch (error) { console.error('Failed to toggle', error); }
   };
 
@@ -143,10 +143,10 @@ export default function Categories() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {loading && categories.length === 0 ? (
+              {loading && categories?.length === 0 ? (
                 <TableRow><TableCell colSpan={5} className="h-24 text-center">Loading categories...</TableCell></TableRow>
-              ) : paginatedCategories.length > 0 ? (
-                paginatedCategories.map((c) => (
+              ) : categories?.length > 0 ? (
+                categories.map((c) => (
                   <TableRow key={c.id}>
                     <TableCell className="text-muted-foreground">{c.displayOrder}</TableCell>
                     <TableCell className="font-medium">{c.name}</TableCell>
@@ -164,31 +164,15 @@ export default function Categories() {
           </Table>
         </CardContent>
         {/* Pagination Controls */}
-        {categories?.length > ITEMS_PER_PAGE && (
-          <div className="flex justify-between items-center p-4 border-t border-[var(--border-color)]/50 bg-[var(--bg-panel-hover)]/30">
-            <span className="text-sm text-[var(--text-muted)]">
-              Showing Page <span className="font-medium text-[var(--text-main)]">{page + 1}</span> of <span className="font-medium text-[var(--text-main)]">{totalPages || 1}</span>
-            </span>
-            <div className="flex gap-2">
-              <button 
-                type="button"
-                disabled={page === 0} 
-                onClick={() => setPage(p => p - 1)}
-                className="text-sm px-3 py-1.5 rounded-lg border border-[var(--border-color)] hover:bg-[var(--bg-panel-hover)] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              >
-                Previous
-              </button>
-              <button 
-                type="button"
-                disabled={page >= totalPages - 1} 
-                onClick={() => setPage(p => p + 1)}
-                className="text-sm px-3 py-1.5 rounded-lg border border-[var(--border-color)] hover:bg-[var(--bg-panel-hover)] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              >
-                Next
-              </button>
-            </div>
-          </div>
-        )}
+        <Pagination
+          currentPage={page}
+          totalPages={totalPages}
+          totalElements={totalElements || categories?.length || 0}
+          pageSize={pageSize}
+          onPageChange={setPage}
+          onPageSizeChange={(newSize) => { setPageSize(newSize); setPage(0); }}
+          loading={loading}
+        />
       </Card>
 
       <Modal isOpen={isModalOpen} onClose={() => !isSaving && setIsModalOpen(false)} title={editingCategory ? "Edit Category" : "Add Category"}>
@@ -201,12 +185,12 @@ export default function Categories() {
             disabled={isSaving} 
           />
 
-          <SearchableSelect
-            label="Parent Category"
+          <SleekSearchDropdown
+            formLabel="Parent Category"
             icon={FolderTree}
             options={categoryOptions}
             value={form.parentId}
-            onChange={val => setForm({...form, parentId: val})}
+            onChange={(opt) => setForm({...form, parentId: opt.value})}
             disabled={isSaving}
           />
           

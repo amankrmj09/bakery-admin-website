@@ -13,6 +13,7 @@ import { useScrollTop } from '../hooks/useScrollTop';
 import { cn } from '../lib/utils';
 import ProductDetails from './ProductDetails';
 import { motion, AnimatePresence } from 'framer-motion';
+import Pagination from '../components/shared/Pagination';
 
 export default function Products() {
   const dispatch = useDispatch();
@@ -21,16 +22,15 @@ export default function Products() {
   const { taxRates } = useSelector((state) => state.tax);
   const isScrolled = useScrollTop();
   const [page, setPage] = useState(0);
-  const ITEMS_PER_PAGE = 10;
+  const [pageSize, setPageSize] = useState(10);
 
   useEffect(() => {
-    dispatch(fetchProducts({ page, size: ITEMS_PER_PAGE }));
+    dispatch(fetchProducts({ page, size: pageSize }));
     dispatch(fetchCategories());
     dispatch(fetchTaxRates());
-  }, [dispatch, page]);
+  }, [dispatch, page, pageSize]);
   
-  const totalPages = Math.ceil((totalElements || products?.length || 0) / ITEMS_PER_PAGE);
-  const paginatedProducts = products || [];
+  const totalPages = Math.ceil((totalElements || products?.length || 0) / pageSize) || 1;
 
   const [showForm, setShowForm] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
@@ -98,10 +98,10 @@ export default function Products() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {loading && products.length === 0 ? (
+                  {loading && products?.length === 0 ? (
                     <TableRow><TableCell colSpan={5} className="h-24 text-center">Loading products...</TableCell></TableRow>
-                  ) : paginatedProducts.length > 0 ? (
-                    paginatedProducts.map((p) => (
+                  ) : products?.length > 0 ? (
+                    products.map((p) => (
                       <TableRow key={p.id}>
                         <TableCell className="text-muted-foreground">{p.sku}</TableCell>
                         <TableCell className="font-medium">{p.name}</TableCell>
@@ -117,31 +117,15 @@ export default function Products() {
               </Table>
             </CardContent>
             {/* Pagination Controls */}
-            {products?.length > ITEMS_PER_PAGE && (
-              <div className="flex justify-between items-center p-4 border-t border-[var(--border-color)]/50 bg-[var(--bg-panel-hover)]/30">
-                <span className="text-sm text-[var(--text-muted)]">
-                  Showing Page <span className="font-medium text-[var(--text-main)]">{page + 1}</span> of <span className="font-medium text-[var(--text-main)]">{totalPages || 1}</span>
-                </span>
-                <div className="flex gap-2">
-                  <button 
-                    type="button"
-                    disabled={page === 0} 
-                    onClick={() => setPage(p => p - 1)}
-                    className="text-sm px-3 py-1.5 rounded-lg border border-[var(--border-color)] hover:bg-[var(--bg-panel-hover)] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                  >
-                    Previous
-                  </button>
-                  <button 
-                    type="button"
-                    disabled={page >= totalPages - 1} 
-                    onClick={() => setPage(p => p + 1)}
-                    className="text-sm px-3 py-1.5 rounded-lg border border-[var(--border-color)] hover:bg-[var(--bg-panel-hover)] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                  >
-                    Next
-                  </button>
-                </div>
-              </div>
-            )}
+            <Pagination
+              currentPage={page}
+              totalPages={totalPages}
+              totalElements={totalElements || products?.length || 0}
+              pageSize={pageSize}
+              onPageChange={setPage}
+              onPageSizeChange={(newSize) => { setPageSize(newSize); setPage(0); }}
+              loading={loading}
+            />
           </Card>
           </motion.div>
         ) : (

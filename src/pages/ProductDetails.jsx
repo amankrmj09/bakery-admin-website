@@ -12,8 +12,9 @@ import api from '../api/axiosConfig';
 import { useScrollTop } from '../hooks/useScrollTop';
 import { cn } from '../lib/utils';
 import { Input } from '../components/ui/Input';
-import { Select } from '../components/ui/Select';
+import SleekDropdown from '../components/ui/SleekDropdown';
 import { Textarea } from '../components/ui/Textarea';
+import ProductReviewsTab from '../components/shared/ProductReviewsTab';
 
 const getImageUrl = (url) => url?.startsWith('/') ? `${import.meta.env.VITE_API_BASE_URL?.replace(/\/$/, '')}${url}` : url;
 
@@ -272,7 +273,7 @@ export default function ProductDetails({ product, categories, taxRates, onClose 
       <Card className="p-6 md:p-8">
         {/* Custom Tabs Navigation */}
         <div className="flex border-b border-border mb-6 overflow-x-auto hide-scrollbar">
-          {['basic', 'inventory', 'details', 'media'].map(tab => (
+          {(isEditing ? ['basic', 'inventory', 'details', 'media', 'reviews'] : ['basic', 'inventory', 'details', 'media']).map(tab => (
             <button
               key={tab}
               type="button"
@@ -300,25 +301,23 @@ export default function ProductDetails({ product, categories, taxRates, onClose 
                 <Input label="Price ($)" type="number" step="0.01" required value={form.price} onChange={e => setForm({...form, price: e.target.value})} disabled={isSaving} />
                 <Input label="Discount Price ($)" type="number" step="0.01" value={form.discountPrice} onChange={e => setForm({...form, discountPrice: e.target.value})} disabled={isSaving} />
                 <Input label="Cost Price ($)" type="number" step="0.01" value={form.costPrice} onChange={e => setForm({...form, costPrice: e.target.value})} disabled={isSaving} />
-                <Select
-                  label="Tax Class"
+                <SleekDropdown
+                  formLabel="Tax Class"
                   value={form.taxClass}
-                  onChange={e => setForm({...form, taxClass: e.target.value})}
+                  onChange={val => setForm({...form, taxClass: val})}
                   disabled={isSaving}
-                >
-                  <option value="">Select Tax Class</option>
-                  {taxRates?.map(tax => (
-                    <option key={tax.id} value={tax.taxClass}>
-                      {tax.taxClass} ({(tax.rate * 100).toFixed(2)}%)
-                    </option>
-                  ))}
-                  {(!taxRates || taxRates.length === 0) && (
-                    <>
-                      <option value="STANDARD">Standard (8%)</option>
-                      <option value="EXEMPT">Exempt (0%)</option>
-                    </>
-                  )}
-                </Select>
+                  fullWidth
+                  options={[
+                    { value: "", label: "Select Tax Class" },
+                    ...(taxRates?.map(tax => ({
+                      value: tax.taxClass,
+                      label: `${tax.taxClass} (${(tax.rate * 100).toFixed(2)}%)`
+                    })) || [
+                      { value: "STANDARD", label: "Standard (8%)" },
+                      { value: "EXEMPT", label: "Exempt (0%)" }
+                    ])
+                  ]}
+                />
               </div>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -351,16 +350,18 @@ export default function ProductDetails({ product, categories, taxRates, onClose 
                 <Input label="Minimum Stock (Alert Level)" type="number" value={form.minimumStock} onChange={e => setForm({...form, minimumStock: e.target.value})} disabled={isSaving || isEditing} />
                 <Input label="Reorder Level (Auto-purchase)" type="number" value={form.reorderLevel} onChange={e => setForm({...form, reorderLevel: e.target.value})} disabled={isSaving || isEditing} />
               </div>
-              <Select
-                label="Product Status"
+              <SleekDropdown
+                formLabel="Product Status"
                 value={form.status}
-                onChange={e => setForm({...form, status: e.target.value})}
+                onChange={val => setForm({...form, status: val})}
                 disabled={isSaving}
-              >
-                <option value="ACTIVE">Active</option>
-                <option value="INACTIVE">Inactive</option>
-                <option value="DISCONTINUED">Discontinued</option>
-              </Select>
+                fullWidth
+                options={[
+                  { value: "ACTIVE", label: "Active" },
+                  { value: "INACTIVE", label: "Inactive" },
+                  { value: "DISCONTINUED", label: "Discontinued" }
+                ]}
+              />
             </div>
           )}
 
@@ -368,17 +369,19 @@ export default function ProductDetails({ product, categories, taxRates, onClose 
           {activeTab === 'details' && (
             <div className="space-y-4 animate-in fade-in">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <Select
-                  label="Unit Type"
+                <SleekDropdown
+                  formLabel="Unit Type"
                   value={form.unit}
-                  onChange={e => setForm({...form, unit: e.target.value})}
+                  onChange={val => setForm({...form, unit: val})}
                   disabled={isSaving}
-                >
-                  <option value="piece">Piece (ea)</option>
-                  <option value="gram">Grams (g)</option>
-                  <option value="slice">Slice</option>
-                  <option value="box">Box</option>
-                </Select>
+                  fullWidth
+                  options={[
+                    { value: "piece", label: "Piece (ea)" },
+                    { value: "gram", label: "Grams (g)" },
+                    { value: "slice", label: "Slice" },
+                    { value: "box", label: "Box" }
+                  ]}
+                />
                 <Input label="Weight (grams)" type="number" value={form.weightGrams} onChange={e => setForm({...form, weightGrams: e.target.value})} disabled={isSaving} />
                 <Input label="Calories (per unit)" type="number" value={form.caloriesPerUnit} onChange={e => setForm({...form, caloriesPerUnit: e.target.value})} disabled={isSaving} />
               </div>
@@ -420,6 +423,13 @@ export default function ProductDetails({ product, categories, taxRates, onClose 
                 removePendingScreenshot={removePendingScreenshot}
                 handleScreenshotSelect={handleScreenshotSelect}
               />
+            </div>
+          )}
+
+          {/* TAB: REVIEWS */}
+          {activeTab === 'reviews' && isEditing && (
+            <div className="animate-in fade-in min-h-[400px]">
+              <ProductReviewsTab productId={product.id} />
             </div>
           )}
 
