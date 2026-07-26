@@ -94,10 +94,13 @@ export default function Orders() {
       case 'CANCELLED':
         return 'destructive';
       case 'CONFIRMED':
+        return 'info';
       case 'PREPARING':
+        return 'purple';
       case 'READY':
+        return 'cyan';
       case 'OUT_FOR_DELIVERY':
-        return 'default';
+        return 'indigo';
       default:
         return 'secondary';
     }
