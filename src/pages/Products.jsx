@@ -14,6 +14,7 @@ import { cn } from '../lib/utils';
 import ProductDetails from './ProductDetails';
 import { motion, AnimatePresence } from 'framer-motion';
 import Pagination from '../components/shared/Pagination';
+import TopSearchBar from '../components/shared/TopSearchBar';
 
 export default function Products() {
   const dispatch = useDispatch();
@@ -23,12 +24,18 @@ export default function Products() {
   const isScrolled = useScrollTop();
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(10);
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const handleSearch = (term) => {
+    setSearchTerm(term);
+    setPage(0);
+  };
 
   useEffect(() => {
-    dispatch(fetchProducts({ page, size: pageSize }));
+    dispatch(fetchProducts({ page, size: pageSize, query: searchTerm }));
     dispatch(fetchCategories());
     dispatch(fetchTaxRates());
-  }, [dispatch, page, pageSize]);
+  }, [dispatch, page, pageSize, searchTerm]);
   
   const totalPages = Math.ceil((totalElements || products?.length || 0) / pageSize) || 1;
 
@@ -75,7 +82,8 @@ export default function Products() {
               </h1>
               <p className="text-[var(--text-muted)] text-sm">Manage your bakery's product offerings and pricing.</p>
             </div>
-            <div className="min-w-[150px] flex sm:justify-end">
+            <div className="flex items-center gap-4 flex-wrap sm:justify-end">
+              <TopSearchBar onSearch={handleSearch} placeholder="Search by SKU or name..." />
               <ActionButton 
                 text="Add Product"
                 onClick={handleAddClick} 

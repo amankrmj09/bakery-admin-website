@@ -3,8 +3,11 @@ import { reviewsApi } from '../api/reviewsApi';
 import { toast } from 'sonner';
 import { AlertTriangle, Check, Trash2 as Trash, MessageSquare } from 'lucide-react';
 import Pagination from '../components/shared/Pagination';
+import { useScrollTop } from '../hooks/useScrollTop';
+import { cn } from '../lib/utils';
 
 export default function Reviews() {
+  const isScrolled = useScrollTop();
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -52,24 +55,27 @@ export default function Reviews() {
     }
   };
 
-  if (loading && reviews.length === 0) {
-    return <div className="p-8">Loading reported reviews...</div>;
-  }
-
   return (
-    <div className="p-8 flex flex-col min-h-full pb-8">
-      <div className="flex items-center gap-3 mb-8">
-        <div className="p-3 bg-red-100 text-red-600 rounded-xl">
-          <AlertTriangle className="w-6 h-6" />
-        </div>
+    <div className="flex flex-col min-h-full gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500 w-full pb-8">
+      <div className={cn(
+        "sticky top-0 z-30 flex justify-between items-center flex-wrap gap-4 transition-all duration-300",
+        isScrolled 
+          ? "bg-[var(--bg-panel)]/80 backdrop-blur-xl border border-[var(--border-color)] shadow-md rounded-2xl px-6 py-4 mt-2" 
+          : "bg-transparent border-transparent py-2"
+      )}>
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Reported Reviews</h1>
-          <p className="text-gray-500 text-sm mt-1">Review and moderate community content</p>
+          <h1 className="text-3xl font-bold text-[var(--text-main)] mb-1 flex items-center gap-2">
+            <AlertTriangle className="text-[var(--color-primary)] h-6 w-6" />
+            Reported Reviews
+          </h1>
+          <p className="text-[var(--text-muted)] text-sm">Review and moderate community content</p>
         </div>
       </div>
 
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm flex flex-col flex-1">
-        {reviews.length === 0 ? (
+        {loading && reviews.length === 0 ? (
+          <div className="text-center py-16 text-gray-500 font-medium">Loading reported reviews...</div>
+        ) : reviews.length === 0 ? (
           <div className="text-center py-16">
             <MessageSquare className="w-12 h-12 text-gray-300 mx-auto mb-4" />
             <h3 className="text-lg font-medium text-gray-900">No reported reviews</h3>

@@ -67,7 +67,8 @@ export const fetchOrders = createAsyncThunk(
   'dashboard/fetchOrders',
   async (params, { rejectWithValue }) => {
     try {
-      const response = await api.get('/api/orders', { params });
+      const endpoint = params?.query ? '/api/orders/admin/search' : '/api/orders';
+      const response = await api.get(endpoint, { params });
       return response.data;
     } catch (error) {
       return rejectWithValue('Failed to fetch orders');
@@ -105,7 +106,8 @@ export const fetchUsers = createAsyncThunk(
   'dashboard/fetchUsers',
   async (params, { rejectWithValue }) => {
     try {
-      const response = await api.get('/api/users/admin/all', { params });
+      const endpoint = params?.query ? '/api/users/admin/search' : '/api/users/admin/all';
+      const response = await api.get(endpoint, { params });
       return response.data;
     } catch (error) {
       return rejectWithValue('Failed to fetch users');
@@ -139,7 +141,8 @@ export const updateUserStatus = createAsyncThunk(
 
 export const fetchProducts = createAsyncThunk('dashboard/fetchProducts', async (params, { rejectWithValue }) => {
     try {
-      const response = await api.get('/api/products', { params });
+      const endpoint = params?.query ? '/api/products/admin/search' : '/api/products';
+      const response = await api.get(endpoint, { params });
       return response.data;
     } catch (error) {
       return rejectWithValue('Failed to fetch products');
@@ -185,7 +188,8 @@ export const deleteProduct = createAsyncThunk(
 
 export const fetchInventory = createAsyncThunk('dashboard/fetchInventory', async (params, { rejectWithValue }) => {
     try {
-      const response = await api.get('/api/inventory', { params });
+      const endpoint = params?.query ? '/api/inventory/admin/search' : '/api/inventory';
+      const response = await api.get(endpoint, { params });
       return response.data;
     } catch (error) {
       return rejectWithValue('Failed to fetch inventory');
@@ -219,9 +223,10 @@ export const addStock = createAsyncThunk(
 
 export const fetchCategories = createAsyncThunk(
   'dashboard/fetchCategories',
-  async (_, { rejectWithValue }) => {
+  async (params, { rejectWithValue }) => {
     try {
-      const response = await api.get('/api/categories');
+      const endpoint = params?.query ? '/api/categories/admin/search' : '/api/categories';
+      const response = await api.get(endpoint, { params });
       return response.data;
     } catch (error) {
       return rejectWithValue('Failed to fetch categories');

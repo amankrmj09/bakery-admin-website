@@ -12,6 +12,7 @@ import { cn } from '../lib/utils';
 import { useScrollTop } from '../hooks/useScrollTop';
 import { Users as UsersIcon } from 'lucide-react';
 import Pagination from '../components/shared/Pagination';
+import TopSearchBar from '../components/shared/TopSearchBar';
 
 export default function Users() {
   const dispatch = useDispatch();
@@ -20,6 +21,8 @@ export default function Users() {
   
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(10);
+  const [searchTerm, setSearchTerm] = useState('');
+  
   const totalPages = Math.ceil((totalElements || users?.length || 0) / pageSize) || 1;
 
   const [selectedUser, setSelectedUser] = useState(null);
@@ -27,9 +30,14 @@ export default function Users() {
   const [editForm, setEditForm] = useState({ role: '', status: '' });
   const [isSaving, setIsSaving] = useState(false);
 
+  const handleSearch = (term) => {
+    setSearchTerm(term);
+    setPage(0);
+  };
+
   useEffect(() => {
-    dispatch(fetchUsers({ page, size: pageSize }));
-  }, [dispatch, page, pageSize]);
+    dispatch(fetchUsers({ page, size: pageSize, query: searchTerm }));
+  }, [dispatch, page, pageSize, searchTerm]);
 
   const handleEditClick = (user) => {
     setSelectedUser(user);
@@ -86,6 +94,7 @@ export default function Users() {
           </h1>
           <p className="text-[var(--text-muted)] text-sm">Manage administrators, staff, and customers.</p>
         </div>
+        <TopSearchBar onSearch={handleSearch} placeholder="Search by name, email, or UID..." />
       </div>
 
       <Card>

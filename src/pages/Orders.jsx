@@ -13,6 +13,7 @@ import { useScrollTop } from '../hooks/useScrollTop';
 import SleekDropdown from '../components/ui/SleekDropdown';
 import { Package, Truck, CheckCircle2, Clock, XCircle, Search, Eye, Download, SearchX, Coffee, ShoppingCart } from 'lucide-react';
 import Pagination from '../components/shared/Pagination';
+import TopSearchBar from '../components/shared/TopSearchBar';
 
 export default function Orders() {
   const dispatch = useDispatch();
@@ -21,10 +22,16 @@ export default function Orders() {
 
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(10);
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const handleSearch = (term) => {
+    setSearchTerm(term);
+    setPage(0);
+  };
   
   useEffect(() => {
-    dispatch(fetchOrders({ page, size: pageSize }));
-  }, [dispatch, page, pageSize]);
+    dispatch(fetchOrders({ page, size: pageSize, query: searchTerm }));
+  }, [dispatch, page, pageSize, searchTerm]);
   
   const totalPages = Math.ceil((totalElements || orders?.length || 0) / pageSize) || 1;
 
@@ -121,6 +128,7 @@ export default function Orders() {
           </h1>
           <p className="text-[var(--text-muted)] text-sm">Monitor and manage customer orders.</p>
         </div>
+        <TopSearchBar onSearch={handleSearch} placeholder="Search order ID or customer..." />
       </div>
 
       <Card>

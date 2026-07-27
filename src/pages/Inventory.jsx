@@ -12,6 +12,7 @@ import { useScrollTop } from '../hooks/useScrollTop';
 import { cn } from '../lib/utils';
 import { Input } from '../components/ui/Input';
 import Pagination from '../components/shared/Pagination';
+import TopSearchBar from '../components/shared/TopSearchBar';
 
 export default function Inventory() {
   const dispatch = useDispatch();
@@ -19,10 +20,16 @@ export default function Inventory() {
   const isScrolled = useScrollTop();
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(10);
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const handleSearch = (term) => {
+    setSearchTerm(term);
+    setPage(0);
+  };
 
   useEffect(() => {
-    dispatch(fetchInventory({ page, size: pageSize }));
-  }, [dispatch, page, pageSize]);
+    dispatch(fetchInventory({ page, size: pageSize, query: searchTerm }));
+  }, [dispatch, page, pageSize, searchTerm]);
   
   const totalPages = Math.ceil((totalElements || inventory?.length || 0) / pageSize) || 1;
 
@@ -94,6 +101,7 @@ export default function Inventory() {
           </h1>
           <p className="text-[var(--text-muted)] text-sm">Track inventory levels and set reorder rules.</p>
         </div>
+        <TopSearchBar onSearch={handleSearch} placeholder="Search by SKU or name..." />
       </div>
 
       <Card>

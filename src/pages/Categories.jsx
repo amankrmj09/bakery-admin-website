@@ -17,6 +17,7 @@ import { Textarea } from '../components/ui/Textarea';
 import SleekSearchDropdown from '../components/ui/SleekSearchDropdown';
 import SingleImageUploader from '../components/shared/SingleImageUploader';
 import Pagination from '../components/shared/Pagination';
+import TopSearchBar from '../components/shared/TopSearchBar';
 
 export default function Categories() {
   const dispatch = useDispatch();
@@ -25,10 +26,16 @@ export default function Categories() {
 
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(10);
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const handleSearch = (term) => {
+    setSearchTerm(term);
+    setPage(0);
+  };
   
   useEffect(() => {
-    dispatch(fetchCategories({ page, size: pageSize }));
-  }, [dispatch, page, pageSize]);
+    dispatch(fetchCategories({ page, size: pageSize, query: searchTerm }));
+  }, [dispatch, page, pageSize, searchTerm]);
   
   const totalPages = Math.ceil((totalElements || categories?.length || 0) / pageSize) || 1;
 
@@ -119,7 +126,8 @@ export default function Categories() {
           </h1>
           <p className="text-[var(--text-muted)] text-sm">Organize your products into logical categories.</p>
         </div>
-        <div className="min-w-[150px] flex sm:justify-end">
+        <div className="flex items-center gap-4 flex-wrap sm:justify-end">
+          <TopSearchBar onSearch={handleSearch} placeholder="Search categories..." />
           <ActionButton 
             text="Add Category"
             onClick={handleAddClick} 

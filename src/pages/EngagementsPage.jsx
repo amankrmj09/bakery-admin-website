@@ -4,8 +4,11 @@ import { toast } from 'sonner';
 import { MessageSquare, Star, Search, CheckCircle2, ShieldAlert, Users, Mail, MessageCircle, Loader2, MapPin, Save } from 'lucide-react';
 import SleekSearchDropdown from '../components/ui/SleekSearchDropdown';
 import Pagination from '../components/shared/Pagination';
+import { useScrollTop } from '../hooks/useScrollTop';
+import { cn } from '../lib/utils';
 
 export default function EngagementsPage() {
+  const isScrolled = useScrollTop();
   const [activeTab, setActiveTab] = useState('testimonials');
   const [testimonials, setTestimonials] = useState([]);
   const [feedbacks, setFeedbacks] = useState([]);
@@ -160,23 +163,26 @@ export default function EngagementsPage() {
     : feedbacks.filter(f => f.type === 'CONTACT_US');
 
   return (
-    <div className="p-8 max-w-7xl mx-auto flex flex-col min-h-full pb-8">
+    <div className="flex flex-col min-h-full gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500 w-full pb-8">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
-        <div className="flex items-center gap-3">
-          <div className="p-3 bg-primary-100 text-primary-600 rounded-xl">
-            <Users className="w-6 h-6" />
-          </div>
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">Customer Engagements</h1>
-            <p className="text-gray-500 text-sm mt-1">Manage testimonials, community feedback, and contact inquiries</p>
-          </div>
+      <div className={cn(
+        "sticky top-0 z-30 flex justify-between items-center flex-wrap gap-4 transition-all duration-300",
+        isScrolled 
+          ? "bg-[var(--bg-panel)]/80 backdrop-blur-xl border border-[var(--border-color)] shadow-md rounded-2xl px-6 py-4 mt-2" 
+          : "bg-transparent border-transparent py-2"
+      )}>
+        <div>
+          <h1 className="text-3xl font-bold text-[var(--text-main)] mb-1 flex items-center gap-2">
+            <Users className="text-[var(--color-primary)] h-6 w-6" />
+            Customer Engagements
+          </h1>
+          <p className="text-[var(--text-muted)] text-sm">Manage testimonials, community feedback, and contact inquiries</p>
         </div>
 
         {activeTab === 'testimonials' && (
-          <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-xl border border-gray-200 shadow-sm">
-            <span className="text-sm font-semibold text-gray-700">Featured on Storefront:</span>
-            <span className={`text-sm font-bold px-2 py-0.5 rounded-full ${featuredCount >= 5 ? 'bg-amber-100 text-amber-700' : 'bg-primary-50 text-primary-600'}`}>
+          <div className="flex items-center gap-2 bg-[var(--bg-panel)] px-4 py-2 rounded-xl border border-[var(--border-color)] shadow-sm">
+            <span className="text-sm font-semibold text-[var(--text-main)]">Featured on Storefront:</span>
+            <span className={`text-sm font-bold px-2 py-0.5 rounded-full ${featuredCount >= 5 ? 'bg-amber-500/20 text-amber-500' : 'bg-[var(--color-primary)]/20 text-[var(--color-primary)]'}`}>
               {featuredCount} / 5
             </span>
           </div>
