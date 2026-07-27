@@ -1,11 +1,15 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { engagementsApi } from '../api/engagementsApi';
 import { toast } from 'sonner';
-import { MessageSquare, Star, Search, CheckCircle2, ShieldAlert, Users, Mail, MessageCircle, Loader2, MapPin, Save, Instagram, Facebook, Twitter, AtSign } from 'lucide-react';
+import { MessageSquare, Star, Search, CheckCircle2, ShieldAlert, Users, Mail, MessageCircle, Loader2, MapPin, Save } from 'lucide-react';
 import SleekSearchDropdown from '../components/ui/SleekSearchDropdown';
 import Pagination from '../components/shared/Pagination';
 import { useScrollTop } from '../hooks/useScrollTop';
 import { cn } from '../lib/utils';
+import ActionButton from '../components/ui/ActionButton';
+import { FaInstagram, FaFacebook, FaGlobe } from 'react-icons/fa';
+import { FaXTwitter, FaThreads } from 'react-icons/fa6';
+
 
 export default function EngagementsPage() {
   const isScrolled = useScrollTop();
@@ -27,7 +31,7 @@ export default function EngagementsPage() {
     address: '', 
     phoneNumbers: ['', ''], 
     emails: ['', ''],
-    socialLinks: { instagram: '', facebook: '', twitter: '', threads: '' }
+    socialLinks: { instagram: '', facebook: '', twitter: '', threads: '', website: '' }
   });
   const [contactInfoSaving, setContactInfoSaving] = useState(false);
 
@@ -48,7 +52,8 @@ export default function EngagementsPage() {
             instagram: res.data.socialLinks?.instagram || '',
             facebook:  res.data.socialLinks?.facebook  || '',
             twitter:   res.data.socialLinks?.twitter   || '',
-            threads:   res.data.socialLinks?.threads   || ''
+            threads:   res.data.socialLinks?.threads   || '',
+            website:   res.data.socialLinks?.website   || ''
           }
         });
       } else {
@@ -230,43 +235,45 @@ export default function EngagementsPage() {
           </button>
         </div>
 
-        <form onSubmit={handleSearch} className="flex items-center gap-2 flex-1 max-w-md">
-          <div className="relative flex-1">
-            <SleekSearchDropdown
-              value={searchQuery}
-              onChange={(opt) => {
-                setSearchQuery(opt.label);
-              }}
-              onSearch={(val) => {
-                setSearchQuery(val);
-                handleDropdownSearch(val);
-              }}
-              onEnter={(val) => {
-                setSearchQuery(val);
-              }}
-              options={searchOptions}
-              isLoading={searchDropdownLoading}
-              placeholder="Search by username via Elasticsearch..."
-              headerTitle="SEARCH USERS"
-            />
-          </div>
-          <button
-            type="submit"
-            disabled={searching}
-            className="px-4 py-2 bg-gray-900 hover:bg-gray-800 text-white rounded-xl text-sm font-semibold transition-colors flex items-center gap-2"
-          >
-            {searching ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Search'}
-          </button>
-          {searchQuery && (
+        {activeTab !== 'contact-info' && (
+          <form onSubmit={handleSearch} className="flex items-center gap-2 flex-1 max-w-md">
+            <div className="relative flex-1">
+              <SleekSearchDropdown
+                value={searchQuery}
+                onChange={(opt) => {
+                  setSearchQuery(opt.label);
+                }}
+                onSearch={(val) => {
+                  setSearchQuery(val);
+                  handleDropdownSearch(val);
+                }}
+                onEnter={(val) => {
+                  setSearchQuery(val);
+                }}
+                options={searchOptions}
+                isLoading={searchDropdownLoading}
+                placeholder="Search User"
+                headerTitle="SEARCH USERS"
+              />
+            </div>
             <button
-              type="button"
-              onClick={() => { setSearchQuery(''); fetchData(); setSearchOptions([]); }}
-              className="text-xs text-gray-500 hover:text-gray-700 underline"
+              type="submit"
+              disabled={searching}
+              className="px-4 py-2 bg-gray-900 hover:bg-gray-800 text-white rounded-xl text-sm font-semibold transition-colors flex items-center gap-2"
             >
-              Clear
+              {searching ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Search'}
             </button>
-          )}
-        </form>
+            {searchQuery && (
+              <button
+                type="button"
+                onClick={() => { setSearchQuery(''); fetchData(); setSearchOptions([]); }}
+                className="text-xs text-gray-500 hover:text-gray-700 underline"
+              >
+                Clear
+              </button>
+            )}
+          </form>
+        )}
       </div>
 
       {/* Content Area */}
@@ -446,7 +453,7 @@ export default function EngagementsPage() {
               </div>
             </div>
 
-            {/* Social Media Links */}
+             {/* Social Media Links */}
             <div className="pt-4 border-t border-gray-100">
               <h3 className="text-base font-bold text-gray-900 mb-1">Social Media Links</h3>
               <p className="text-xs text-gray-500 mb-4">These links will appear in the user site footer. Leave blank to hide.</p>
@@ -454,17 +461,19 @@ export default function EngagementsPage() {
                 {/* Instagram */}
                 <div className="space-y-2">
                   <label className="text-sm font-bold text-gray-700 flex items-center gap-1.5">
-                    <span className="w-4 h-4 inline-flex items-center justify-center text-pink-500">&#x1F4F7;</span>
+                    <FaInstagram className="w-4 h-4 text-pink-500" />
                     Instagram
                   </label>
                   <div className="relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-pink-400 text-xs font-bold">IG</span>
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-pink-400">
+                      <FaInstagram className="w-4 h-4" />
+                    </span>
                     <input
                       type="url"
                       value={contactInfo.socialLinks.instagram}
                       onChange={e => setContactInfo({ ...contactInfo, socialLinks: { ...contactInfo.socialLinks, instagram: e.target.value } })}
                       className="w-full bg-gray-50 border border-gray-200 rounded-xl pl-10 pr-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-pink-400 transition-all"
-                      placeholder="https://instagram.com/yourbakery"
+                      placeholder="https://instagram.com/..."
                     />
                   </div>
                 </div>
@@ -472,17 +481,19 @@ export default function EngagementsPage() {
                 {/* Facebook */}
                 <div className="space-y-2">
                   <label className="text-sm font-bold text-gray-700 flex items-center gap-1.5">
-                    <span className="w-4 h-4 inline-flex items-center justify-center text-blue-600">&#x1F4D8;</span>
+                    <FaFacebook className="w-4 h-4 text-blue-600" />
                     Facebook
                   </label>
                   <div className="relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-blue-500 text-xs font-bold">FB</span>
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-blue-500">
+                      <FaFacebook className="w-4 h-4" />
+                    </span>
                     <input
                       type="url"
                       value={contactInfo.socialLinks.facebook}
                       onChange={e => setContactInfo({ ...contactInfo, socialLinks: { ...contactInfo.socialLinks, facebook: e.target.value } })}
                       className="w-full bg-gray-50 border border-gray-200 rounded-xl pl-10 pr-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all"
-                      placeholder="https://facebook.com/yourbakery"
+                      placeholder="https://facebook.com/..."
                     />
                   </div>
                 </div>
@@ -490,17 +501,19 @@ export default function EngagementsPage() {
                 {/* Twitter / X */}
                 <div className="space-y-2">
                   <label className="text-sm font-bold text-gray-700 flex items-center gap-1.5">
-                    <span className="w-4 h-4 inline-flex items-center justify-center text-gray-900 font-black text-xs">𝕏</span>
+                    <FaXTwitter className="w-4 h-4 text-gray-900" />
                     Twitter / X
                   </label>
                   <div className="relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-700 text-xs font-black">X</span>
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-700">
+                      <FaXTwitter className="w-4 h-4" />
+                    </span>
                     <input
                       type="url"
                       value={contactInfo.socialLinks.twitter}
                       onChange={e => setContactInfo({ ...contactInfo, socialLinks: { ...contactInfo.socialLinks, twitter: e.target.value } })}
                       className="w-full bg-gray-50 border border-gray-200 rounded-xl pl-10 pr-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-gray-400 transition-all"
-                      placeholder="https://x.com/yourbakery"
+                      placeholder="https://x.com/..."
                     />
                   </div>
                 </div>
@@ -508,32 +521,55 @@ export default function EngagementsPage() {
                 {/* Threads */}
                 <div className="space-y-2">
                   <label className="text-sm font-bold text-gray-700 flex items-center gap-1.5">
-                    <span className="w-4 h-4 inline-flex items-center justify-center text-gray-800 font-black text-xs">@</span>
+                    <FaThreads className="w-4 h-4 text-gray-800" />
                     Threads
                   </label>
                   <div className="relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-600 text-xs font-bold">@</span>
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-600">
+                      <FaThreads className="w-4 h-4" />
+                    </span>
                     <input
                       type="url"
                       value={contactInfo.socialLinks.threads}
                       onChange={e => setContactInfo({ ...contactInfo, socialLinks: { ...contactInfo.socialLinks, threads: e.target.value } })}
                       className="w-full bg-gray-50 border border-gray-200 rounded-xl pl-10 pr-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-gray-400 transition-all"
-                      placeholder="https://threads.net/@yourbakery"
+                      placeholder="https://threads.net/@..."
                     />
                   </div>
                 </div>
+
+                {/* Website */}
+                <div className="space-y-2">
+                  <label className="text-sm font-bold text-gray-700 flex items-center gap-1.5">
+                    <FaGlobe className="w-4 h-4 text-primary" />
+                    Website / URL
+                  </label>
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-primary/70">
+                      <FaGlobe className="w-4 h-4" />
+                    </span>
+                    <input
+                      type="url"
+                      value={contactInfo.socialLinks.website || ''}
+                      onChange={e => setContactInfo({ ...contactInfo, socialLinks: { ...contactInfo.socialLinks, website: e.target.value } })}
+                      className="w-full bg-gray-50 border border-gray-200 rounded-xl pl-10 pr-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all"
+                      placeholder="https://..."
+                    />
+                  </div>
+                </div>
+
+
               </div>
             </div>
 
             <div className="pt-4 flex justify-end">
-              <button
+              <ActionButton
                 type="submit"
                 disabled={contactInfoSaving}
-                className="flex items-center gap-2 bg-primary-600 hover:bg-primary-700 text-white font-bold py-3 px-6 rounded-xl transition-colors shadow-sm disabled:opacity-70 disabled:cursor-not-allowed"
-              >
-                {contactInfoSaving ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />}
-                Save Changes
-              </button>
+                text={contactInfoSaving ? "Saving..." : "Save Changes"}
+                icon={Save}
+                showArrow={true}
+              />
             </div>
           </form>
         </div>
