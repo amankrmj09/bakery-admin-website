@@ -6,7 +6,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '.
 import { Badge } from '../components/ui/Badge';
 import { Button } from '../components/ui/Button';
 import ActionButton from '../components/ui/ActionButton';
-import { Plus, Trash2, Tags, Loader2, Save, FolderTree } from 'lucide-react';
+import { Plus, Trash2, Tags, Loader2, Save, FolderTree, Power, Edit } from 'lucide-react';
 import { Modal } from '../components/ui/Modal';
 import { toast } from 'sonner';
 import api from '../api/axiosConfig';
@@ -18,6 +18,7 @@ import SleekSearchDropdown from '../components/ui/SleekSearchDropdown';
 import SingleImageUploader from '../components/shared/SingleImageUploader';
 import Pagination from '../components/shared/Pagination';
 import TopSearchBar from '../components/shared/TopSearchBar';
+import ActionIconButton from '../components/ui/ActionIconButton';
 
 export default function Categories() {
   const dispatch = useDispatch();
@@ -161,9 +162,9 @@ export default function Categories() {
                     <TableCell>{c.productCount || 0}</TableCell>
                     <TableCell><Badge variant={c.active ? 'success' : 'secondary'}>{c.active ? 'Active' : 'Inactive'}</Badge></TableCell>
                     <TableCell><Badge variant={c.isTopCategory ? 'success' : 'secondary'}>{c.isTopCategory ? 'Yes' : 'No'}</Badge></TableCell>
-                    <TableCell className="text-right space-x-2">
-                      <Button variant="outline" size="sm" onClick={() => handleToggleStatus(c.id)}>Toggle</Button>
-                      <Button variant="ghost" size="sm" onClick={() => handleEditClick(c)}>Edit</Button>
+                    <TableCell className="text-right whitespace-nowrap">
+                      <ActionIconButton icon={Power} onClick={() => handleToggleStatus(c.id)} title="Toggle Status" colorClass="text-amber-600 bg-amber-50 hover:bg-amber-100" />
+                      <ActionIconButton icon={Edit} onClick={() => handleEditClick(c)} title="Edit Category" colorClass="text-blue-600 bg-blue-50 hover:bg-blue-100" />
                     </TableCell>
                   </TableRow>
                 ))

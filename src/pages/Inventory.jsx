@@ -6,13 +6,14 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '.
 import { Badge } from '../components/ui/Badge';
 import { Button } from '../components/ui/Button';
 import ActionButton from '../components/ui/ActionButton';
-import { Archive, Loader2, Save } from 'lucide-react';
+import { Archive, Loader2, Save, PackagePlus, Sliders } from 'lucide-react';
 import { Modal } from '../components/ui/Modal';
 import { useScrollTop } from '../hooks/useScrollTop';
 import { cn } from '../lib/utils';
 import { Input } from '../components/ui/Input';
 import Pagination from '../components/shared/Pagination';
 import TopSearchBar from '../components/shared/TopSearchBar';
+import ActionIconButton from '../components/ui/ActionIconButton';
 
 export default function Inventory() {
   const dispatch = useDispatch();
@@ -126,9 +127,9 @@ export default function Inventory() {
                     <TableCell className="font-medium">{item.productName}</TableCell>
                     <TableCell>{item.currentStock}</TableCell>
                     <TableCell><Badge variant={getStatusBadge(item.status)}>{item.status}</Badge></TableCell>
-                    <TableCell className="text-right space-x-2">
-                      <Button variant="outline" size="sm" onClick={() => handleAddStockClick(item)}>Add Stock</Button>
-                      <Button variant="ghost" size="sm" onClick={() => handleEditRulesClick(item)}>Rules</Button>
+                    <TableCell className="text-right whitespace-nowrap">
+                      <ActionIconButton icon={PackagePlus} onClick={() => handleAddStockClick(item)} title="Add Stock" colorClass="text-green-600 bg-green-50 hover:bg-green-100" />
+                      <ActionIconButton icon={Sliders} onClick={() => handleEditRulesClick(item)} title="Rules" colorClass="text-purple-600 bg-purple-50 hover:bg-purple-100" />
                     </TableCell>
                   </TableRow>
                 ))

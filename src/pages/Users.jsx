@@ -10,9 +10,10 @@ import { Modal } from '../components/ui/Modal';
 import { toast } from 'sonner';
 import { cn } from '../lib/utils';
 import { useScrollTop } from '../hooks/useScrollTop';
-import { Users as UsersIcon } from 'lucide-react';
+import { Users as UsersIcon, Edit } from 'lucide-react';
 import Pagination from '../components/shared/Pagination';
 import TopSearchBar from '../components/shared/TopSearchBar';
+import ActionIconButton from '../components/ui/ActionIconButton';
 
 export default function Users() {
   const dispatch = useDispatch();
@@ -131,10 +132,8 @@ export default function Users() {
                           {user.status || 'ACTIVE'}
                         </Badge>
                       </TableCell>
-                      <TableCell className="text-right">
-                        <Button variant="ghost" size="sm" onClick={() => handleEditClick(user)}>
-                          Edit
-                        </Button>
+                      <TableCell className="text-right whitespace-nowrap">
+                        <ActionIconButton icon={Edit} onClick={() => handleEditClick(user)} title="Edit User" colorClass="text-blue-600 bg-blue-50 hover:bg-blue-100" />
                       </TableCell>
                     </TableRow>
                   ))

@@ -22,7 +22,7 @@ const initialFormState = {
   sku: '', name: '', categoryId: '', price: '', discountPrice: '', costPrice: '', taxClass: 'STANDARD', 
   status: 'ACTIVE', isFeatured: false, description: '', shortDescription: '',
   initialStock: 0, minimumStock: 0, reorderLevel: 0, maxOrderQuantity: '',
-  unit: 'piece', weightGrams: '', caloriesPerUnit: '', preparationTimeMinutes: '', shelfLifeHours: '',
+  unit: '', calories: '', preparationTimeMinutes: '', shelfLifeHours: '',
   ingredients: '', allergens: '', tags: '', metaTitle: '', metaDescription: '',
   mediaUrls: [], videoUrl: ''
 };
@@ -62,9 +62,8 @@ export default function ProductDetails({ product, categories, taxRates, onClose 
         minimumStock: 0,
         reorderLevel: 0,
         maxOrderQuantity: product.maxOrderQuantity || '',
-        unit: product.unit || 'piece',
-        weightGrams: product.weightGrams || '',
-        caloriesPerUnit: product.caloriesPerUnit || '',
+        unit: product.unit || '',
+        calories: product.calories || '',
         preparationTimeMinutes: product.preparationTimeMinutes || '',
         shelfLifeHours: product.shelfLifeHours || '',
         ingredients: (product.ingredients || []).join(', '),
@@ -192,8 +191,8 @@ export default function ProductDetails({ product, categories, taxRates, onClose 
         discountPrice: form.discountPrice ? parseFloat(form.discountPrice) : null,
         costPrice: form.costPrice ? parseFloat(form.costPrice) : null,
         taxRate: selectedTax ? selectedTax.rate : 0.08, // Default fallback
-        weightGrams: form.weightGrams ? parseInt(form.weightGrams) : null,
-        caloriesPerUnit: form.caloriesPerUnit ? parseInt(form.caloriesPerUnit) : null,
+        unit: form.unit || '',
+        calories: form.calories || '',
         preparationTimeMinutes: form.preparationTimeMinutes ? parseInt(form.preparationTimeMinutes) : null,
         shelfLifeHours: form.shelfLifeHours ? parseInt(form.shelfLifeHours) : null,
         maxOrderQuantity: form.maxOrderQuantity ? parseInt(form.maxOrderQuantity) : null,
@@ -369,21 +368,8 @@ export default function ProductDetails({ product, categories, taxRates, onClose 
           {activeTab === 'details' && (
             <div className="space-y-4 animate-in fade-in">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <SleekDropdown
-                  formLabel="Unit Type"
-                  value={form.unit}
-                  onChange={val => setForm({...form, unit: val})}
-                  disabled={isSaving}
-                  fullWidth
-                  options={[
-                    { value: "piece", label: "Piece (ea)" },
-                    { value: "gram", label: "Grams (g)" },
-                    { value: "slice", label: "Slice" },
-                    { value: "box", label: "Box" }
-                  ]}
-                />
-                <Input label="Weight (grams)" type="number" value={form.weightGrams} onChange={e => setForm({...form, weightGrams: e.target.value})} disabled={isSaving} />
-                <Input label="Calories (per unit)" type="number" value={form.caloriesPerUnit} onChange={e => setForm({...form, caloriesPerUnit: e.target.value})} disabled={isSaving} />
+                <Input label="Unit / Size Description" value={form.unit} onChange={e => setForm({...form, unit: e.target.value})} disabled={isSaving} placeholder="e.g. 100 grams, 2 slices (100g each)" />
+                <Input label="Calories Description" value={form.calories} onChange={e => setForm({...form, calories: e.target.value})} disabled={isSaving} placeholder="e.g. 250 kcal per 100g" />
               </div>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

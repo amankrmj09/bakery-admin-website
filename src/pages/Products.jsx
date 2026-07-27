@@ -7,7 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '.
 import { Badge } from '../components/ui/Badge';
 import { Button } from '../components/ui/Button';
 import ActionButton from '../components/ui/ActionButton';
-import { Package, Plus } from 'lucide-react';
+import { Package, Plus, Edit } from 'lucide-react';
 import { toast } from 'sonner';
 import { useScrollTop } from '../hooks/useScrollTop';
 import { cn } from '../lib/utils';
@@ -15,6 +15,7 @@ import ProductDetails from './ProductDetails';
 import { motion, AnimatePresence } from 'framer-motion';
 import Pagination from '../components/shared/Pagination';
 import TopSearchBar from '../components/shared/TopSearchBar';
+import ActionIconButton from '../components/ui/ActionIconButton';
 
 export default function Products() {
   const dispatch = useDispatch();
@@ -115,8 +116,8 @@ export default function Products() {
                         <TableCell className="font-medium">{p.name}</TableCell>
                         <TableCell>${p.price}</TableCell>
                         <TableCell><Badge variant={p.status === 'ACTIVE' ? 'success' : 'secondary'}>{p.status}</Badge></TableCell>
-                        <TableCell className="text-right space-x-2">
-                          <Button variant="ghost" size="sm" onClick={() => handleEditClick(p)}>Edit</Button>
+                        <TableCell className="text-right whitespace-nowrap">
+                          <ActionIconButton icon={Edit} onClick={() => handleEditClick(p)} title="Edit Product" colorClass="text-blue-600 bg-blue-50 hover:bg-blue-100" />
                         </TableCell>
                       </TableRow>
                     ))

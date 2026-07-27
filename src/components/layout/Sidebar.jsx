@@ -5,6 +5,7 @@ import { useDispatch } from 'react-redux';
 import { logout } from '../../store/slices/authSlice';
 import { cn } from '../../lib/utils';
 import { useTheme } from '../../app/ThemeContext';
+import { toast } from 'sonner';
 
 const navItems = [
   { name: 'Dashboard', path: '/', icon: LayoutDashboard },
@@ -24,6 +25,7 @@ export const Sidebar = ({ isOpen, setIsOpen }) => {
 
   const handleLogout = () => {
     dispatch(logout());
+    toast.success('Logged out successfully');
   };
 
   return (

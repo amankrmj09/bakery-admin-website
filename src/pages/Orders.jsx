@@ -11,9 +11,10 @@ import api from '../api/axiosConfig';
 import { cn } from '../lib/utils';
 import { useScrollTop } from '../hooks/useScrollTop';
 import SleekDropdown from '../components/ui/SleekDropdown';
-import { Package, Truck, CheckCircle2, Clock, XCircle, Search, Eye, Download, SearchX, Coffee, ShoppingCart } from 'lucide-react';
+import { Package, Truck, CheckCircle2, Clock, XCircle, Search, Eye, Download, SearchX, Coffee, ShoppingCart, Check, X } from 'lucide-react';
 import Pagination from '../components/shared/Pagination';
 import TopSearchBar from '../components/shared/TopSearchBar';
+import ActionIconButton from '../components/ui/ActionIconButton';
 
 export default function Orders() {
   const dispatch = useDispatch();
@@ -160,29 +161,14 @@ export default function Orders() {
                           {order.status}
                         </Badge>
                       </TableCell>
-                      <TableCell className="text-right space-x-2">
+                      <TableCell className="text-right whitespace-nowrap">
                         {order.status === 'PENDING' && (
                           <>
-                            <Button 
-                              variant="outline" 
-                              size="sm"
-                              onClick={() => handleStatusChange(order.id, 'CONFIRMED')}
-                            >
-                              Confirm
-                            </Button>
-                            <Button 
-                              variant="destructive" 
-                              size="sm"
-                              className="bg-red-500/10 text-red-500 hover:bg-red-500/20"
-                              onClick={() => handleDecline(order.id)}
-                            >
-                              Decline
-                            </Button>
+                            <ActionIconButton icon={Check} onClick={() => handleStatusChange(order.id, 'CONFIRMED')} title="Confirm Order" colorClass="text-green-600 bg-green-50 hover:bg-green-100" />
+                            <ActionIconButton icon={X} onClick={() => handleDecline(order.id)} title="Decline Order" colorClass="text-red-600 bg-red-50 hover:bg-red-100" />
                           </>
                         )}
-                        <Button variant="ghost" size="sm" onClick={() => handleViewClick(order)}>
-                          View
-                        </Button>
+                        <ActionIconButton icon={Eye} onClick={() => handleViewClick(order)} title="View Details" colorClass="text-blue-600 bg-blue-50 hover:bg-blue-100" />
                       </TableCell>
                     </TableRow>
                   ))
