@@ -37,6 +37,7 @@ const SleekDropdown = ({
   placeholder,
   customTrigger,
   emptyStateNode,
+  triggerClassName = '',
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
@@ -67,7 +68,7 @@ const SleekDropdown = ({
         <button
           type="button"
           onClick={() => setIsOpen(!isOpen)}
-          className={`flex items-center gap-2 bg-white border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm font-medium font-sans text-gray-900 hover:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary shadow-sm transition-all ${fullWidth ? 'w-full justify-between' : ''}`}
+          className={`flex items-center gap-2 bg-white border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm font-medium font-sans text-gray-900 hover:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary shadow-sm transition-all ${fullWidth ? 'w-full justify-between' : ''} ${triggerClassName}`}
         >
           <div className="flex items-center gap-2 min-w-0">
             {Icon && <Icon className={`w-4 h-4 flex-shrink-0 ${iconColor}`} />}

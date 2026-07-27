@@ -75,7 +75,7 @@ export default function Dashboard() {
     },
     {
       title: 'Total Revenue',
-      value: `$${stats.totalRevenue?.toFixed(2) || '0.00'}`,
+      value: `₹${stats.totalRevenue?.toFixed(2) || '0.00'}`,
       icon: CreditCard,
       color: 'text-emerald-600',
       bg: 'bg-emerald-100',
@@ -186,7 +186,7 @@ export default function Dashboard() {
               <LineChart data={processedChartData}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} />
                 <XAxis dataKey="name" axisLine={false} tickLine={false} />
-                <YAxis axisLine={false} tickLine={false} tickFormatter={(value) => `$${value}`} />
+                <YAxis axisLine={false} tickLine={false} tickFormatter={(value) => `₹${value}`} />
                 <Tooltip />
                 <Line type="monotone" dataKey="revenue" stroke="#8b5cf6" strokeWidth={2} dot={{ r: 4 }} activeDot={{ r: 6 }} />
               </LineChart>
@@ -206,7 +206,7 @@ export default function Dashboard() {
                     <p className="text-xs text-muted-foreground">{new Date(order.createdAt || order.orderDate || new Date()).toLocaleDateString()}</p>
                   </div>
                   <div className="text-right">
-                    <p className="text-sm font-bold">${order.totalAmount?.toFixed(2) || '0.00'}</p>
+                    <p className="text-sm font-bold">₹{order.totalAmount?.toFixed(2) || '0.00'}</p>
                     <Badge variant={getStatusBadgeVariant(order.status)} className="mt-1 text-[10px]">
                       {order.status || 'PENDING'}
                     </Badge>

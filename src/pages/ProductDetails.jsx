@@ -297,14 +297,15 @@ export default function ProductDetails({ product, categories, taxRates, onClose 
                 <Input label="SKU" required value={form.sku} onChange={e => setForm({...form, sku: e.target.value})} disabled={isSaving || isEditing} />
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <Input label="Price ($)" type="number" step="0.01" required value={form.price} onChange={e => setForm({...form, price: e.target.value})} disabled={isSaving} />
-                <Input label="Discount Price ($)" type="number" step="0.01" value={form.discountPrice} onChange={e => setForm({...form, discountPrice: e.target.value})} disabled={isSaving} />
-                <Input label="Cost Price ($)" type="number" step="0.01" value={form.costPrice} onChange={e => setForm({...form, costPrice: e.target.value})} disabled={isSaving} />
+                <Input label="Price (₹)" type="number" step="0.01" required value={form.price} onChange={e => setForm({...form, price: e.target.value})} disabled={isSaving} />
+                <Input label="Discount Price (₹)" type="number" step="0.01" value={form.discountPrice} onChange={e => setForm({...form, discountPrice: e.target.value})} disabled={isSaving} />
+                <Input label="Cost Price (₹)" type="number" step="0.01" value={form.costPrice} onChange={e => setForm({...form, costPrice: e.target.value})} disabled={isSaving} />
                 <SleekDropdown
                   formLabel="Tax Class"
                   value={form.taxClass}
                   onChange={val => setForm({...form, taxClass: val})}
                   disabled={isSaving}
+                  triggerClassName="!py-3.5"
                   fullWidth
                   options={[
                     { value: "", label: "Select Tax Class" },

@@ -22,10 +22,15 @@ const SleekSearchDropdown = ({
   const inputRef = useRef(null);
 
   useEffect(() => {
-    if (value !== searchTerm) {
+    // Resolve label from options when value is set (e.g., on edit load)
+    const matchingOption = options.find(o => o.value === value);
+    if (matchingOption) {
+      setSearchTerm(matchingOption.label);
+    } else if (value !== searchTerm && !options.find(o => o.label === searchTerm)) {
+      // Only fall back to raw value if no matching option found and current term isn't already a label
       setSearchTerm(value || '');
     }
-  }, [value]);
+  }, [value, options]);
 
   const handleInputChange = (e, setIsOpen) => {
     const newVal = e.target.value;
