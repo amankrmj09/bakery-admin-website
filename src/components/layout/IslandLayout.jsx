@@ -36,7 +36,9 @@ export const IslandLayout = () => {
                 transition={{ duration: 0.3, ease: 'easeOut' }}
                 className="w-full min-h-full flex flex-col gap-6"
               >
-                {outlet}
+                <React.Suspense fallback={<div className="flex items-center justify-center h-64"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--color-primary)]"></div></div>}>
+                  {outlet}
+                </React.Suspense>
               </motion.div>
             </AnimatePresence>
           </div>
