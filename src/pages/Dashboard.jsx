@@ -13,6 +13,7 @@ export default function Dashboard() {
   const dispatch = useDispatch();
   const isScrolled = useScrollTop();
   const [timeframe, setTimeframe] = useState('1m');
+  const [chartMode, setChartMode] = useState('daily');
   const { stats } = useSelector((state) => state.dashboard);
   const { data: ordersData } = useSelector((state) => state.dashboard.orders);
 
@@ -35,6 +36,15 @@ export default function Dashboard() {
   const chartData = stats.chartData && stats.chartData.length > 0 ? stats.chartData : [
     { name: 'No Data', revenue: 0 }
   ];
+
+  const processedChartData = React.useMemo(() => {
+    if (chartMode === 'daily') return chartData;
+    let cumulative = 0;
+    return chartData.map(dataPoint => {
+      cumulative += (dataPoint.revenue || 0);
+      return { ...dataPoint, revenue: cumulative };
+    });
+  }, [chartData, chartMode]);
 
   const recentOrders = [...(ordersData || [])]
     .sort((a, b) => new Date(b.orderDate || b.createdAt || 0) - new Date(a.orderDate || a.createdAt || 0))
@@ -113,6 +123,12 @@ export default function Dashboard() {
                 {stat.isGrowthCard ? (
                   <div className="absolute top-4 right-4 flex items-center bg-muted rounded-lg p-0.5 border border-border text-xs">
                     <button
+                      onClick={() => setTimeframe('1d')}
+                      className={`px-2 py-1 rounded-md transition-colors ${timeframe === '1d' ? 'bg-background shadow text-foreground font-semibold' : 'text-muted-foreground hover:text-foreground'}`}
+                    >
+                      1D
+                    </button>
+                    <button
                       onClick={() => setTimeframe('7d')}
                       className={`px-2 py-1 rounded-md transition-colors ${timeframe === '7d' ? 'bg-background shadow text-foreground font-semibold' : 'text-muted-foreground hover:text-foreground'}`}
                     >
@@ -136,7 +152,7 @@ export default function Dashboard() {
                 {stat.isGrowthCard && (
                   <div className="flex items-center text-xs text-muted-foreground mt-1">
                     <TrendingUp className={`mr-1 h-3 w-3 ${stat.color}`} />
-                    vs last {timeframe === '7d' ? '7 days' : 'month'}
+                    vs last {timeframe === '1d' ? 'day' : timeframe === '7d' ? '7 days' : 'month'}
                   </div>
                 )}
               </CardContent>
@@ -148,12 +164,26 @@ export default function Dashboard() {
       {/* Charts / Recent Activity */}
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-7">
         <Card className="col-span-4">
-          <CardHeader>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative">
             <CardTitle>Revenue Overview</CardTitle>
+            <div className="absolute top-4 right-4 z-10 flex items-center bg-muted rounded-lg p-0.5 border border-border text-xs">
+              <button
+                onClick={() => setChartMode('cumulative')}
+                className={`px-2 py-1 rounded-md transition-colors ${chartMode === 'cumulative' ? 'bg-background shadow text-foreground font-semibold' : 'text-muted-foreground hover:text-foreground'}`}
+              >
+                Cumulative
+              </button>
+              <button
+                onClick={() => setChartMode('daily')}
+                className={`px-2 py-1 rounded-md transition-colors ${chartMode === 'daily' ? 'bg-background shadow text-foreground font-semibold' : 'text-muted-foreground hover:text-foreground'}`}
+              >
+                Daily
+              </button>
+            </div>
           </CardHeader>
-          <CardContent className="h-80 w-full">
+          <CardContent className="h-80 w-full pt-4">
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={chartData}>
+              <LineChart data={processedChartData}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} />
                 <XAxis dataKey="name" axisLine={false} tickLine={false} />
                 <YAxis axisLine={false} tickLine={false} tickFormatter={(value) => `$${value}`} />

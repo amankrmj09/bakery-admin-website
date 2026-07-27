@@ -8,7 +8,7 @@ export default function TaxSettings() {
   const dispatch = useDispatch();
   const { taxRates, loading, error, success } = useSelector((state) => state.tax);
   const [isEditing, setIsEditing] = useState(false);
-  const [currentTax, setCurrentTax] = useState({ taxClass: '', rate: '', description: '' });
+  const [currentTax, setCurrentTax] = useState({ type: '', rate: '', description: '' });
 
   useEffect(() => {
     dispatch(fetchTaxRates());
@@ -17,7 +17,7 @@ export default function TaxSettings() {
   useEffect(() => {
     if (success) {
       setIsEditing(false);
-      setCurrentTax({ taxClass: '', rate: '', description: '' });
+      setCurrentTax({ type: '', rate: '', description: '' });
       dispatch(clearTaxState());
     }
     if (error) {
@@ -53,7 +53,7 @@ export default function TaxSettings() {
         <button
           onClick={() => {
             setIsEditing(!isEditing);
-            setCurrentTax({ taxClass: '', rate: '', description: '' });
+            setCurrentTax({ type: '', rate: '', description: '' });
           }}
           className="bg-[var(--color-primary)] text-white px-4 py-2 rounded-lg text-sm transition-opacity hover:opacity-90"
         >
@@ -72,8 +72,8 @@ export default function TaxSettings() {
                 <input
                   type="text"
                   required
-                  value={currentTax.taxClass}
-                  onChange={(e) => setCurrentTax({ ...currentTax, taxClass: e.target.value })}
+                  value={currentTax.type}
+                  onChange={(e) => setCurrentTax({ ...currentTax, type: e.target.value })}
                   className="w-full bg-[var(--bg-panel)] border border-[var(--border-color)] rounded-lg px-4 py-2 text-[var(--text-main)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
                   placeholder="e.g. STANDARD, EXEMPT"
                 />
@@ -134,7 +134,7 @@ export default function TaxSettings() {
               ) : (
                 taxRates.map((tax) => (
                   <tr key={tax.id} className="border-b border-[var(--border-color)] hover:bg-[var(--bg-panel-hover)] transition-colors">
-                    <td className="py-4 px-2 font-medium">{tax.taxClass}</td>
+                    <td className="py-4 px-2 font-medium">{tax.type}</td>
                     <td className="py-4 px-2">{(tax.rate * 100).toFixed(2)}%</td>
                     <td className="py-4 px-2 text-[var(--text-muted)]">{tax.description || '-'}</td>
                     <td className="py-4 px-2 text-right">

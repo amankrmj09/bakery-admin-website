@@ -184,7 +184,7 @@ export default function ProductDetails({ product, categories, taxRates, onClose 
 
       const parseArray = (str) => str ? str.split(',').map(s => s.trim()).filter(Boolean) : [];
 
-      const selectedTax = taxRates?.find(t => t.taxClass === form.taxClass);
+      const selectedTax = taxRates?.find(t => t.type === form.taxClass);
       
       const payload = { 
         ...form, 
@@ -310,8 +310,8 @@ export default function ProductDetails({ product, categories, taxRates, onClose 
                   options={[
                     { value: "", label: "Select Tax Class" },
                     ...(taxRates?.map(tax => ({
-                      value: tax.taxClass,
-                      label: `${tax.taxClass} (${(tax.rate * 100).toFixed(2)}%)`
+                      value: tax.type,
+                      label: `${tax.type} (${(tax.rate * 100).toFixed(2)}%)`
                     })) || [
                       { value: "STANDARD", label: "Standard (8%)" },
                       { value: "EXEMPT", label: "Exempt (0%)" }
