@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { engagementsApi } from '../api/engagementsApi';
 import { toast } from 'sonner';
-import { MessageSquare, Star, Search, CheckCircle2, ShieldAlert, Users, Mail, MessageCircle, Loader2, MapPin, Save } from 'lucide-react';
+import { MessageSquare, Star, Search, CheckCircle2, ShieldAlert, Users, Mail, MessageCircle, Loader2, MapPin, Save, Instagram, Facebook, Twitter, AtSign } from 'lucide-react';
 import SleekSearchDropdown from '../components/ui/SleekSearchDropdown';
 import Pagination from '../components/shared/Pagination';
 import { useScrollTop } from '../hooks/useScrollTop';
@@ -23,7 +23,12 @@ export default function EngagementsPage() {
   const [pageSize, setPageSize] = useState(10);
   const [totalElements, setTotalElements] = useState(0);
 
-  const [contactInfo, setContactInfo] = useState({ address: '', phoneNumbers: ['', ''], emails: ['', ''] });
+  const [contactInfo, setContactInfo] = useState({ 
+    address: '', 
+    phoneNumbers: ['', ''], 
+    emails: ['', ''],
+    socialLinks: { instagram: '', facebook: '', twitter: '', threads: '' }
+  });
   const [contactInfoSaving, setContactInfoSaving] = useState(false);
 
   const fetchData = async () => {
@@ -38,7 +43,13 @@ export default function EngagementsPage() {
         setContactInfo({
           address: res.data.address || '',
           phoneNumbers: [res.data.phoneNumbers?.[0] || '', res.data.phoneNumbers?.[1] || ''],
-          emails: [res.data.emails?.[0] || '', res.data.emails?.[1] || '']
+          emails: [res.data.emails?.[0] || '', res.data.emails?.[1] || ''],
+          socialLinks: {
+            instagram: res.data.socialLinks?.instagram || '',
+            facebook:  res.data.socialLinks?.facebook  || '',
+            twitter:   res.data.socialLinks?.twitter   || '',
+            threads:   res.data.socialLinks?.threads   || ''
+          }
         });
       } else {
         const res = await engagementsApi.getFeedbacks(page, pageSize);
@@ -136,7 +147,8 @@ export default function EngagementsPage() {
       const payload = {
         address: contactInfo.address,
         phoneNumbers: contactInfo.phoneNumbers.filter(p => p.trim() !== ''),
-        emails: contactInfo.emails.filter(em => em.trim() !== '')
+        emails: contactInfo.emails.filter(em => em.trim() !== ''),
+        socialLinks: contactInfo.socialLinks
       };
       await engagementsApi.updateContactDetails(payload);
       toast.success('Contact info updated successfully');
@@ -433,6 +445,86 @@ export default function EngagementsPage() {
                 />
               </div>
             </div>
+
+            {/* Social Media Links */}
+            <div className="pt-4 border-t border-gray-100">
+              <h3 className="text-base font-bold text-gray-900 mb-1">Social Media Links</h3>
+              <p className="text-xs text-gray-500 mb-4">These links will appear in the user site footer. Leave blank to hide.</p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Instagram */}
+                <div className="space-y-2">
+                  <label className="text-sm font-bold text-gray-700 flex items-center gap-1.5">
+                    <span className="w-4 h-4 inline-flex items-center justify-center text-pink-500">&#x1F4F7;</span>
+                    Instagram
+                  </label>
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-pink-400 text-xs font-bold">IG</span>
+                    <input
+                      type="url"
+                      value={contactInfo.socialLinks.instagram}
+                      onChange={e => setContactInfo({ ...contactInfo, socialLinks: { ...contactInfo.socialLinks, instagram: e.target.value } })}
+                      className="w-full bg-gray-50 border border-gray-200 rounded-xl pl-10 pr-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-pink-400 transition-all"
+                      placeholder="https://instagram.com/yourbakery"
+                    />
+                  </div>
+                </div>
+
+                {/* Facebook */}
+                <div className="space-y-2">
+                  <label className="text-sm font-bold text-gray-700 flex items-center gap-1.5">
+                    <span className="w-4 h-4 inline-flex items-center justify-center text-blue-600">&#x1F4D8;</span>
+                    Facebook
+                  </label>
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-blue-500 text-xs font-bold">FB</span>
+                    <input
+                      type="url"
+                      value={contactInfo.socialLinks.facebook}
+                      onChange={e => setContactInfo({ ...contactInfo, socialLinks: { ...contactInfo.socialLinks, facebook: e.target.value } })}
+                      className="w-full bg-gray-50 border border-gray-200 rounded-xl pl-10 pr-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all"
+                      placeholder="https://facebook.com/yourbakery"
+                    />
+                  </div>
+                </div>
+
+                {/* Twitter / X */}
+                <div className="space-y-2">
+                  <label className="text-sm font-bold text-gray-700 flex items-center gap-1.5">
+                    <span className="w-4 h-4 inline-flex items-center justify-center text-gray-900 font-black text-xs">𝕏</span>
+                    Twitter / X
+                  </label>
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-700 text-xs font-black">X</span>
+                    <input
+                      type="url"
+                      value={contactInfo.socialLinks.twitter}
+                      onChange={e => setContactInfo({ ...contactInfo, socialLinks: { ...contactInfo.socialLinks, twitter: e.target.value } })}
+                      className="w-full bg-gray-50 border border-gray-200 rounded-xl pl-10 pr-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-gray-400 transition-all"
+                      placeholder="https://x.com/yourbakery"
+                    />
+                  </div>
+                </div>
+
+                {/* Threads */}
+                <div className="space-y-2">
+                  <label className="text-sm font-bold text-gray-700 flex items-center gap-1.5">
+                    <span className="w-4 h-4 inline-flex items-center justify-center text-gray-800 font-black text-xs">@</span>
+                    Threads
+                  </label>
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-600 text-xs font-bold">@</span>
+                    <input
+                      type="url"
+                      value={contactInfo.socialLinks.threads}
+                      onChange={e => setContactInfo({ ...contactInfo, socialLinks: { ...contactInfo.socialLinks, threads: e.target.value } })}
+                      className="w-full bg-gray-50 border border-gray-200 rounded-xl pl-10 pr-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-gray-400 transition-all"
+                      placeholder="https://threads.net/@yourbakery"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <div className="pt-4 flex justify-end">
               <button
                 type="submit"
