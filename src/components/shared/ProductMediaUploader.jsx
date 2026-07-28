@@ -44,7 +44,7 @@ export const ProductMediaUploader = ({
         ) : (
           <div className="flex items-center gap-2 max-w-lg">
             <input type="file" id="videoSelect" accept="video/*" className="hidden" onChange={handleVideoSelect} />
-            <label htmlFor="videoSelect" className="cursor-pointer flex items-center gap-2 px-4 py-2 rounded-xl border border-dashed border-[var(--color-primary)] text-[var(--color-primary)] hover:bg-[var(--color-primary)]/10 transition-colors text-sm font-medium">
+            <label htmlFor="videoSelect" className="cursor-pointer flex items-center gap-2 text-sm font-semibold px-5 py-2.5 border-2 border-dashed border-[var(--color-primary)]/50 text-[var(--color-primary)] rounded-xl hover:bg-[var(--color-primary)]/10 transition-colors">
               <Upload size={16} /> Select Video
             </label>
           </div>

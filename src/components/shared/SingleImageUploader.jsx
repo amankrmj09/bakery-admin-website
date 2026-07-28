@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Upload, X, RefreshCw, ImageIcon, Trash2 } from 'lucide-react';
 import ActionButton from '../ui/ActionButton';
+import { toast } from 'sonner';
 
 // If it's a relative URL from the server, prefix with API base
 const getImageUrl = (url) =>
@@ -37,6 +38,15 @@ export default function SingleImageUploader({ value, onChange }) {
   const handleFileChange = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    
+    // Check for 5MB limit
+    const MAX_SIZE = 5 * 1024 * 1024;
+    if (file.size > MAX_SIZE) {
+      toast.error(`Image size exceeds 5MB limit. Please choose a smaller file.`);
+      e.target.value = '';
+      return;
+    }
+
     onChange(file); // Pass File — actual upload deferred to onSubmit
     e.target.value = ''; // Reset so same file can be re-selected
   };

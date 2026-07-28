@@ -7,6 +7,7 @@ import { toast } from 'sonner';
 import { cn } from '../lib/utils';
 import { useScrollTop } from '../hooks/useScrollTop';
 import TaxSettings from '../components/settings/TaxSettings';
+import { Settings as SettingsIcon } from 'lucide-react';
 
 export default function Settings() {
   const dispatch = useDispatch();
@@ -41,7 +42,7 @@ export default function Settings() {
   };
 
   return (
-    <div className="flex flex-col min-h-full gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500 w-full pb-8 max-w-4xl mx-auto">
+    <div className="flex flex-col min-h-full gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500 w-full pb-8">
       <div className={cn(
         "sticky top-0 z-30 flex justify-between items-center flex-wrap gap-4 transition-all duration-300",
         isScrolled 
@@ -49,7 +50,10 @@ export default function Settings() {
           : "bg-transparent border-transparent py-2"
       )}>
         <div>
-          <h1 className="text-3xl font-bold text-[var(--text-main)] mb-1">Settings</h1>
+          <h1 className="text-3xl font-bold text-[var(--text-main)] mb-1 flex items-center gap-2">
+            <SettingsIcon className="text-[var(--color-primary)] h-6 w-6" />
+            Settings
+          </h1>
           <p className="text-[var(--text-muted)] text-sm">Manage your preferences, appearance, and store status.</p>
         </div>
       </div>

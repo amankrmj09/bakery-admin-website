@@ -7,6 +7,7 @@ import ActionButton from '../components/ui/ActionButton';
 import SingleImageUploader from '../components/shared/SingleImageUploader';
 import { toast } from 'sonner';
 import { Loader2, Plus, Trash2, SettingsIcon, Save, LayoutTemplate, Store, Info, Briefcase, Tag } from 'lucide-react';
+import CustomDatePicker from '../components/ui/CustomDatePicker';
 import { cn } from '../lib/utils';
 import { useScrollTop } from '../hooks/useScrollTop';
 import { Input } from '../components/ui/Input';
@@ -243,6 +244,34 @@ export default function Storefront() {
                   <div className="grid grid-cols-1 gap-4 mb-4">
                     <Input label="Offer Title" {...register(`specialOfferSection.offers.${index}.title`)} />
                     <Textarea label="Offer Description" rows={2} {...register(`specialOfferSection.offers.${index}.description`)} />
+                    <div className="flex flex-col gap-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                        <Input label="Coupon Code" {...register(`specialOfferSection.offers.${index}.couponCode`)} />
+                        <div className="flex flex-col gap-1.5 relative group">
+                          <label className="text-[10px] uppercase font-bold tracking-wider text-[var(--text-muted)] ml-1 group-focus-within:text-[var(--color-primary)] transition-colors">Discount Type</label>
+                          <select className="w-full text-sm p-3.5 rounded-xl border bg-white dark:bg-slate-900 text-[var(--text-main)] outline-none transition-all shadow-sm focus:shadow-md focus:-translate-y-0.5 border-[var(--border-color)] focus:border-[var(--color-primary)] appearance-none" {...register(`specialOfferSection.offers.${index}.discountType`)}>
+                            <option value="PERCENTAGE">Percentage (%)</option>
+                            <option value="FLAT">Flat Amount</option>
+                          </select>
+                        </div>
+                        <Input type="number" step="0.01" label="Discount Value" {...register(`specialOfferSection.offers.${index}.discountValue`, { valueAsNumber: true })} />
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                        <Controller 
+                          name={`specialOfferSection.offers.${index}.expiryDate`} 
+                          control={control} 
+                          render={({ field: dateField }) => (
+                            <CustomDatePicker
+                              value={dateField.value}
+                              onChange={dateField.onChange}
+                              label="Expiry Date"
+                              minDate={new Date()}
+                            />
+                          )} 
+                        />
+                        <Input type="number" step="0.01" label="Min Cart Value" {...register(`specialOfferSection.offers.${index}.minCartValue`, { valueAsNumber: true })} />
+                      </div>
+                    </div>
                   </div>
                   <Controller name={`specialOfferSection.offers.${index}.imageUrl`} control={control} render={({ field: imgField }) => (
                       <div className="space-y-1.5">

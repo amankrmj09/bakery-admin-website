@@ -359,57 +359,59 @@ export default function OrderDetails({ order, onClose }) {
           </Card>
 
           {/* Quick Management Panel */}
-          <Card className="!overflow-visible">
-            <CardContent className="p-6 space-y-4">
-              <div className="flex items-center gap-2 mb-2 border-b border-[var(--border-color)] pb-3">
-                <Clock className="text-[var(--color-primary)] w-5 h-5" />
-                <h3 className="text-lg font-bold text-[var(--text-main)]">Manage Order</h3>
-              </div>
-
-              <div className="space-y-3">
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-semibold text-[var(--text-muted)]">ORDER STATUS</label>
-                  <SleekDropdown 
-                    widthClass="w-full"
-                    value={orderStatus}
-                    onChange={handleStatusChange}
-                    options={
-                      order.deliveryType === 'PICKUP' 
-                      ? [
-                          { value: "PENDING", label: "Pending" },
-                          { value: "CONFIRMED", label: "Confirmed" },
-                          { value: "PREPARING", label: "Preparing" },
-                          { value: "READY", label: "Ready" },
-                          { value: "DELIVERED", label: "Picked Up / Completed" },
-                          { value: "CANCELLED", label: "Cancelled" },
-                        ]
-                      : [
-                          { value: "PENDING", label: "Pending" },
-                          { value: "CONFIRMED", label: "Confirmed" },
-                          { value: "PREPARING", label: "Preparing" },
-                          { value: "READY", label: "Ready" },
-                          { value: "OUT_FOR_DELIVERY", label: "Out for Delivery" },
-                          { value: "DELIVERED", label: "Delivered / Completed" },
-                          { value: "CANCELLED", label: "Cancelled" },
-                        ]
-                    }
-                  />
+          {orderStatus !== 'DELIVERED' && (
+            <Card className="!overflow-visible">
+              <CardContent className="p-6 space-y-4">
+                <div className="flex items-center gap-2 mb-2 border-b border-[var(--border-color)] pb-3">
+                  <Clock className="text-[var(--color-primary)] w-5 h-5" />
+                  <h3 className="text-lg font-bold text-[var(--text-main)]">Manage Order</h3>
                 </div>
 
-                {showPaymentDropdown && (
+                <div className="space-y-3">
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-xs font-semibold text-[var(--text-muted)]">PAYMENT STATUS</label>
+                    <label className="text-xs font-semibold text-[var(--text-muted)]">ORDER STATUS</label>
                     <SleekDropdown 
                       widthClass="w-full"
-                      value={paymentStatus}
-                      onChange={handlePaymentStatusChange}
-                      options={paymentOptions}
+                      value={orderStatus}
+                      onChange={handleStatusChange}
+                      options={
+                        order.deliveryType === 'PICKUP' 
+                        ? [
+                            { value: "PENDING", label: "Pending" },
+                            { value: "CONFIRMED", label: "Confirmed" },
+                            { value: "PREPARING", label: "Preparing" },
+                            { value: "READY", label: "Ready" },
+                            { value: "DELIVERED", label: "Picked Up / Completed" },
+                            { value: "CANCELLED", label: "Cancelled" },
+                          ]
+                        : [
+                            { value: "PENDING", label: "Pending" },
+                            { value: "CONFIRMED", label: "Confirmed" },
+                            { value: "PREPARING", label: "Preparing" },
+                            { value: "READY", label: "Ready" },
+                            { value: "OUT_FOR_DELIVERY", label: "Out for Delivery" },
+                            { value: "DELIVERED", label: "Delivered / Completed" },
+                            { value: "CANCELLED", label: "Cancelled" },
+                          ]
+                      }
                     />
                   </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
+
+                  {showPaymentDropdown && (
+                    <div className="flex flex-col gap-1.5">
+                      <label className="text-xs font-semibold text-[var(--text-muted)]">PAYMENT STATUS</label>
+                      <SleekDropdown 
+                        widthClass="w-full"
+                        value={paymentStatus}
+                        onChange={handlePaymentStatusChange}
+                        options={paymentOptions}
+                      />
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          )}
         </div>
       </div>
 
