@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Upload, X, RefreshCw, ImageIcon } from 'lucide-react';
+import { Upload, X, RefreshCw, ImageIcon, Trash2 } from 'lucide-react';
+import ActionButton from '../ui/ActionButton';
 
 // If it's a relative URL from the server, prefix with API base
 const getImageUrl = (url) =>
@@ -71,26 +72,30 @@ export default function SingleImageUploader({ value, onChange }) {
           <div className="absolute inset-0 z-10 bg-black/0 group-hover:bg-black/40 transition-all duration-300 pointer-events-none" />
 
           {/* Bottom action strip — slides up on hover */}
-          <div className="absolute bottom-0 left-0 right-0 z-20 flex items-center justify-between gap-2 px-3 py-2.5 bg-black/70 backdrop-blur-sm translate-y-full group-hover:translate-y-0 transition-transform duration-300">
+          <div className="absolute inset-x-0 bottom-0 z-20 flex items-center justify-center gap-4 p-4 pt-8 bg-gradient-to-t from-black/90 via-black/60 to-transparent translate-y-full group-hover:translate-y-0 transition-transform duration-300">
             {/* Re-upload button */}
-            <button
-              type="button"
+            <ActionButton
+              text="Replace"
               onClick={triggerReupload}
-              className="flex items-center gap-1.5 text-white text-xs font-semibold hover:text-amber-400 transition-colors"
-            >
-              <RefreshCw className="w-3.5 h-3.5" />
-              Replace
-            </button>
+              icon={RefreshCw}
+              bgClass="bg-white/10 backdrop-blur-md"
+              textClass="text-white text-xs sm:text-sm"
+              borderClass="border border-white/20"
+              hoverBgClass="bg-white/20"
+              className="w-28 h-10"
+            />
 
             {/* Remove button */}
-            <button
-              type="button"
+            <ActionButton
+              text="Remove"
               onClick={handleRemove}
-              className="flex items-center gap-1.5 text-white text-xs font-semibold hover:text-red-400 transition-colors"
-            >
-              <X className="w-3.5 h-3.5" />
-              Remove
-            </button>
+              icon={Trash2}
+              bgClass="bg-red-500/80 backdrop-blur-md"
+              textClass="text-white text-xs sm:text-sm"
+              borderClass="border border-red-500/20"
+              hoverBgClass="bg-red-500"
+              className="w-28 h-10"
+            />
           </div>
 
           {/* Hidden file input for re-upload */}
