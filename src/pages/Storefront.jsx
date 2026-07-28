@@ -135,23 +135,13 @@ export default function Storefront() {
                     <Input label="Campaign Title" {...register(`heroSection.campaigns.${index}.title`)} />
                     <Textarea label="Campaign Description" rows={2} {...register(`heroSection.campaigns.${index}.description`)} />
                   </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                    <div>
-                      <Controller name={`heroSection.campaigns.${index}.largeImageUrl`} control={control} render={({ field }) => (
-                        <div className="space-y-1.5">
-                          <label className="text-[10px] uppercase font-bold tracking-wider text-[var(--text-muted)] ml-1">Large Image (3:2 ratio)</label>
-                          <SingleImageUploader value={field.value} onChange={field.onChange} />
-                        </div>
-                      )} />
-                    </div>
-                    <div>
-                      <Controller name={`heroSection.campaigns.${index}.smallImageUrl`} control={control} render={({ field }) => (
-                        <div className="space-y-1.5">
-                          <label className="text-[10px] uppercase font-bold tracking-wider text-[var(--text-muted)] ml-1">Small Image (1:1 ratio)</label>
-                          <SingleImageUploader value={field.value} onChange={field.onChange} />
-                        </div>
-                      )} />
-                    </div>
+                  <div className="mt-2">
+                    <Controller name={`heroSection.campaigns.${index}.imageUrl`} control={control} render={({ field }) => (
+                      <div className="space-y-1.5">
+                        <label className="text-[10px] uppercase font-bold tracking-wider text-[var(--text-muted)] ml-1">Campaign Image (3:2 ratio)</label>
+                        <SingleImageUploader value={field.value} onChange={field.onChange} />
+                      </div>
+                    )} />
                   </div>
                 </div>
                 <Button type="button" variant="ghost" size="sm" onClick={() => removeCampaign(index)} disabled={campaignFields.length <= 3} className="text-destructive mt-6 rounded-xl hover:bg-destructive/10 h-10 w-10 p-0 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed">
@@ -160,7 +150,7 @@ export default function Storefront() {
               </div>
             ))}
               {campaignFields.length < 5 && (
-                <button type="button" onClick={() => appendCampaign({ largeImageUrl: '', smallImageUrl: '' })} className="self-start flex items-center gap-2 text-sm font-semibold px-4 py-2 border-2 border-dashed border-primary-500/50 text-primary-500 rounded-xl hover:bg-primary-500/10 transition-colors mt-2">
+                <button type="button" onClick={() => appendCampaign({ imageUrl: '' })} className="self-start flex items-center gap-2 text-sm font-semibold px-4 py-2 border-2 border-dashed border-primary-500/50 text-primary-500 rounded-xl hover:bg-primary-500/10 transition-colors mt-2">
                   <Plus size={16} /> Add Campaign
                 </button>
               )}
