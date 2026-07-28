@@ -11,6 +11,31 @@ import { cn } from '../lib/utils';
 import { useScrollTop } from '../hooks/useScrollTop';
 import { Input } from '../components/ui/Input';
 import { Textarea } from '../components/ui/Textarea';
+import api from '../api/axiosConfig';
+
+/** Recursively walks an object and uploads any File values via the media API.
+ *  Returns a new object with File values replaced by their uploaded URLs. */
+async function uploadPendingFiles(obj) {
+  if (obj instanceof File) {
+    const formData = new FormData();
+    formData.append('media', obj);
+    const res = await api.post('/api/uploads/media', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    return res.data.urls?.[0] ?? '';
+  }
+  if (Array.isArray(obj)) {
+    return Promise.all(obj.map(uploadPendingFiles));
+  }
+  if (obj !== null && typeof obj === 'object') {
+    const result = {};
+    for (const [key, val] of Object.entries(obj)) {
+      result[key] = await uploadPendingFiles(val);
+    }
+    return result;
+  }
+  return obj;
+}
 
 
 export default function Storefront() {
@@ -59,8 +84,9 @@ export default function Storefront() {
   const onSubmit = async (data) => {
     setIsSaving(true);
     try {
-      const payload = JSON.parse(JSON.stringify(data));
-      
+      // Upload any images the user selected (File objects) before sending payload
+      let payload = await uploadPendingFiles(data);
+
       // Preserve howWeWorkSection since it was removed from Admin UI
       if (storefront.data && storefront.data.howWeWorkSection) {
         payload.howWeWorkSection = storefront.data.howWeWorkSection;
@@ -68,8 +94,9 @@ export default function Storefront() {
 
       await dispatch(updateStorefront(payload)).unwrap();
       toast.success('Site configuration saved successfully!');
-      reset(data);
+      reset(payload); // reset with resolved URLs so isDirty resets correctly
     } catch (err) {
+      console.error(err);
       toast.error('Failed to save configuration.');
     } finally {
       setIsSaving(false);
