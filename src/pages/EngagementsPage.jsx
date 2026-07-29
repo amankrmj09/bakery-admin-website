@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { engagementsApi } from '../api/engagementsApi';
 import { toast } from 'sonner';
-import { MessageSquare, Star, Search, CheckCircle2, ShieldAlert, Users, Mail, MessageCircle, Loader2, MapPin, Save } from 'lucide-react';
+import { MessageSquare, Star, Search, CheckCircle2, ShieldAlert, Users, Mail, MessageCircle, Loader2, MapPin, Save, Trash2 } from 'lucide-react';
 import SleekSearchDropdown from '../components/ui/SleekSearchDropdown';
 import Pagination from '../components/shared/Pagination';
 import { useScrollTop } from '../hooks/useScrollTop';
@@ -142,6 +142,18 @@ export default function EngagementsPage() {
     } catch (error) {
       const msg = error.response?.data?.error || 'Failed to update featured status';
       toast.error(msg);
+    }
+  };
+
+  const handleDeleteTestimonial = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this testimonial?")) return;
+    try {
+      await engagementsApi.deleteTestimonial(id);
+      toast.success("Testimonial deleted");
+      setTestimonials(testimonials.filter(t => t.id !== id));
+      setTotalElements(prev => prev - 1);
+    } catch (error) {
+      toast.error("Failed to delete testimonial");
     }
   };
 
@@ -325,17 +337,26 @@ export default function EngagementsPage() {
                       Status: <span className="text-emerald-600 font-semibold">{item.status || 'APPROVED'}</span>
                     </span>
 
-                    <label className="flex items-center gap-2 cursor-pointer group">
-                      <input
-                        type="checkbox"
-                        checked={!!item.isFeatured}
-                        onChange={() => handleToggleFeature(item.id, item.isFeatured)}
-                        className="w-4 h-4 text-amber-500 rounded border-gray-300 focus:ring-amber-500 cursor-pointer"
-                      />
-                      <span className="text-sm font-semibold text-gray-700 group-hover:text-gray-900 transition-colors">
-                        Feature on Storefront
-                      </span>
-                    </label>
+                    <div className="flex items-center gap-4">
+                      <label className="flex items-center gap-2 cursor-pointer group">
+                        <input
+                          type="checkbox"
+                          checked={!!item.isFeatured}
+                          onChange={() => handleToggleFeature(item.id, item.isFeatured)}
+                          className="w-4 h-4 text-amber-500 rounded border-gray-300 focus:ring-amber-500 cursor-pointer"
+                        />
+                        <span className="text-sm font-semibold text-gray-700 group-hover:text-gray-900 transition-colors">
+                          Feature
+                        </span>
+                      </label>
+                      <button
+                        onClick={() => handleDeleteTestimonial(item.id)}
+                        className="text-gray-400 hover:text-red-500 hover:bg-red-50 p-1.5 rounded-lg transition-colors"
+                        title="Delete Testimonial"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
                   </div>
                 </div>
               ))}

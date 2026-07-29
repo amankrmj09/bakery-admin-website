@@ -52,10 +52,29 @@ export default function Dashboard() {
 
   const getStatusBadgeVariant = (status) => {
     const s = (status || '').toUpperCase();
-    if (['COMPLETED', 'DELIVERED', 'SUCCESS'].includes(s)) return 'success';
-    if (['PENDING', 'PROCESSING'].includes(s)) return 'warning';
-    if (['CANCELLED', 'FAILED', 'DECLINED'].includes(s)) return 'destructive';
-    return 'default';
+    switch (s) {
+      case 'COMPLETED':
+      case 'DELIVERED':
+      case 'SUCCESS':
+        return 'success';
+      case 'PENDING':
+      case 'PROCESSING':
+        return 'warning';
+      case 'CANCELLED':
+      case 'FAILED':
+      case 'DECLINED':
+        return 'destructive';
+      case 'CONFIRMED':
+        return 'info';
+      case 'PREPARING':
+        return 'purple';
+      case 'READY':
+        return 'cyan';
+      case 'OUT_FOR_DELIVERY':
+        return 'indigo';
+      default:
+        return 'secondary';
+    }
   };
 
   const statCards = [
