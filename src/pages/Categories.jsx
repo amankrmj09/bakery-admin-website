@@ -6,19 +6,16 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '.
 import { Badge } from '../components/ui/Badge';
 import { Button } from '../components/ui/Button';
 import ActionButton from '../components/ui/ActionButton';
-import { Plus, Trash2, Tags, Loader2, Save, FolderTree, Power, Edit } from 'lucide-react';
-import { Modal } from '../components/ui/Modal';
+import { Plus, Tags, Power, Edit } from 'lucide-react';
 import { toast } from 'sonner';
 import api from '../api/axiosConfig';
 import { useScrollTop } from '../hooks/useScrollTop';
 import { cn } from '../lib/utils';
-import { Input } from '../components/ui/Input';
-import { Textarea } from '../components/ui/Textarea';
-import SleekSearchDropdown from '../components/ui/SleekSearchDropdown';
-import SingleImageUploader from '../components/shared/SingleImageUploader';
 import Pagination from '../components/shared/Pagination';
 import TopSearchBar from '../components/shared/TopSearchBar';
 import ActionIconButton from '../components/ui/ActionIconButton';
+import CategoryDetails from './CategoryDetails';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export default function Categories() {
   const dispatch = useDispatch();
@@ -40,54 +37,17 @@ export default function Categories() {
   
   const totalPages = Math.ceil((totalElements || categories?.length || 0) / pageSize) || 1;
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [showForm, setShowForm] = useState(false);
   const [editingCategory, setEditingCategory] = useState(null);
-  const [isSaving, setIsSaving] = useState(false);
-  const [form, setForm] = useState({ name: '', description: '', parentId: '', displayOrder: 0, active: true, isTopCategory: false, mediaUrls: [] });
-
-  const categoryOptions = useMemo(() => [
-    { value: '', label: 'None (Top Level Category)' },
-    ...(categories || []).filter(c => c.id !== editingCategory?.id).map(c => ({ value: c.id, label: c.name }))
-  ], [categories, editingCategory]);
 
   const handleAddClick = () => {
     setEditingCategory(null);
-    setForm({ name: '', description: '', parentId: '', displayOrder: 0, active: true, isTopCategory: false, mediaUrls: [] });
-    setIsModalOpen(true);
+    setShowForm(true);
   };
 
   const handleEditClick = (category) => {
     setEditingCategory(category);
-    setForm({ 
-      name: category.name, 
-      description: category.description || '', 
-      parentId: category.parentId || '',
-      displayOrder: category.displayOrder || 0, 
-      active: category.active !== false,
-      isTopCategory: category.isTopCategory || false,
-      mediaUrls: category.mediaUrls || []
-    });
-    setIsModalOpen(true);
-  };
-
-  const handleSave = async (e) => {
-    e.preventDefault();
-    setIsSaving(true);
-    try {
-      const payload = { ...form };
-
-      if (editingCategory) {
-        await dispatch(updateCategory({ categoryId: editingCategory.id, data: payload })).unwrap();
-        toast.success('Category updated successfully');
-      } else {
-        await dispatch(createCategory(payload)).unwrap();
-        toast.success('Category created successfully');
-      }
-      setIsModalOpen(false);
-    } catch (error) { 
-      console.error('Failed to save category', error); 
-      toast.error('Failed to save category');
-    } finally { setIsSaving(false); }
+    setShowForm(true);
   };
 
   const handleToggleStatus = async (categoryId) => {
@@ -97,25 +57,21 @@ export default function Categories() {
     } catch (error) { console.error('Failed to toggle', error); }
   };
 
-  const handleDeleteClick = async (categoryId) => {
-    if (window.confirm('Are you sure you want to delete this category? All associated products may be deleted as well.')) {
-      try {
-        await dispatch(deleteCategory(categoryId)).unwrap();
-        toast.success('Category deleted successfully');
-        setIsModalOpen(false);
-      } catch (error) {
-        console.error('Failed to delete category', error);
-        toast.error('Failed to delete category');
-      }
-    }
-  };
-
   return (
-    <div className="flex flex-col min-h-full gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500 w-full pb-8">
-      
-      {/* Sticky Header */}
+    <div className="flex flex-col min-h-full w-full pb-8">
+      <AnimatePresence mode="wait">
+        {!showForm ? (
+          <motion.div 
+            key="list"
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0, transitionEnd: { transform: 'none' } }}
+            exit={{ opacity: 0, y: -15, transitionEnd: { transform: 'none' } }}
+            transition={{ duration: 0.3, ease: 'easeOut' }}
+            className="flex flex-col gap-6 w-full"
+          >
+            {/* Sticky Header */}
       <div className={cn(
-        "sticky top-0 z-30 flex justify-between items-center flex-wrap gap-4 transition-all duration-300",
+        "sticky top-0 z-40 flex justify-between items-center flex-wrap gap-4 transition-all duration-300",
         isScrolled 
           ? "bg-[var(--bg-panel)]/80 backdrop-blur-xl border border-[var(--border-color)] shadow-md rounded-2xl px-6 py-4 mt-2" 
           : "bg-transparent border-transparent py-2"
@@ -183,76 +139,26 @@ export default function Categories() {
           loading={loading}
         />
       </Card>
-
-      <Modal isOpen={isModalOpen} onClose={() => !isSaving && setIsModalOpen(false)} title={editingCategory ? "Edit Category" : "Add Category"}>
-        <form onSubmit={handleSave} className="space-y-4 pt-2">
-          <Input 
-            label="Name" 
-            required 
-            value={form.name} 
-            onChange={e => setForm({...form, name: e.target.value})} 
-            disabled={isSaving} 
-          />
-
-          <SleekSearchDropdown
-            formLabel="Parent Category"
-            icon={FolderTree}
-            options={categoryOptions}
-            value={form.parentId}
-            onChange={(opt) => setForm({...form, parentId: opt.value})}
-            disabled={isSaving}
-          />
-          
-          <Textarea 
-            label="Description" 
-            rows={3} 
-            value={form.description} 
-            onChange={e => setForm({...form, description: e.target.value})} 
-            disabled={isSaving} 
-          />
-          
-          <div className="flex items-center space-x-2">
-            <input 
-              type="checkbox" 
-              id="isTopCategory" 
-              checked={form.isTopCategory} 
-              onChange={e => setForm({...form, isTopCategory: e.target.checked})} 
-              disabled={isSaving}
-              className="w-4 h-4 text-[var(--color-primary)] border-[var(--border-color)] rounded focus:ring-[var(--color-primary)] bg-[var(--bg-panel)]"
+          </motion.div>
+        ) : (
+          <motion.div
+            key="form"
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0, transitionEnd: { transform: 'none' } }}
+            exit={{ opacity: 0, y: -15, transitionEnd: { transform: 'none' } }}
+            transition={{ duration: 0.3, ease: 'easeOut' }}
+            className="w-full flex flex-col gap-6"
+          >
+            <CategoryDetails 
+              category={editingCategory} 
+              categories={categories} 
+              onClose={() => setShowForm(false)} 
             />
-            <label htmlFor="isTopCategory" className="text-sm font-medium text-[var(--text-main)]">
-              Show as Top Category
-            </label>
-          </div>
-
-          <div>
-            <label className="text-xs font-semibold text-[var(--text-muted)] tracking-wide mb-2 block">Category Image</label>
-            <SingleImageUploader 
-               value={form.mediaUrls?.[0] || ''}
-               onChange={(url) => setForm({...form, mediaUrls: url ? [url] : []})}
-            />
-          </div>
-
-          <div className="pt-4 flex justify-between items-center border-t border-border mt-6">
-            {editingCategory ? (
-              <Button type="button" variant="ghost" className="text-red-500 hover:text-red-700 hover:bg-red-50" onClick={() => handleDeleteClick(editingCategory.id)} disabled={isSaving}>
-                <Trash2 className="w-4 h-4 mr-2" /> Delete
-              </Button>
-            ) : <div />}
-            <div className="flex space-x-2">
-              <Button type="button" variant="outline" onClick={() => setIsModalOpen(false)} disabled={isSaving}>Cancel</Button>
-              <ActionButton 
-                type="submit" 
-                text={isSaving ? 'Saving...' : 'Save Category'}
-                disabled={isSaving}
-                icon={isSaving ? Loader2 : Save}
-                className="px-4 h-10"
-              />
-            </div>
-          </div>
-        </form>
-      </Modal>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
+
 

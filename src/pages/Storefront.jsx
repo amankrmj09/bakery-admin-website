@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { fetchStorefront, updateStorefront } from '../store/slices/dashboardSlice';
 import { Button } from '../components/ui/Button';
 import ActionButton from '../components/ui/ActionButton';
+import ActionIconButton from '../components/ui/ActionIconButton';
 import SingleImageUploader from '../components/shared/SingleImageUploader';
 import { toast } from 'sonner';
 import { Loader2, Plus, Trash2, SettingsIcon, Save, LayoutTemplate, Store, Info, Briefcase, Tag } from 'lucide-react';
@@ -119,7 +120,7 @@ export default function Storefront() {
       
       {/* Sticky Header */}
       <div className={cn(
-        "sticky top-0 z-30 flex justify-between items-center flex-wrap gap-4 transition-all duration-300",
+        "sticky top-0 z-40 flex justify-between items-center flex-wrap gap-4 transition-all duration-300",
         isScrolled 
           ? "bg-[var(--bg-panel)]/80 backdrop-blur-xl border border-[var(--border-color)] shadow-md rounded-2xl px-6 py-4 mt-2" 
           : "bg-transparent border-transparent py-2"
@@ -172,9 +173,13 @@ export default function Storefront() {
                     )} />
                   </div>
                 </div>
-                <Button type="button" variant="ghost" size="sm" onClick={() => removeCampaign(index)} disabled={campaignFields.length <= 3} className="text-destructive mt-6 rounded-xl hover:bg-destructive/10 h-10 w-10 p-0 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed">
-                  <Trash2 className="h-4 w-4" />
-                </Button>
+                <ActionIconButton
+                  icon={Trash2}
+                  title="Remove Campaign"
+                  onClick={() => removeCampaign(index)}
+                  disabled={campaignFields.length <= 3}
+                  colorClass="text-red-600 bg-red-50 hover:bg-red-100 mt-6"
+                />
               </div>
             ))}
               {campaignFields.length < 5 && (
@@ -280,9 +285,13 @@ export default function Storefront() {
                       </div>
                   )} />
                 </div>
-                <Button type="button" variant="ghost" size="sm" onClick={() => removeSpecialOfferImage(index)} disabled={specialOfferImageFields.length <= 1} className="text-destructive mt-6 rounded-xl hover:bg-destructive/10 h-10 w-10 p-0 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed">
-                  <Trash2 className="h-4 w-4" />
-                </Button>
+                <ActionIconButton
+                  icon={Trash2}
+                  title="Remove Offer"
+                  onClick={() => removeSpecialOfferImage(index)}
+                  disabled={specialOfferImageFields.length <= 1}
+                  colorClass="text-red-600 bg-red-50 hover:bg-red-100 mt-6"
+                />
               </div>
             ))}
             {specialOfferImageFields.length < 5 && (
@@ -301,6 +310,7 @@ export default function Storefront() {
     </div>
   );
 }
+
 
 
 

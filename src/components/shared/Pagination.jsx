@@ -1,6 +1,7 @@
 import React from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '../../lib/utils';
+import SleekDropdown from '../ui/SleekDropdown';
 
 export default function Pagination({
   currentPage,
@@ -91,22 +92,21 @@ export default function Pagination({
       <div className="flex items-center gap-3">
         <div className="flex items-center gap-2 pr-3 border-r border-[var(--border-color)]">
           <label htmlFor="pageSizeTop" className="text-xs font-semibold text-[var(--text-muted)]">Show:</label>
-          <select
-            id="pageSizeTop"
+          <SleekDropdown
+            options={[
+              { value: 5, label: '5' },
+              { value: 10, label: '10' },
+              { value: 20, label: '20' },
+              { value: 50, label: '50' },
+            ]}
             value={pageSize}
-            onChange={(e) => {
+            onChange={(val) => {
               if (!loading && onPageSizeChange) {
-                onPageSizeChange(Number(e.target.value));
+                onPageSizeChange(Number(val));
               }
             }}
-            disabled={loading}
-            className="bg-transparent border border-[var(--border-color)] rounded-lg px-2 py-1 text-xs font-bold text-[var(--text-main)] focus:outline-none focus:border-[var(--color-primary)]"
-          >
-            <option value={5}>5</option>
-            <option value={10}>10</option>
-            <option value={20}>20</option>
-            <option value={50}>50</option>
-          </select>
+            widthClass="w-20"
+          />
         </div>
 
         <div className="flex items-center gap-1">

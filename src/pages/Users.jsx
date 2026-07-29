@@ -83,7 +83,7 @@ export default function Users() {
   return (
     <div className="flex flex-col min-h-full gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500 w-full pb-8">
       <div className={cn(
-        "sticky top-0 z-30 flex justify-between items-center flex-wrap gap-4 transition-all duration-300",
+        "sticky top-0 z-40 flex justify-between items-center flex-wrap gap-4 transition-all duration-300",
         isScrolled 
           ? "bg-[var(--bg-panel)]/80 backdrop-blur-xl border border-[var(--border-color)] shadow-md rounded-2xl px-6 py-4 mt-2" 
           : "bg-transparent border-transparent py-2"
@@ -214,4 +214,5 @@ export default function Users() {
     </div>
   );
 }
+
 

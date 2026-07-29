@@ -5,6 +5,7 @@ import { AlertTriangle, Check, Trash2 as Trash, MessageSquare } from 'lucide-rea
 import Pagination from '../components/shared/Pagination';
 import { useScrollTop } from '../hooks/useScrollTop';
 import { cn } from '../lib/utils';
+import ActionButton from '../components/ui/ActionButton';
 
 export default function Reviews() {
   const isScrolled = useScrollTop();
@@ -58,7 +59,7 @@ export default function Reviews() {
   return (
     <div className="flex flex-col min-h-full gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500 w-full pb-8">
       <div className={cn(
-        "sticky top-0 z-30 flex justify-between items-center flex-wrap gap-4 transition-all duration-300",
+        "sticky top-0 z-40 flex justify-between items-center flex-wrap gap-4 transition-all duration-300",
         isScrolled 
           ? "bg-[var(--bg-panel)]/80 backdrop-blur-xl border border-[var(--border-color)] shadow-md rounded-2xl px-6 py-4 mt-2" 
           : "bg-transparent border-transparent py-2"
@@ -103,18 +104,24 @@ export default function Reviews() {
                 </div>
                 
                 <div className="flex flex-row md:flex-col gap-3 justify-center md:border-l border-gray-100 md:pl-6">
-                  <button
+                  <ActionButton
+                    text="Dismiss Report"
                     onClick={() => handleDismiss(review.id)}
-                    className="flex items-center justify-center gap-2 px-4 py-2 bg-gray-50 hover:bg-gray-100 text-gray-700 rounded-xl font-medium transition-colors"
-                  >
-                    <Check className="w-4 h-4" /> Dismiss Report
-                  </button>
-                  <button
+                    icon={Check}
+                    bgClass="bg-gray-100"
+                    textClass="text-gray-700"
+                    iconColor="text-gray-700"
+                    hoverBgClass="bg-gray-200"
+                    className="px-4 h-[42px] w-full"
+                  />
+                  <ActionButton
+                    text="Delete Review"
                     onClick={() => handleDelete(review.id, review.productId)}
-                    className="flex items-center justify-center gap-2 px-4 py-2 bg-red-50 hover:bg-red-100 text-red-600 rounded-xl font-medium transition-colors"
-                  >
-                    <Trash className="w-4 h-4" /> Delete Review
-                  </button>
+                    icon={Trash}
+                    bgClass="bg-red-500"
+                    hoverBgClass="bg-red-600"
+                    className="px-4 h-[42px] w-full"
+                  />
                 </div>
               </div>
             ))}
@@ -137,3 +144,4 @@ export default function Reviews() {
     </div>
   );
 }
+

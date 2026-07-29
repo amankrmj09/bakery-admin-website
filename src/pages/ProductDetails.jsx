@@ -241,7 +241,7 @@ export default function ProductDetails({ product, categories, taxRates, onClose 
     <div className="flex flex-col gap-6 w-full">
       {/* Form Header with same UI as list view */}
       <div className={cn(
-        "sticky top-0 z-30 flex justify-between items-center flex-wrap gap-4 transition-all duration-300",
+        "sticky top-0 z-40 flex justify-between items-center flex-wrap gap-4 transition-all duration-300",
         isScrolled 
           ? "bg-[var(--bg-panel)]/80 backdrop-blur-xl border border-[var(--border-color)] shadow-md rounded-2xl px-6 py-4 mt-2" 
           : "bg-transparent border-transparent py-2"
@@ -422,9 +422,16 @@ export default function ProductDetails({ product, categories, taxRates, onClose 
 
           <div className="pt-4 flex justify-between items-center border-t border-border mt-8">
             {isEditing ? (
-              <Button type="button" variant="ghost" className="text-red-500 hover:text-red-700 hover:bg-red-50" onClick={handleDeleteClick} disabled={isSaving}>
-                <Trash2 className="w-4 h-4 mr-2" /> Delete
-              </Button>
+              <ActionButton 
+                type="button" 
+                text="Delete" 
+                icon={Trash2} 
+                onClick={handleDeleteClick} 
+                disabled={isSaving}
+                bgClass="bg-red-500"
+                hoverBgClass="bg-red-600"
+                className="px-6 h-[42px]"
+              />
             ) : <div />}
           </div>
         </form>
@@ -432,3 +439,4 @@ export default function ProductDetails({ product, categories, taxRates, onClose 
     </div>
   );
 }
+

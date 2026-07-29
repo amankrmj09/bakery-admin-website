@@ -31,16 +31,32 @@ const SleekDropdown = ({
   value,
   onChange,
   widthClass = 'w-44',
-  maxHeightClass = 'max-h-60',
+  maxHeightClass = 'max-h-[280px]',
   renderTriggerLabel,
   fullWidth = false,
   placeholder,
   customTrigger,
   emptyStateNode,
   triggerClassName = '',
+  placement = 'auto',
 }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [autoPlacement, setAutoPlacement] = useState('bottom');
   const dropdownRef = useRef(null);
+
+  useEffect(() => {
+    if (isOpen && dropdownRef.current && placement === 'auto') {
+      const rect = dropdownRef.current.getBoundingClientRect();
+      const spaceBelow = window.innerHeight - rect.bottom;
+      const spaceAbove = rect.top;
+      
+      if (spaceBelow < 280 && spaceAbove > spaceBelow) {
+        setAutoPlacement('top');
+      } else {
+        setAutoPlacement('bottom');
+      }
+    }
+  }, [isOpen, placement]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -53,9 +69,10 @@ const SleekDropdown = ({
   }, []);
 
   const currentOption = options.find((o) => o.value === value);
+  const finalPlacement = placement === 'auto' ? autoPlacement : placement;
 
   return (
-    <div className={`relative flex flex-col gap-1.5 group ${fullWidth ? 'w-full' : 'inline-block'}`} ref={dropdownRef}>
+    <div className={`relative flex flex-col gap-1.5 group ${fullWidth ? 'w-full' : 'inline-block'} ${isOpen ? 'z-[9999]' : ''}`} ref={dropdownRef}>
       {formLabel && (
         <label className="text-[10px] uppercase font-bold tracking-wider text-gray-500 ml-1 group-focus-within:text-primary transition-colors">
           {formLabel}
@@ -94,7 +111,7 @@ const SleekDropdown = ({
 
       {isOpen && (
         <div
-          className={`absolute left-0 mt-1.5 ${fullWidth ? 'w-full' : widthClass} bg-white border border-gray-200 rounded-xl shadow-xl z-50 py-1 ${maxHeightClass} overflow-y-auto animate-in fade-in zoom-in-95 duration-150`}
+          className={`absolute left-0 ${finalPlacement === 'top' ? 'bottom-full mb-1.5 origin-bottom' : 'mt-1.5 origin-top'} ${fullWidth ? 'w-full' : widthClass} bg-white border border-gray-200 rounded-xl shadow-xl z-[9999] py-1 ${maxHeightClass} overflow-y-auto animate-in fade-in zoom-in-95 duration-150`}
         >
           {headerTitle && (
             <div className="px-3 py-1.5 text-[10px] font-extrabold text-gray-500 uppercase tracking-wider border-b border-gray-200/50 mb-1 sticky top-0 bg-white z-10">
