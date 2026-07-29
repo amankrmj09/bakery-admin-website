@@ -330,7 +330,18 @@ export default function EngagementsPage() {
                         {item.rating || 5} / 5
                       </div>
                     </div>
-                    <p className="text-gray-700 text-sm italic line-clamp-3">"{item.message}"</p>
+                    {(() => {
+                      const hasTitle = item.message?.includes('::');
+                      const [title, message] = hasTitle 
+                        ? item.message.split('::') 
+                        : ['Fantastic Experience!', item.message];
+                      return (
+                        <div className="flex flex-col gap-1">
+                          {hasTitle && <h5 className="font-bold text-gray-900 text-sm">{title}</h5>}
+                          <p className="text-gray-700 text-sm italic line-clamp-3">"{message}"</p>
+                        </div>
+                      );
+                    })()}
                   </div>
 
                   <div className="flex items-center justify-between pt-3 border-t border-gray-100">
