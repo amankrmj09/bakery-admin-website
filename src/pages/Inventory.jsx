@@ -160,8 +160,17 @@ export default function Inventory() {
             onChange={e => setStockForm({...stockForm, quantity: parseInt(e.target.value) || 1})} 
             disabled={isSaving} 
           />
-          <div className="pt-4 flex justify-end space-x-2 border-t border-border mt-6">
-            <Button type="button" variant="outline" onClick={() => setIsStockModalOpen(false)} disabled={isSaving}>Cancel</Button>
+          <div className="pt-4 flex justify-end space-x-2 border-t border-[var(--border-color)] mt-6">
+            <ActionButton 
+              text="Cancel"
+              onClick={() => setIsStockModalOpen(false)}
+              disabled={isSaving}
+              bgClass="bg-gray-100 dark:bg-gray-800"
+              textClass="text-gray-700 dark:text-gray-300"
+              hoverBgClass="bg-gray-200 dark:bg-gray-700"
+              showArrow={false}
+              className="px-4 h-10"
+            />
             <ActionButton 
                 type="submit" 
                 text={isSaving ? 'Saving...' : 'Confirm'}
@@ -199,8 +208,17 @@ export default function Inventory() {
               />
             </div>
           </div>
-          <div className="pt-4 flex justify-end space-x-2 border-t border-border mt-6">
-            <Button type="button" variant="outline" onClick={() => setIsRulesModalOpen(false)} disabled={isSaving}>Cancel</Button>
+          <div className="pt-4 flex justify-end space-x-2 border-t border-[var(--border-color)] mt-6">
+            <ActionButton 
+              text="Cancel"
+              onClick={() => setIsRulesModalOpen(false)}
+              disabled={isSaving}
+              bgClass="bg-gray-100 dark:bg-gray-800"
+              textClass="text-gray-700 dark:text-gray-300"
+              hoverBgClass="bg-gray-200 dark:bg-gray-700"
+              showArrow={false}
+              className="px-4 h-10"
+            />
             <ActionButton 
                 type="submit" 
                 text={isSaving ? 'Saving...' : 'Save Rules'}

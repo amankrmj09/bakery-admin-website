@@ -477,19 +477,25 @@ export default function OrderDetails({ order, onClose }) {
             )}
           </div>
           
-          <div className="flex justify-end gap-3 pt-2 border-t border-[var(--border-color)]">
-            <Button variant="outline" onClick={() => setIsCancelModalOpen(false)}>
-              Keep Order
-            </Button>
-            <Button 
-              variant="danger" 
+          <div className="flex justify-end space-x-2 pt-4 border-t border-[var(--border-color)] mt-6">
+            <ActionButton 
+              text="Keep Order"
+              onClick={() => setIsCancelModalOpen(false)}
+              bgClass="bg-gray-100 dark:bg-gray-800"
+              textClass="text-gray-700 dark:text-gray-300"
+              hoverBgClass="bg-gray-200 dark:bg-gray-700"
+              showArrow={false}
+              className="px-4 h-10"
+            />
+            <ActionButton 
+              text="Confirm Cancellation"
               onClick={confirmDecline}
               disabled={selectedPreset === "Other reason" && !cancelReason.trim()}
-              className="flex items-center gap-2"
-            >
-              <XCircle size={16} />
-              Confirm Cancellation
-            </Button>
+              icon={XCircle}
+              bgClass="bg-red-500"
+              hoverBgClass="bg-red-600"
+              className="px-4 h-10"
+            />
           </div>
         </div>
       </Modal>

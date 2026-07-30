@@ -35,12 +35,12 @@ export function Modal({ isOpen, onClose, title, children, maxWidth = "max-w-lg" 
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 10 }}
               className={cn(
-                "text-[var(--text-main)] rounded-3xl shadow-lg shadow-white dark:shadow-2xl dark:shadow-black/50 w-full pointer-events-auto overflow-hidden border border-[var(--border-color)]",
+                "text-[var(--text-main)] rounded-3xl shadow-lg shadow-black/10 dark:shadow-2xl dark:shadow-black w-full pointer-events-auto overflow-hidden border border-[var(--border-color)]",
                 maxWidth,
-                glass ? "glass-panel" : "bg-[var(--bg-panel)]"
+                "bg-white dark:bg-black"
               )}
             >
-              <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--border-color)]/50 bg-[var(--bg-panel)]/50">
+              <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--border-color)]/50 bg-white dark:bg-black">
                 <h3 className="font-semibold text-lg">{title}</h3>
                 <button
                   onClick={onClose}

@@ -211,7 +211,7 @@ export default function Users() {
               ]}
             />
 
-            <div className="pt-4 flex justify-between items-center border-t border-border mt-6">
+            <div className="pt-4 flex justify-between items-center border-t border-[var(--border-color)] mt-6">
               <ActionButton 
                 text="Delete User"
                 onClick={handleDeleteUser}
@@ -219,22 +219,25 @@ export default function Users() {
                 bgClass="bg-red-500"
                 hoverBgClass="bg-red-600"
                 disabled={isSaving}
+                className="px-4 h-10"
               />
               <div className="flex space-x-2">
                 <ActionButton 
                   text="Cancel"
                   onClick={() => setIsEditModalOpen(false)}
                   disabled={isSaving}
-                  bgClass="bg-gray-100"
-                  textClass="text-gray-700"
-                  iconColor="text-gray-700"
-                  hoverBgClass="bg-gray-200"
+                  bgClass="bg-gray-100 dark:bg-gray-800"
+                  textClass="text-gray-700 dark:text-gray-300"
+                  hoverBgClass="bg-gray-200 dark:bg-gray-700"
+                  showArrow={false}
+                  className="px-4 h-10"
                 />
                 <ActionButton 
                   text={isSaving ? 'Saving...' : 'Save Changes'}
                   onClick={handleSave} 
                   disabled={isSaving || (editForm.role === selectedUser.role && editForm.status === selectedUser.status)}
                   showArrow={true}
+                  className="px-4 h-10"
                 />
               </div>
             </div>
