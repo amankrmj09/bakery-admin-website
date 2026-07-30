@@ -15,6 +15,7 @@ export default function Settings() {
   const { settings } = useSelector((state) => state.dashboard);
   const { theme, setTheme, glass, toggleGlass } = useTheme();
   const [isAcceptingOrders, setIsAcceptingOrders] = useState(true);
+  const [adminEmail, setAdminEmail] = useState('');
 
   useEffect(() => {
     dispatch(fetchStoreSettings());
@@ -23,6 +24,9 @@ export default function Settings() {
   useEffect(() => {
     if (settings.data) {
       setIsAcceptingOrders(settings.data.isAcceptingOrders);
+      if (settings.data.adminNotificationEmail) {
+        setAdminEmail(settings.data.adminNotificationEmail);
+      }
     }
   }, [settings.data]);
 
@@ -38,6 +42,18 @@ export default function Settings() {
     } catch (e) {
       toast.error('Failed to update store settings');
       setIsAcceptingOrders(!newValue);
+    }
+  };
+
+  const handleSaveAdminEmail = async () => {
+    try {
+      await dispatch(updateStoreSettings({
+        id: settings.data?.id,
+        adminNotificationEmail: adminEmail
+      })).unwrap();
+      toast.success('Admin notification email saved');
+    } catch (e) {
+      toast.error('Failed to update admin email');
     }
   };
 
@@ -116,9 +132,9 @@ export default function Settings() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Store Status</CardTitle>
+            <CardTitle>Store & Notifications</CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="space-y-6">
             <div className="flex items-center justify-between p-4 border border-[var(--border-color)] rounded-lg bg-[var(--bg-panel-hover)]">
               <div>
                 <h4 className="font-medium text-[var(--text-main)]">Accepting Orders</h4>
@@ -139,6 +155,28 @@ export default function Settings() {
                   }`}
                 />
               </button>
+            </div>
+            
+            <div className="pt-2">
+              <h4 className="font-medium text-[var(--text-main)] mb-2">Admin Notification Email</h4>
+              <p className="text-sm text-[var(--text-muted)] mb-3">
+                Email address to receive critical alerts (new orders, cancellations, etc).
+              </p>
+              <div className="flex items-center space-x-2">
+                <input
+                  type="email"
+                  value={adminEmail}
+                  onChange={(e) => setAdminEmail(e.target.value)}
+                  placeholder="admin@bakery.com"
+                  className="flex-1 px-3 py-2 bg-[var(--bg-panel)] border border-[var(--border-color)] rounded-md text-[var(--text-main)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
+                />
+                <button
+                  onClick={handleSaveAdminEmail}
+                  className="px-4 py-2 bg-[var(--color-primary)] text-white font-medium rounded-md hover:opacity-90 transition-opacity"
+                >
+                  Save
+                </button>
+              </div>
             </div>
           </CardContent>
         </Card>
