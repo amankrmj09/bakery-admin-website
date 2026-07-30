@@ -10,7 +10,8 @@ import ActionButton from '../components/ui/ActionButton';
 import ActionIconButton from '../components/ui/ActionIconButton';
 import { FaInstagram, FaFacebook, FaGlobe } from 'react-icons/fa';
 import { FaXTwitter, FaThreads } from 'react-icons/fa6';
-
+import { Modal } from '../components/ui/Modal';
+import { Eye } from 'lucide-react';
 
 export default function EngagementsPage() {
   const isScrolled = useScrollTop();
@@ -23,6 +24,8 @@ export default function EngagementsPage() {
   const [searchOptions, setSearchOptions] = useState([]);
   const [searchDropdownLoading, setSearchDropdownLoading] = useState(false);
   const searchTimeoutRef = useRef(null);
+  
+  const [selectedFeedback, setSelectedFeedback] = useState(null);
 
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(10);
@@ -155,6 +158,34 @@ export default function EngagementsPage() {
       setTotalElements(prev => prev - 1);
     } catch (error) {
       toast.error("Failed to delete testimonial");
+    }
+  };
+
+  const handleDeleteFeedback = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this feedback?")) return;
+    try {
+      await engagementsApi.deleteFeedback(id);
+      toast.success("Feedback deleted");
+      setFeedbacks(feedbacks.filter(f => f.id !== id));
+      setTotalElements(prev => prev - 1);
+      if (selectedFeedback?.id === id) {
+        setSelectedFeedback(null);
+      }
+    } catch (error) {
+      toast.error("Failed to delete feedback");
+    }
+  };
+
+  const handleViewDetails = async (item) => {
+    setSelectedFeedback(item);
+    if (!item.status || item.status === 'NEW') {
+      try {
+        await engagementsApi.updateFeedbackStatus(item.id, 'READ');
+        setFeedbacks(feedbacks.map(f => f.id === item.id ? { ...f, status: 'READ' } : f));
+        setSelectedFeedback({ ...item, status: 'READ' });
+      } catch (error) {
+        console.error("Failed to update feedback status", error);
+      }
     }
   };
 
@@ -393,20 +424,53 @@ export default function EngagementsPage() {
               <p className="text-gray-500 text-sm mt-1">Customer inquiries and feedback will appear here.</p>
             </div>
           ) : (
-            <div className="p-4 space-y-3">
+            <div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
               {filteredFeedbacks.map((item) => (
-                <div key={item.id} className="bg-white rounded-2xl border border-gray-200 p-5 shadow-sm flex flex-col sm:flex-row justify-between gap-4">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-2">
-                      <span className="font-bold text-gray-900 text-sm">{item.name || 'Anonymous'}</span>
-                      {item.email && <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-md font-mono">{item.email}</span>}
-                      <span className="text-xs bg-blue-50 text-blue-700 px-2 py-0.5 rounded font-semibold uppercase">{item.type || 'GENERAL'}</span>
+                <div 
+                  key={item.id} 
+                  className="bg-white rounded-2xl border border-gray-200 p-5 shadow-sm hover:shadow-md hover:border-blue-200 transition-all duration-300 flex flex-col justify-between gap-4 group"
+                >
+                  <div>
+                    <div className="flex items-start justify-between gap-3 mb-3">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 text-white font-bold flex items-center justify-center text-sm shadow-sm flex-shrink-0">
+                          {getInitials(item.name)}
+                        </div>
+                        <div className="flex flex-col">
+                          <h4 className="font-bold text-gray-900 text-sm flex items-center gap-2">
+                            {item.name || 'Anonymous'}
+                            <span className="text-[10px] bg-blue-50 text-blue-700 px-2 py-0.5 rounded font-semibold uppercase tracking-wider">
+                              {item.type || 'GENERAL'}
+                            </span>
+                          </h4>
+                          {item.email && <span className="text-xs text-gray-500 font-mono mt-0.5">{item.email}</span>}
+                        </div>
+                      </div>
                     </div>
-                    <p className="text-gray-700 text-sm">{item.message}</p>
+                    <div className="bg-gray-50/50 rounded-xl p-3 border border-gray-100 group-hover:bg-blue-50/30 transition-colors">
+                      <p className="text-gray-700 text-sm line-clamp-3">"{item.message}"</p>
+                    </div>
                   </div>
-                  <div className="flex sm:flex-col justify-between sm:items-end text-xs text-gray-400 font-medium">
-                    <span>Status: <strong className="text-gray-700">{item.status || 'NEW'}</strong></span>
-                    <span>{item.createdAt ? new Date(item.createdAt).toLocaleDateString() : 'Recent'}</span>
+
+                  <div className="flex items-center justify-between pt-3 border-t border-gray-100 mt-2">
+                    <div className="flex flex-col text-xs text-gray-400 font-medium">
+                      <span>Status: <strong className="text-gray-700">{item.status || 'NEW'}</strong></span>
+                      <span>{item.createdAt ? new Date(item.createdAt).toLocaleDateString() : 'Recent'}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <ActionIconButton
+                        icon={Eye}
+                        title="View Details"
+                        onClick={() => handleViewDetails(item)}
+                        colorClass="text-gray-400 hover:text-blue-600 hover:bg-blue-50 group-hover:text-blue-500"
+                      />
+                      <ActionIconButton
+                        icon={Trash2}
+                        title="Delete"
+                        onClick={() => handleDeleteFeedback(item.id)}
+                        colorClass="text-gray-400 hover:text-red-500 hover:bg-red-50"
+                      />
+                    </div>
                   </div>
                 </div>
               ))}
@@ -606,6 +670,41 @@ export default function EngagementsPage() {
           </form>
         </div>
       ) : null}
+
+      {/* Feedback Details Modal */}
+      <Modal
+        isOpen={!!selectedFeedback}
+        onClose={() => setSelectedFeedback(null)}
+        title={selectedFeedback?.type === 'CONTACT_US' ? 'Contact Details' : 'Feedback Details'}
+      >
+        {selectedFeedback && (
+          <div className="space-y-4">
+            <div className="flex items-center justify-between border-b pb-3">
+              <div>
+                <h4 className="font-bold text-gray-900 text-lg">{selectedFeedback.name || 'Anonymous'}</h4>
+                {selectedFeedback.email && <p className="text-sm text-gray-500">{selectedFeedback.email}</p>}
+              </div>
+              <span className="text-xs bg-blue-50 text-blue-700 px-2.5 py-1 rounded-md font-semibold uppercase">
+                {selectedFeedback.type || 'GENERAL'}
+              </span>
+            </div>
+            
+            <div className="py-2">
+              <h5 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Message</h5>
+              <div className="bg-gray-50 p-4 rounded-xl border border-gray-100 text-gray-800 text-sm whitespace-pre-wrap">
+                {selectedFeedback.message}
+              </div>
+            </div>
+            
+            <div className="flex items-center justify-between text-xs text-gray-500 pt-3 border-t">
+              <span>Status: <strong className="text-gray-700">{selectedFeedback.status || 'NEW'}</strong></span>
+              <span>
+                Submitted on: {selectedFeedback.createdAt ? new Date(selectedFeedback.createdAt).toLocaleString() : 'Unknown'}
+              </span>
+            </div>
+          </div>
+        )}
+      </Modal>
     </div>
   );
 }
