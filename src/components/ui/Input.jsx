@@ -11,7 +11,7 @@ export const Input = forwardRef(({ className, label, error, icon: Icon, wrapperC
       )}
       <div className="relative">
         {Icon && (
-          <Icon size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)] group-focus-within:text-[var(--color-primary)] transition-colors" />
+          <Icon size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)] group-focus-within:text-[var(--color-primary)] transition-colors z-10 pointer-events-none" />
         )}
         <input
           ref={ref}
