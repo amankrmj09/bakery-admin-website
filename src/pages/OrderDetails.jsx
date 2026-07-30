@@ -148,6 +148,9 @@ export default function OrderDetails({ order, onClose }) {
     ];
   }
 
+  const showOrderStatusDropdown = orderStatus !== 'CANCELLED' && orderStatus !== 'DELIVERED';
+  const showManagementPanel = showOrderStatusDropdown || showPaymentDropdown;
+
   return (
     <div className="flex flex-col min-h-full gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500 w-full pb-8">
       {/* Sticky Header */}
@@ -359,7 +362,7 @@ export default function OrderDetails({ order, onClose }) {
           </Card>
 
           {/* Quick Management Panel */}
-          {orderStatus !== 'DELIVERED' && (orderStatus !== 'CANCELLED' || showPaymentDropdown) && (
+          {showManagementPanel && (
             <Card className="!overflow-visible">
               <CardContent className="p-6 space-y-4">
                 <div className="flex items-center gap-2 mb-2 border-b border-[var(--border-color)] pb-3">
@@ -368,7 +371,7 @@ export default function OrderDetails({ order, onClose }) {
                 </div>
 
                 <div className="space-y-3">
-                  {orderStatus !== 'CANCELLED' && (
+                  {showOrderStatusDropdown && (
                     <div className="flex flex-col gap-1.5">
                       <label className="text-xs font-semibold text-[var(--text-muted)]">ORDER STATUS</label>
                       <SleekDropdown 
