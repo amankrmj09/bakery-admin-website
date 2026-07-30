@@ -73,7 +73,7 @@ export default function Reviews() {
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm flex flex-col flex-1">
+      <div className="bg-[var(--bg-panel)]/80 backdrop-blur-xl rounded-2xl border border-[var(--border-color)] shadow-sm flex flex-col flex-1">
         {loading && reviews.length === 0 ? (
           <div className="text-center py-16 text-gray-500 font-medium">Loading reported reviews...</div>
         ) : reviews.length === 0 ? (

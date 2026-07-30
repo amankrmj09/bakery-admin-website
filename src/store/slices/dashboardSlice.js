@@ -139,6 +139,18 @@ export const updateUserStatus = createAsyncThunk(
   }
 );
 
+export const deleteUser = createAsyncThunk(
+  'dashboard/deleteUser',
+  async (userId, { rejectWithValue }) => {
+    try {
+      await api.delete(`/api/users/admin/${userId}`);
+      return userId;
+    } catch (error) {
+      return rejectWithValue('Failed to delete user');
+    }
+  }
+);
+
 export const fetchProducts = createAsyncThunk('dashboard/fetchProducts', async (params, { rejectWithValue }) => {
     try {
       const endpoint = params?.query ? '/api/products/admin/search' : '/api/products';

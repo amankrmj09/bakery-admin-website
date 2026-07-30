@@ -220,7 +220,7 @@ export default function EngagementsPage() {
       </div>
 
       {/* Tabs & Search Bar */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 mb-6 bg-white p-4 rounded-2xl border border-gray-100 shadow-sm">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 mb-6 bg-[var(--bg-panel)]/80 backdrop-blur-xl p-4 rounded-2xl border border-[var(--border-color)] shadow-sm">
         <div className="flex bg-gray-100 p-1 rounded-xl">
           <button
             onClick={() => { setActiveTab('testimonials'); setSearchQuery(''); }}
@@ -291,12 +291,12 @@ export default function EngagementsPage() {
 
       {/* Content Area */}
       {loading ? (
-        <div className="flex flex-col items-center justify-center py-16 bg-white rounded-2xl border border-gray-100 shadow-sm">
+        <div className="flex flex-col items-center justify-center py-16 bg-[var(--bg-panel)]/80 backdrop-blur-xl rounded-2xl border border-[var(--border-color)] shadow-sm">
           <Loader2 className="w-8 h-8 text-primary-500 animate-spin mb-3" />
           <p className="text-gray-500 text-sm font-medium">Loading engagement records...</p>
         </div>
       ) : activeTab === 'testimonials' ? (
-        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm">
+        <div className="bg-[var(--bg-panel)]/80 backdrop-blur-xl rounded-2xl border border-[var(--border-color)] shadow-sm">
           {testimonials.length === 0 ? (
             <div className="text-center py-16">
               <Star className="w-12 h-12 text-gray-300 mx-auto mb-3" />
@@ -385,7 +385,7 @@ export default function EngagementsPage() {
           />
         </div>
       ) : activeTab === 'feedbacks' || activeTab === 'contact' ? (
-        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm">
+        <div className="bg-[var(--bg-panel)]/80 backdrop-blur-xl rounded-2xl border border-[var(--border-color)] shadow-sm">
           {filteredFeedbacks.length === 0 ? (
             <div className="text-center py-16">
               <MessageCircle className="w-12 h-12 text-gray-300 mx-auto mb-3" />
@@ -424,7 +424,7 @@ export default function EngagementsPage() {
           />
         </div>
       ) : activeTab === 'contact-info' ? (
-        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 max-w-3xl">
+        <div className="bg-[var(--bg-panel)]/80 backdrop-blur-xl rounded-2xl border border-[var(--border-color)] shadow-sm p-6 max-w-3xl">
           <h2 className="text-xl font-bold text-gray-900 mb-6">Storefront Contact Information</h2>
           <form onSubmit={handleSaveContactInfo} className="space-y-6">
             <div className="space-y-2">

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchUsers, updateUserRole, updateUserStatus } from '../store/slices/dashboardSlice';
+import { fetchUsers, updateUserRole, updateUserStatus, deleteUser } from '../store/slices/dashboardSlice';
 import { Card, CardContent } from '../components/ui/Card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/Table';
 import { Badge } from '../components/ui/Badge';
@@ -10,10 +10,11 @@ import { Modal } from '../components/ui/Modal';
 import { toast } from 'sonner';
 import { cn } from '../lib/utils';
 import { useScrollTop } from '../hooks/useScrollTop';
-import { Users as UsersIcon, Edit } from 'lucide-react';
+import { Users as UsersIcon, Edit, Trash2 } from 'lucide-react';
 import Pagination from '../components/shared/Pagination';
 import TopSearchBar from '../components/shared/TopSearchBar';
 import ActionIconButton from '../components/ui/ActionIconButton';
+import ActionButton from '../components/ui/ActionButton';
 
 export default function Users() {
   const dispatch = useDispatch();
@@ -68,9 +69,26 @@ export default function Users() {
     }
   };
 
+  const handleDeleteUser = async () => {
+    if (!selectedUser) return;
+    if (!window.confirm("Are you sure you want to completely delete this user? This cannot be undone.")) return;
+    
+    setIsSaving(true);
+    try {
+      await dispatch(deleteUser(selectedUser.id)).unwrap();
+      toast.success('User deleted successfully');
+      setIsEditModalOpen(false);
+    } catch (err) {
+      toast.error('Failed to delete user');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   const getRoleBadge = (role) => {
-    if (role === 'ADMIN') return 'default';
+    if (role === 'ADMIN') return 'purple';
     if (role === 'STAFF') return 'secondary';
+    if (role === 'USER') return 'info';
     return 'outline';
   };
 
@@ -193,20 +211,32 @@ export default function Users() {
               ]}
             />
 
-            <div className="pt-4 flex justify-end space-x-2 border-t border-border mt-6">
-              <Button 
-                variant="outline" 
-                onClick={() => setIsEditModalOpen(false)}
+            <div className="pt-4 flex justify-between items-center border-t border-border mt-6">
+              <ActionButton 
+                text="Delete User"
+                onClick={handleDeleteUser}
+                icon={Trash2}
+                bgClass="bg-red-500"
+                hoverBgClass="bg-red-600"
                 disabled={isSaving}
-              >
-                Cancel
-              </Button>
-              <Button 
-                onClick={handleSave} 
-                disabled={isSaving || (editForm.role === selectedUser.role && editForm.status === selectedUser.status)}
-              >
-                {isSaving ? 'Saving...' : 'Save Changes'}
-              </Button>
+              />
+              <div className="flex space-x-2">
+                <ActionButton 
+                  text="Cancel"
+                  onClick={() => setIsEditModalOpen(false)}
+                  disabled={isSaving}
+                  bgClass="bg-gray-100"
+                  textClass="text-gray-700"
+                  iconColor="text-gray-700"
+                  hoverBgClass="bg-gray-200"
+                />
+                <ActionButton 
+                  text={isSaving ? 'Saving...' : 'Save Changes'}
+                  onClick={handleSave} 
+                  disabled={isSaving || (editForm.role === selectedUser.role && editForm.status === selectedUser.status)}
+                  showArrow={true}
+                />
+              </div>
             </div>
           </div>
         )}
