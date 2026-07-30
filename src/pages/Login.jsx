@@ -71,7 +71,7 @@ export default function Login() {
                 label="Username or Email"
                 icon={User}
                 className="bg-[var(--bg-panel-hover)] border-[var(--border-color)] text-[var(--text-main)] placeholder:text-[var(--text-muted)] focus:border-primary rounded-xl" 
-                placeholder="admin@bakery.com"
+                placeholder="Enter username or email"
                 name="usernameOrEmail"
                 value={credentials.usernameOrEmail}
                 onChange={handleChange}
