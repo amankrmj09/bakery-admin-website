@@ -35,12 +35,12 @@ export function Modal({ isOpen, onClose, title, children, maxWidth = "max-w-lg" 
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 10 }}
               className={cn(
-                "text-[var(--text-main)] rounded-3xl shadow-lg shadow-black/10 dark:shadow-2xl dark:shadow-black w-full pointer-events-auto overflow-hidden border border-[var(--border-color)] my-8",
+                "text-[var(--text-main)] rounded-3xl shadow-lg shadow-black/10 dark:shadow-2xl dark:shadow-black w-full pointer-events-auto border border-[var(--border-color)] my-8 relative",
                 maxWidth,
                 "bg-white dark:bg-black"
               )}
             >
-              <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--border-color)]/50 bg-white dark:bg-black sticky top-0 z-10">
+              <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--border-color)]/50 bg-white dark:bg-black sticky top-0 z-10 rounded-t-3xl">
                 <h3 className="font-semibold text-lg">{title}</h3>
                 <button
                   onClick={onClose}
@@ -49,7 +49,7 @@ export function Modal({ isOpen, onClose, title, children, maxWidth = "max-w-lg" 
                   <X className="w-5 h-5" />
                 </button>
               </div>
-              <div className="p-6">
+              <div className="p-6 rounded-b-3xl">
                 {children}
               </div>
             </motion.div>

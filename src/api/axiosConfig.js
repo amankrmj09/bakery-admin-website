@@ -29,7 +29,7 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (!error.response || error.code === 'ERR_NETWORK') {
-      toast.error('Backend API is not responding. Please try again later.');
+      toast.error('Our services are temporarily unavailable. Please try again later.');
     } else if (error.response.status >= 500) {
       toast.error('Server error occurred. Please try again later.');
     } else if (error.response.status === 401) {
