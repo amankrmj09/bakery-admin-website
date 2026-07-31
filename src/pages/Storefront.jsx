@@ -54,17 +54,15 @@ export default function Storefront() {
     formState: { isDirty }
   } = useForm({
     defaultValues: {
-      heroSection: {},
+      heroSection: { heroBanners: [{}, {}, {}] },
       aboutSection: {},
-      heroSection: { campaigns: [{}, {}, {}] },
-      
       specialOfferSection: {}
     }
   });
 
-  const { fields: campaignFields, append: appendCampaign, remove: removeCampaign } = useFieldArray({
+  const { fields: bannerFields, append: appendBanner, remove: removeBanner } = useFieldArray({
     control,
-    name: 'heroSection.campaigns'
+    name: 'heroSection.heroBanners'
   });
 
   const { fields: specialOfferImageFields, append: appendSpecialOfferImage, remove: removeSpecialOfferImage } = useFieldArray({
@@ -151,23 +149,23 @@ export default function Storefront() {
         <div className="flex flex-col gap-5">
             <div className="flex flex-row items-center justify-between border-b border-[var(--border-color)]/50 pb-3 mb-4">
               <h3 className="font-bold text-sm uppercase tracking-wider text-[var(--text-main)] flex items-center gap-2">
-                <Store className="h-4 w-4 text-primary-500" /> Hero Carousel Campaigns
+                <Store className="h-4 w-4 text-primary-500" /> Hero Banners
               </h3>
             </div>
           
           <div className="space-y-4">
-            {campaignFields.map((field, index) => (
+            {bannerFields.map((field, index) => (
               <div key={field.id} className="flex gap-4 items-start border border-[var(--border-color)]/60 p-5 rounded-2xl bg-[var(--bg-panel-hover)] transition-all">
                 <div className="flex-1 space-y-4">
-                  <h4 className="font-bold text-sm text-[var(--text-main)] mb-2">Campaign {index + 1}</h4>
+                  <h4 className="font-bold text-sm text-[var(--text-main)] mb-2">Banner {index + 1}</h4>
                   <div className="grid grid-cols-1 gap-4 mb-4">
-                    <Input label="Campaign Title" {...register(`heroSection.campaigns.${index}.title`)} />
-                    <Textarea label="Campaign Description" rows={2} {...register(`heroSection.campaigns.${index}.description`)} />
+                    <Input label="Banner Title" {...register(`heroSection.heroBanners.${index}.title`)} />
+                    <Textarea label="Banner Description" rows={2} {...register(`heroSection.heroBanners.${index}.description`)} />
                   </div>
                   <div className="mt-2">
-                    <Controller name={`heroSection.campaigns.${index}.imageUrl`} control={control} render={({ field }) => (
+                    <Controller name={`heroSection.heroBanners.${index}.imageUrl`} control={control} render={({ field }) => (
                       <div className="space-y-1.5">
-                        <label className="text-[10px] uppercase font-bold tracking-wider text-[var(--text-muted)] ml-1">Campaign Image (3:2 ratio)</label>
+                        <label className="text-[10px] uppercase font-bold tracking-wider text-[var(--text-muted)] ml-1">Banner Image (3:2 ratio)</label>
                         <SingleImageUploader value={field.value} onChange={field.onChange} />
                       </div>
                     )} />
@@ -175,25 +173,25 @@ export default function Storefront() {
                 </div>
                 <ActionIconButton
                   icon={Trash2}
-                  title="Remove Campaign"
-                  onClick={() => removeCampaign(index)}
-                  disabled={campaignFields.length <= 3}
+                  title="Remove Banner"
+                  onClick={() => removeBanner(index)}
+                  disabled={bannerFields.length <= 3}
                   colorClass="text-red-600 bg-red-50 hover:bg-red-100 mt-6"
                 />
               </div>
             ))}
-              {campaignFields.length < 5 && (
-                <button type="button" onClick={() => appendCampaign({ imageUrl: '' })} className="self-start flex items-center gap-2 text-sm font-semibold px-4 py-2 border-2 border-dashed border-primary-500/50 text-primary-500 rounded-xl hover:bg-primary-500/10 transition-colors mt-2">
-                  <Plus size={16} /> Add Campaign
+              {bannerFields.length < 5 && (
+                <button type="button" onClick={() => appendBanner({ imageUrl: '' })} className="self-start flex items-center gap-2 text-sm font-semibold px-4 py-2 border-2 border-dashed border-primary-500/50 text-primary-500 rounded-xl hover:bg-primary-500/10 transition-colors mt-2">
+                  <Plus size={16} /> Add Banner
                 </button>
               )}
-              {campaignFields.length >= 5 && (
+              {bannerFields.length >= 5 && (
                 <p className="text-xs text-primary-500/70 italic flex items-center gap-2 mt-2">
-                  <SettingsIcon size={14} /> Maximum of 5 campaigns reached.
+                  <SettingsIcon size={14} /> Maximum of 5 banners reached.
                 </p>
               )}
-              {campaignFields.length < 3 && (
-                <p className="text-sm text-red-500 italic text-center py-4 bg-red-500/10 rounded-2xl border border-dashed border-red-500/30">You must add at least 3 campaigns to enable the carousel rotation.</p>
+              {bannerFields.length < 3 && (
+                <p className="text-sm text-red-500 italic text-center py-4 bg-red-500/10 rounded-2xl border border-dashed border-red-500/30">You must add at least 3 banners to enable the carousel rotation.</p>
               )}
             </div>
         </div>
