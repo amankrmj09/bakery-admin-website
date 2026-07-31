@@ -6,13 +6,35 @@ export const loginAdmin = createAsyncThunk(
   async (credentials, { rejectWithValue }) => {
     try {
       const response = await api.post('/api/auth/admin/login', credentials);
-      // Ensure the user is an admin
-      if (response.data.user.role !== 'ADMIN') {
-        return rejectWithValue('Unauthorized: Admin access required');
-      }
+      // Backend now returns LoginInitResponse (requiresOtp)
+      // So no need to check role here as backend handles it during verification
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Login failed');
+    }
+  }
+);
+
+export const verifyAdminLogin = createAsyncThunk(
+  'auth/verifyLogin',
+  async (payload, { rejectWithValue }) => {
+    try {
+      const response = await api.post('/api/auth/admin/login/verify', payload);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || 'OTP Verification failed');
+    }
+  }
+);
+
+export const resendLoginOtp = createAsyncThunk(
+  'auth/resendLoginOtp',
+  async (email, { rejectWithValue }) => {
+    try {
+      const response = await api.post('/api/auth/login/resend', { email });
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to resend OTP');
     }
   }
 );
@@ -35,6 +57,8 @@ const initialState = {
   isAuthenticated: !!localStorage.getItem('token'),
   loading: false,
   error: null,
+  isOtpPending: false,
+  pendingEmail: null,
 };
 
 const authSlice = createSlice({
@@ -47,29 +71,76 @@ const authSlice = createSlice({
       state.user = null;
       state.isAuthenticated = false;
       state.error = null;
+      state.isOtpPending = false;
+      state.pendingEmail = null;
     },
     clearError: (state) => {
       state.error = null;
+    },
+    clearOtpState: (state) => {
+      state.isOtpPending = false;
+      state.pendingEmail = null;
     }
   },
   extraReducers: (builder) => {
     builder
+      // loginAdmin
       .addCase(loginAdmin.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
       .addCase(loginAdmin.fulfilled, (state, action) => {
         state.loading = false;
-        state.isAuthenticated = true;
-        state.token = action.payload.access_token;
-        state.user = action.payload.user;
-        localStorage.setItem('token', action.payload.access_token);
+        if (action.payload.requiresOtp) {
+          state.isOtpPending = true;
+          // We will store the email/username used for login in pendingEmail (handled by component usually, or passed here. 
+          // Let's store it from the action meta if needed, but since it returns just requireOtp, the component can handle it.
+        } else {
+          // If 2FA is somehow bypassed (e.g. dev)
+          state.isAuthenticated = true;
+          state.token = action.payload.authResponse.access_token;
+          state.user = action.payload.authResponse.user;
+          localStorage.setItem('token', action.payload.authResponse.access_token);
+        }
       })
       .addCase(loginAdmin.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
         state.isAuthenticated = false;
       })
+      
+      // verifyAdminLogin
+      .addCase(verifyAdminLogin.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(verifyAdminLogin.fulfilled, (state, action) => {
+        state.loading = false;
+        state.isOtpPending = false;
+        state.isAuthenticated = true;
+        state.token = action.payload.access_token;
+        state.user = action.payload.user;
+        localStorage.setItem('token', action.payload.access_token);
+      })
+      .addCase(verifyAdminLogin.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+      // resendLoginOtp
+      .addCase(resendLoginOtp.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(resendLoginOtp.fulfilled, (state) => {
+        state.loading = false;
+      })
+      .addCase(resendLoginOtp.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+      // fetchCurrentUser
       .addCase(fetchCurrentUser.fulfilled, (state, action) => {
         state.user = action.payload;
         state.isAuthenticated = true;
@@ -83,5 +154,5 @@ const authSlice = createSlice({
   },
 });
 
-export const { logout, clearError } = authSlice.actions;
+export const { logout, clearError, clearOtpState } = authSlice.actions;
 export default authSlice.reducer;
