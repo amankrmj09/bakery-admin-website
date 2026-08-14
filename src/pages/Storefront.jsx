@@ -21,7 +21,7 @@ async function uploadPendingFiles(obj) {
   if (obj instanceof File) {
     const formData = new FormData();
     formData.append('media', obj);
-    const res = await api.post('/api/uploads/media', formData, {
+    const res = await api.post('/api/v1/uploads/media', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
     return res.data.urls?.[0] ?? '';

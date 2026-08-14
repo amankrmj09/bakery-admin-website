@@ -5,7 +5,7 @@ export const loginAdmin = createAsyncThunk(
   'auth/login',
   async (credentials, { rejectWithValue }) => {
     try {
-      const response = await api.post('/api/auth/admin/login', credentials);
+      const response = await api.post('/api/v1/auth/admin/login', credentials);
       // Backend now returns LoginInitResponse (requiresOtp)
       // So no need to check role here as backend handles it during verification
       return response.data;
@@ -19,7 +19,7 @@ export const verifyAdminLogin = createAsyncThunk(
   'auth/verifyLogin',
   async (payload, { rejectWithValue }) => {
     try {
-      const response = await api.post('/api/auth/admin/login/verify', payload);
+      const response = await api.post('/api/v1/auth/admin/login/verify', payload);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'OTP Verification failed');
@@ -31,7 +31,7 @@ export const resendLoginOtp = createAsyncThunk(
   'auth/resendLoginOtp',
   async (email, { rejectWithValue }) => {
     try {
-      const response = await api.post('/api/auth/login/resend', { email });
+      const response = await api.post('/api/v1/auth/login/resend', { email });
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Failed to resend OTP');
@@ -43,7 +43,7 @@ export const fetchCurrentUser = createAsyncThunk(
   'auth/me',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await api.get('/api/auth/me');
+      const response = await api.get('/api/v1/auth/me');
       return response.data;
     } catch (error) {
       return rejectWithValue('Failed to fetch user profile');

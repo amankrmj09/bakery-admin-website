@@ -14,10 +14,6 @@ const api = axios.create({
 
 api.interceptors.request.use(
   (config) => {
-    // Automatically prepend /v1 to /api/ requests if not already present
-    if (config.url && config.url.startsWith('/api/') && !config.url.startsWith('/api/v1/')) {
-      config.url = config.url.replace('/api/', '/api/v1/');
-    }
     const token = localStorage.getItem('token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;

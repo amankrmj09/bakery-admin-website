@@ -52,7 +52,7 @@ export default function Categories() {
 
   const handleToggleStatus = async (categoryId) => {
     try {
-      await api.post(`/api/categories/${categoryId}/toggle-status`);
+      await api.post(`/api/v1/categories/${categoryId}/toggle-status`);
       dispatch(fetchCategories({ page, size: pageSize }));
     } catch (error) { console.error('Failed to toggle', error); }
   };

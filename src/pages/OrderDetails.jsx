@@ -38,7 +38,7 @@ export default function OrderDetails({ order, onClose }) {
     const fetchPaymentDetails = async () => {
       if (!order?.id) return;
       try {
-        const response = await api.get(`/api/payments/order/${order.id}`);
+        const response = await api.get(`/api/v1/payments/order/${order.id}`);
         setPaymentStatus(response.data.status);
         setPaymentId(response.data.id);
       } catch (error) {
@@ -92,9 +92,9 @@ export default function OrderDetails({ order, onClose }) {
   const handlePaymentStatusChange = async (newStatus) => {
     try {
       if (paymentId) {
-        await api.patch(`/api/payments/${paymentId}/status`, { status: newStatus });
+        await api.patch(`/api/v1/payments/${paymentId}/status`, { status: newStatus });
       } else {
-        await api.post(`/api/orders/${order.id}/payment-update`, { status: newStatus });
+        await api.post(`/api/v1/orders/${order.id}/payment-update`, { status: newStatus });
       }
       setPaymentStatus(newStatus);
       toast.success(`Payment status updated to ${newStatus}`);

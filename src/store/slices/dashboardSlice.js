@@ -5,7 +5,7 @@ export const fetchDashboardStats = createAsyncThunk(
   'dashboard/fetchStats',
   async (timeframe = '1m', { rejectWithValue }) => {
     try {
-      const response = await api.get('/api/users/admin/dashboard-stats', {
+      const response = await api.get('/api/v1/users/admin/dashboard-stats', {
         params: { timeframe }
       });
       return response.data;
@@ -19,7 +19,7 @@ export const fetchStoreSettings = createAsyncThunk(
   'dashboard/fetchStoreSettings',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await api.get('/api/store/settings');
+      const response = await api.get('/api/v1/store/settings');
       return response.data;
     } catch (error) {
       return rejectWithValue('Failed to fetch store settings');
@@ -31,7 +31,7 @@ export const updateStoreSettings = createAsyncThunk(
   'dashboard/updateStoreSettings',
   async (data, { rejectWithValue }) => {
     try {
-      const response = await api.put('/api/store/settings', data);
+      const response = await api.put('/api/v1/store/settings', data);
       return response.data;
     } catch (error) {
       return rejectWithValue('Failed to update store settings');
@@ -43,7 +43,7 @@ export const fetchStorefront = createAsyncThunk(
   'dashboard/fetchStorefront',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await api.get('/api/storefront/frontpage');
+      const response = await api.get('/api/v1/storefront/frontpage');
       return response.data;
     } catch (error) {
       return rejectWithValue('Failed to fetch site config');
@@ -55,7 +55,7 @@ export const updateStorefront = createAsyncThunk(
   'dashboard/updateStorefront',
   async (data, { rejectWithValue }) => {
     try {
-      const response = await api.put('/api/storefront/frontpage', data);
+      const response = await api.put('/api/v1/storefront/frontpage', data);
       return response.data;
     } catch (error) {
       return rejectWithValue('Failed to update site config');
@@ -67,7 +67,7 @@ export const fetchOrders = createAsyncThunk(
   'dashboard/fetchOrders',
   async (params, { rejectWithValue }) => {
     try {
-      const endpoint = params?.query ? '/api/orders/admin/search' : '/api/orders';
+      const endpoint = params?.query ? '/api/v1/orders/admin/search' : '/api/v1/orders';
       const response = await api.get(endpoint, { params });
       return response.data;
     } catch (error) {
@@ -80,7 +80,7 @@ export const updateOrderStatus = createAsyncThunk(
   'dashboard/updateOrderStatus',
   async ({ orderId, status }, { rejectWithValue }) => {
     try {
-      const response = await api.patch(`/api/orders/${orderId}/status`, { status });
+      const response = await api.patch(`/api/v1/orders/${orderId}/status`, { status });
       return response.data;
     } catch (error) {
       console.error("Update Order Status Error:", error);
@@ -93,7 +93,7 @@ export const cancelOrder = createAsyncThunk(
   'dashboard/cancelOrder',
   async ({ orderId, reason }, { rejectWithValue }) => {
     try {
-      const response = await api.post(`/api/orders/${orderId}/cancel`, { reason: reason || 'Declined by admin' });
+      const response = await api.post(`/api/v1/orders/${orderId}/cancel`, { reason: reason || 'Declined by admin' });
       return response.data;
     } catch (error) {
       console.error("Cancel Order Error:", error);
@@ -106,7 +106,7 @@ export const fetchUsers = createAsyncThunk(
   'dashboard/fetchUsers',
   async (params, { rejectWithValue }) => {
     try {
-      const endpoint = params?.query ? '/api/users/admin/search' : '/api/users/admin/all';
+      const endpoint = params?.query ? '/api/v1/users/admin/search' : '/api/v1/users/admin/all';
       const response = await api.get(endpoint, { params });
       return response.data;
     } catch (error) {
@@ -119,7 +119,7 @@ export const updateUserRole = createAsyncThunk(
   'dashboard/updateUserRole',
   async ({ userId, role }, { rejectWithValue }) => {
     try {
-      await api.put(`/api/users/admin/${userId}/role`, { role });
+      await api.put(`/api/v1/users/admin/${userId}/role`, { role });
       return { id: userId, role };
     } catch (error) {
       return rejectWithValue('Failed to update user role');
@@ -131,7 +131,7 @@ export const updateUserStatus = createAsyncThunk(
   'dashboard/updateUserStatus',
   async ({ userId, status }, { rejectWithValue }) => {
     try {
-      await api.put(`/api/users/admin/${userId}/status`, { status });
+      await api.put(`/api/v1/users/admin/${userId}/status`, { status });
       return { id: userId, status };
     } catch (error) {
       return rejectWithValue('Failed to update user status');
@@ -143,7 +143,7 @@ export const deleteUser = createAsyncThunk(
   'dashboard/deleteUser',
   async (userId, { rejectWithValue }) => {
     try {
-      await api.delete(`/api/users/admin/${userId}`);
+      await api.delete(`/api/v1/users/admin/${userId}`);
       return userId;
     } catch (error) {
       return rejectWithValue('Failed to delete user');
@@ -153,7 +153,7 @@ export const deleteUser = createAsyncThunk(
 
 export const fetchProducts = createAsyncThunk('dashboard/fetchProducts', async (params, { rejectWithValue }) => {
     try {
-      const endpoint = params?.query ? '/api/products/admin/search' : '/api/products';
+      const endpoint = params?.query ? '/api/v1/products/admin/search' : '/api/v1/products';
       const response = await api.get(endpoint, { params });
       return response.data;
     } catch (error) {
@@ -166,7 +166,7 @@ export const createProduct = createAsyncThunk(
   'dashboard/createProduct',
   async (productData, { rejectWithValue }) => {
     try {
-      const response = await api.post('/api/products', productData);
+      const response = await api.post('/api/v1/products', productData);
       return response.data;
     } catch (error) {
       return rejectWithValue('Failed to create product');
@@ -178,7 +178,7 @@ export const updateProduct = createAsyncThunk(
   'dashboard/updateProduct',
   async ({ productId, data }, { rejectWithValue }) => {
     try {
-      const response = await api.put(`/api/products/${productId}`, data);
+      const response = await api.put(`/api/v1/products/${productId}`, data);
       return response.data;
     } catch (error) {
       return rejectWithValue('Failed to update product');
@@ -190,7 +190,7 @@ export const deleteProduct = createAsyncThunk(
   'dashboard/deleteProduct',
   async (productId, { rejectWithValue }) => {
     try {
-      await api.delete(`/api/products/${productId}`);
+      await api.delete(`/api/v1/products/${productId}`);
       return productId;
     } catch (error) {
       return rejectWithValue('Failed to delete product');
@@ -200,7 +200,7 @@ export const deleteProduct = createAsyncThunk(
 
 export const fetchInventory = createAsyncThunk('dashboard/fetchInventory', async (params, { rejectWithValue }) => {
     try {
-      const endpoint = params?.query ? '/api/inventory/admin/search' : '/api/inventory';
+      const endpoint = params?.query ? '/api/v1/inventory/admin/search' : '/api/v1/inventory';
       const response = await api.get(endpoint, { params });
       return response.data;
     } catch (error) {
@@ -213,7 +213,7 @@ export const updateInventory = createAsyncThunk(
   'dashboard/updateInventory',
   async ({ productId, data }, { rejectWithValue }) => {
     try {
-      const response = await api.put(`/api/inventory/product/${productId}`, data);
+      const response = await api.put(`/api/v1/inventory/product/${productId}`, data);
       return response.data;
     } catch (error) {
       return rejectWithValue('Failed to update inventory');
@@ -225,7 +225,7 @@ export const addStock = createAsyncThunk(
   'dashboard/addStock',
   async ({ productId, quantity, notes }, { rejectWithValue }) => {
     try {
-      const response = await api.post(`/api/inventory/product/${productId}/add-stock`, { quantity, notes });
+      const response = await api.post(`/api/v1/inventory/product/${productId}/add-stock`, { quantity, notes });
       return response.data;
     } catch (error) {
       return rejectWithValue('Failed to add stock');
@@ -237,7 +237,7 @@ export const fetchCategories = createAsyncThunk(
   'dashboard/fetchCategories',
   async (params, { rejectWithValue }) => {
     try {
-      const endpoint = params?.query ? '/api/categories/admin/search' : '/api/categories';
+      const endpoint = params?.query ? '/api/v1/categories/admin/search' : '/api/v1/categories';
       const response = await api.get(endpoint, { params });
       return response.data;
     } catch (error) {
@@ -250,7 +250,7 @@ export const createCategory = createAsyncThunk(
   'dashboard/createCategory',
   async (categoryData, { rejectWithValue }) => {
     try {
-      const response = await api.post('/api/categories', categoryData);
+      const response = await api.post('/api/v1/categories', categoryData);
       return response.data;
     } catch (error) {
       return rejectWithValue('Failed to create category');
@@ -262,7 +262,7 @@ export const updateCategory = createAsyncThunk(
   'dashboard/updateCategory',
   async ({ categoryId, data }, { rejectWithValue }) => {
     try {
-      const response = await api.put(`/api/categories/${categoryId}`, data);
+      const response = await api.put(`/api/v1/categories/${categoryId}`, data);
       return response.data;
     } catch (error) {
       return rejectWithValue('Failed to update category');
@@ -274,7 +274,7 @@ export const deleteCategory = createAsyncThunk(
   'dashboard/deleteCategory',
   async (categoryId, { rejectWithValue }) => {
     try {
-      await api.delete(`/api/categories/${categoryId}`);
+      await api.delete(`/api/v1/categories/${categoryId}`);
       return categoryId;
     } catch (error) {
       return rejectWithValue('Failed to delete category');

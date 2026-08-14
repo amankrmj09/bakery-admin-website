@@ -168,7 +168,7 @@ export default function ProductDetails({ product, categories, taxRates, onClose 
         pendingScreenshots.forEach(pf => formData.append('media', pf.file));
         if (pendingVideo) formData.append('video', pendingVideo.file);
 
-        const response = await api.post('/api/uploads/media', formData, {
+        const response = await api.post('/api/v1/uploads/media', formData, {
           headers: { 'Content-Type': 'multipart/form-data' }
         });
         
