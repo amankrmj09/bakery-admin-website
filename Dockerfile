@@ -6,7 +6,7 @@ FROM node:lts-alpine AS build
 WORKDIR /app
 
 # Accept build arguments for environment variables
-ARG VITE_API_URL
+ARG VITE_API_URL=http://bakery-api.blubug.me
 ENV VITE_API_URL=$VITE_API_URL
 
 # Copy package files and install dependencies
