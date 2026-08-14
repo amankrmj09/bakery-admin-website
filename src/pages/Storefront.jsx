@@ -75,7 +75,7 @@ export default function Storefront() {
   }, [dispatch]);
 
   useEffect(() => {
-    if (storefront.data) {
+    if (storefront.data && typeof storefront.data === 'object') {
       const d = JSON.parse(JSON.stringify(storefront.data));
       reset(d);
     }
