@@ -5,7 +5,7 @@ import { toast } from 'sonner';
 
 // If it's a relative URL from the server, prefix with API base
 const getImageUrl = (url) =>
-  url?.startsWith('/') ? `${import.meta.env.VITE_API_BASE_URL?.replace(/\/$/, '')}${url}` : url;
+  url?.startsWith('/') ? `${import.meta.env.VITE_API_URL?.replace(/\/$/, '')}${url}` : url;
 
 /**
  * SingleImageUploader — Deferred upload design

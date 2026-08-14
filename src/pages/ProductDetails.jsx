@@ -16,7 +16,7 @@ import SleekDropdown from '../components/ui/SleekDropdown';
 import { Textarea } from '../components/ui/Textarea';
 import ProductReviewsTab from '../components/shared/ProductReviewsTab';
 
-const getImageUrl = (url) => url?.startsWith('/') ? `${import.meta.env.VITE_API_BASE_URL?.replace(/\/$/, '')}${url}` : url;
+const getImageUrl = (url) => url?.startsWith('/') ? `${import.meta.env.VITE_API_URL?.replace(/\/$/, '')}${url}` : url;
 
 const initialFormState = {
   sku: '', name: '', categoryId: '', price: '', discountPrice: '', costPrice: '', taxClass: 'STANDARD', 
