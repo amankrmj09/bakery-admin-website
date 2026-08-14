@@ -25,3 +25,6 @@ dist-ssr
 
 # Migration Plans
 rtk-query-migration-plan.md
+
+# Environment Variables
+.env
