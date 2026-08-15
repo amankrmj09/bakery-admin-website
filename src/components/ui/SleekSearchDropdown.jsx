@@ -48,7 +48,14 @@ const SleekSearchDropdown = ({
     }
   };
 
-  const topOptions = options.slice(0, 5);
+  const selectedLabel = options.find(o => o.value === value)?.label || '';
+  const isSearching = searchTerm !== selectedLabel;
+  
+  const displayOptions = (!onSearch && isSearching && searchTerm)
+    ? options.filter(o => o.label.toLowerCase().includes(searchTerm.toLowerCase()))
+    : options;
+
+  const topOptions = displayOptions;
 
   return (
     <SleekDropdown

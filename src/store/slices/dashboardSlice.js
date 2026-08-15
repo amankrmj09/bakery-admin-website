@@ -186,6 +186,18 @@ export const updateProduct = createAsyncThunk(
   }
 );
 
+export const toggleFeaturedProduct = createAsyncThunk(
+  'dashboard/toggleFeaturedProduct',
+  async (productId, { rejectWithValue }) => {
+    try {
+      const response = await api.post(`/api/v1/products/${productId}/toggle-featured`);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue('Failed to toggle featured status');
+    }
+  }
+);
+
 export const deleteProduct = createAsyncThunk(
   'dashboard/deleteProduct',
   async (productId, { rejectWithValue }) => {
@@ -397,6 +409,12 @@ const dashboardSlice = createSlice({
         state.products.data.push(action.payload);
       })
       .addCase(updateProduct.fulfilled, (state, action) => {
+        const index = state.products.data.findIndex(p => p.id === action.payload.id);
+        if (index !== -1) {
+          state.products.data[index] = action.payload;
+        }
+      })
+      .addCase(toggleFeaturedProduct.fulfilled, (state, action) => {
         const index = state.products.data.findIndex(p => p.id === action.payload.id);
         if (index !== -1) {
           state.products.data[index] = action.payload;

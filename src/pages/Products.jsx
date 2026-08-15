@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchProducts, fetchCategories } from '../store/slices/dashboardSlice';
+import { fetchProducts, fetchCategories, toggleFeaturedProduct } from '../store/slices/dashboardSlice';
 import { fetchTaxRates } from '../store/slices/taxSlice';
 import { Card, CardContent } from '../components/ui/Card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/Table';
 import { Badge } from '../components/ui/Badge';
 import { Button } from '../components/ui/Button';
 import ActionButton from '../components/ui/ActionButton';
-import { Package, Plus, Edit } from 'lucide-react';
+import { Package, Plus, Edit, Star } from 'lucide-react';
 import { toast } from 'sonner';
 import { useScrollTop } from '../hooks/useScrollTop';
 import { cn } from '../lib/utils';
@@ -34,7 +34,7 @@ export default function Products() {
 
   useEffect(() => {
     dispatch(fetchProducts({ page, size: pageSize, query: searchTerm }));
-    dispatch(fetchCategories());
+    dispatch(fetchCategories({ size: 1000 }));
     dispatch(fetchTaxRates());
   }, [dispatch, page, pageSize, searchTerm]);
   
@@ -55,6 +55,15 @@ export default function Products() {
   const handleEditClick = (product) => {
     setEditingProduct(product);
     setShowForm(true);
+  };
+
+  const handleToggleFeatured = async (productId) => {
+    try {
+      await dispatch(toggleFeaturedProduct(productId)).unwrap();
+      toast.success('Featured status updated');
+    } catch (error) {
+      toast.error('Failed to update featured status');
+    }
   };
 
   return (
@@ -128,6 +137,12 @@ export default function Products() {
                         <TableCell>{p.inventory?.currentStock ?? 0}</TableCell>
                         <TableCell><Badge variant={p.status === 'ACTIVE' ? 'success' : 'secondary'}>{p.status}</Badge></TableCell>
                         <TableCell className="text-right whitespace-nowrap">
+                          <ActionIconButton 
+                            icon={Star} 
+                            onClick={() => handleToggleFeatured(p.id)} 
+                            title={p.isFeatured ? "Unfeature Product" : "Feature Product"} 
+                            colorClass={p.isFeatured ? "text-yellow-600 bg-yellow-50 hover:bg-yellow-100" : "text-gray-400 bg-gray-50 hover:bg-gray-100"} 
+                          />
                           <ActionIconButton icon={Edit} onClick={() => handleEditClick(p)} title="Edit Product" colorClass="text-blue-600 bg-blue-50 hover:bg-blue-100" />
                         </TableCell>
                       </TableRow>
