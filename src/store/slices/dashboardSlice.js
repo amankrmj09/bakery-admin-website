@@ -93,7 +93,7 @@ export const cancelOrder = createAsyncThunk(
   'dashboard/cancelOrder',
   async ({ orderId, reason }, { rejectWithValue }) => {
     try {
-      const response = await api.post(`/api/v1/orders/${orderId}/cancel`, { reason: reason || 'Declined by admin' });
+      const response = await api.post(`/api/v1/orders/${orderId}/admin-cancel`, { reason: reason || 'Declined by admin' });
       return response.data;
     } catch (error) {
       console.error("Cancel Order Error:", error);

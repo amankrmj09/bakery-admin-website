@@ -92,7 +92,7 @@ export default function OrderDetails({ order, onClose }) {
   const handlePaymentStatusChange = async (newStatus) => {
     try {
       if (paymentId) {
-        await api.patch(`/api/v1/payments/${paymentId}/status`, { status: newStatus });
+        await api.patch(`/api/v1/admin/payments/${paymentId}/status`, { status: newStatus });
       } else {
         await api.post(`/api/v1/orders/${order.id}/payment-update`, { status: newStatus });
       }
