@@ -81,16 +81,24 @@ export default function Reviews() {
             <p className="text-[var(--text-muted)] text-sm">Review and moderate community content</p>
           </div>
         </div>
-        <div className="flex gap-2">
+        <div className="inline-flex bg-gray-100 p-1 rounded-xl shadow-inner border border-gray-200">
           <button
             onClick={() => { setTab('all'); setPage(0); }}
-            className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${tab === 'all' ? 'bg-primary-50 text-[var(--color-primary)] border border-primary-200' : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'}`}
+            className={`px-6 py-2 text-sm font-semibold rounded-lg transition-all duration-200 ${
+              tab === 'all' 
+                ? 'bg-white text-[var(--color-primary)] shadow-sm ring-1 ring-gray-900/5' 
+                : 'text-gray-500 hover:text-gray-800 hover:bg-gray-200/50'
+            }`}
           >
             All Reviews
           </button>
           <button
             onClick={() => { setTab('reported'); setPage(0); }}
-            className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${tab === 'reported' ? 'bg-red-50 text-red-700 border border-red-200' : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'}`}
+            className={`px-6 py-2 text-sm font-semibold rounded-lg transition-all duration-200 ${
+              tab === 'reported' 
+                ? 'bg-white text-red-600 shadow-sm ring-1 ring-gray-900/5' 
+                : 'text-gray-500 hover:text-gray-800 hover:bg-gray-200/50'
+            }`}
           >
             Reported Reviews
           </button>
