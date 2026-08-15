@@ -43,7 +43,7 @@ export default function EngagementsPage() {
     setLoading(true);
     try {
       if (activeTab === 'testimonials') {
-        const res = await engagementsApi.getTestimonials(page, pageSize);
+        const res = await engagementsApi.getTestimonials({ page, size: pageSize });
         setTestimonials(res.data?.content || res.data || []);
         setTotalElements(res.data?.page?.totalElements || res.data?.totalElements || res.data?.length || 0);
       } else if (activeTab === 'contact-info') {
@@ -96,7 +96,7 @@ export default function EngagementsPage() {
         if (activeTab === 'testimonials') {
           const res = await engagementsApi.searchTestimonials(query);
           const data = res.data?.content || res.data || [];
-          const opts = data.map(item => ({ value: item.id, label: item.name || 'Anonymous User' }));
+          const opts = data.map(item => ({ value: item.id, label: item.authorName || 'Anonymous User' }));
           setSearchOptions(opts);
         } else {
           const res = await engagementsApi.searchFeedbacks(query);
@@ -344,15 +344,15 @@ export default function EngagementsPage() {
                   <div>
                     <div className="flex items-start justify-between gap-3 mb-3">
                       <div className="flex items-center gap-3">
-                        {item.profileImageUrl ? (
-                          <img src={item.profileImageUrl} alt={item.name} className="w-10 h-10 rounded-full object-cover border border-gray-200" />
+                        {item.avatarUrl ? (
+                          <img src={item.avatarUrl} alt={item.authorName} className="w-10 h-10 rounded-full object-cover border border-gray-200" />
                         ) : (
                           <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary-500 to-indigo-600 text-white font-bold flex items-center justify-center text-sm shadow-sm">
-                            {getInitials(item.name)}
+                            {getInitials(item.authorName)}
                           </div>
                         )}
                         <div>
-                          <h4 className="font-bold text-gray-900 text-sm">{item.name || 'Anonymous User'}</h4>
+                          <h4 className="font-bold text-gray-900 text-sm">{item.authorName || 'Anonymous User'}</h4>
                           <span className="text-xs text-gray-400">ID: {item.uid || item.id}</span>
                         </div>
                       </div>
@@ -362,14 +362,14 @@ export default function EngagementsPage() {
                       </div>
                     </div>
                     {(() => {
-                      const hasTitle = item.message?.includes('::');
-                      const [title, message] = hasTitle 
-                        ? item.message.split('::') 
-                        : ['Fantastic Experience!', item.message];
+                      const hasTitle = item.content?.includes('::');
+                      const [title, body] = hasTitle 
+                        ? item.content.split('::') 
+                        : ['Fantastic Experience!', item.content];
                       return (
                         <div className="flex flex-col gap-1">
                           {hasTitle && <h5 className="font-bold text-gray-900 text-sm">{title}</h5>}
-                          <p className="text-gray-700 text-sm italic line-clamp-3">"{message}"</p>
+                          <p className="text-gray-700 text-sm italic line-clamp-3">"{body}"</p>
                         </div>
                       );
                     })()}
