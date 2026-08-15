@@ -36,7 +36,7 @@ export default function ProductDetails({ product, categories, taxRates, onClose 
   const [activeTab, setActiveTab] = useState('basic');
   const [isSaving, setIsSaving] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
-  const [pendingScreenshots, setPendingScreenshots] = useState([]);
+  const [pendingImages, setPendingImages] = useState([]);
   const [pendingVideo, setPendingVideo] = useState(null);
   const [thumbnailIndex, setThumbnailIndex] = useState(0);
 
@@ -79,12 +79,12 @@ export default function ProductDetails({ product, categories, taxRates, onClose 
     }
   }, [product, isEditing, categories]);
 
-  const combinedScreenshots = [
+  const combinedImages = [
     ...(form.mediaUrls || []).map((url, i) => ({ type: 'existing', url: getImageUrl(url), index: i })),
-    ...pendingScreenshots.map((p, i) => ({ type: 'pending', url: p.previewUrl, index: (form.mediaUrls?.length || 0) + i }))
+    ...pendingImages.map((p, i) => ({ type: 'pending', url: p.previewUrl, index: (form.mediaUrls?.length || 0) + i }))
   ];
 
-  const handleScreenshotSelect = (e) => {
+  const handleImageSelect = (e) => {
     const files = Array.from(e.target.files);
     const validFiles = [];
     const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/jpg'];
@@ -106,7 +106,7 @@ export default function ProductDetails({ product, categories, taxRates, onClose 
       file,
       previewUrl: URL.createObjectURL(file)
     }));
-    setPendingScreenshots(prev => [...prev, ...newPending]);
+    setPendingImages(prev => [...prev, ...newPending]);
     e.target.value = ''; 
   };
 
@@ -131,7 +131,7 @@ export default function ProductDetails({ product, categories, taxRates, onClose 
     e.target.value = '';
   };
 
-  const removeExistingScreenshot = (idx) => {
+  const removeExistingImage = (idx) => {
     const current = form.mediaUrls || [];
     const updated = current.filter((_, i) => i !== idx);
     setForm(prev => ({ ...prev, mediaUrls: updated }));
@@ -139,9 +139,9 @@ export default function ProductDetails({ product, categories, taxRates, onClose 
     else if (thumbnailIndex > idx) setThumbnailIndex(thumbnailIndex - 1);
   };
 
-  const removePendingScreenshot = (idx) => {
-    URL.revokeObjectURL(pendingScreenshots[idx].previewUrl);
-    setPendingScreenshots(prev => prev.filter((_, i) => i !== idx));
+  const removePendingImage = (idx) => {
+    URL.revokeObjectURL(pendingImages[idx].previewUrl);
+    setPendingImages(prev => prev.filter((_, i) => i !== idx));
     const realIdx = (form.mediaUrls?.length || 0) + idx;
     if (thumbnailIndex === realIdx) setThumbnailIndex(0);
     else if (thumbnailIndex > realIdx) setThumbnailIndex(thumbnailIndex - 1);
@@ -162,10 +162,10 @@ export default function ProductDetails({ product, categories, taxRates, onClose 
       let uploadedUrls = [];
       let finalVideoUrl = form.videoUrl;
       
-      if (pendingScreenshots.length > 0 || pendingVideo) {
+      if (pendingImages.length > 0 || pendingVideo) {
         setIsUploading(true);
         const formData = new FormData();
-        pendingScreenshots.forEach(pf => formData.append('media', pf.file));
+        pendingImages.forEach(pf => formData.append('media', pf.file));
         if (pendingVideo) formData.append('video', pendingVideo.file);
 
         const response = await api.post('/api/v1/uploads/media', formData, {
@@ -403,12 +403,12 @@ export default function ProductDetails({ product, categories, taxRates, onClose 
                 existingVideoUrl={form.videoUrl}
                 handleVideoSelect={handleVideoSelect}
                 removeVideo={removeVideo}
-                combinedScreenshots={combinedScreenshots}
-                existingScreenshotsLength={form.mediaUrls?.length || 0}
-                pendingScreenshots={pendingScreenshots}
-                removeExistingScreenshot={removeExistingScreenshot}
-                removePendingScreenshot={removePendingScreenshot}
-                handleScreenshotSelect={handleScreenshotSelect}
+                combinedImages={combinedImages}
+                existingImagesLength={form.mediaUrls?.length || 0}
+                pendingImages={pendingImages}
+                removeExistingImage={removeExistingImage}
+                removePendingImage={removePendingImage}
+                handleImageSelect={handleImageSelect}
               />
             </div>
           )}

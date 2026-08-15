@@ -10,12 +10,12 @@ export const ProductMediaUploader = ({
   existingVideoUrl, 
   handleVideoSelect, 
   removeVideo,
-  combinedScreenshots,
-  existingScreenshotsLength,
-  pendingScreenshots,
-  removeExistingScreenshot,
-  removePendingScreenshot,
-  handleScreenshotSelect
+  combinedImages,
+  existingImagesLength,
+  pendingImages,
+  removeExistingImage,
+  removePendingImage,
+  handleImageSelect
 }) => {
   return (
     <div className="flex flex-col gap-6 mt-2">
@@ -59,7 +59,7 @@ export const ProductMediaUploader = ({
         </p>
         
         <div className="flex flex-col gap-4">
-          {combinedScreenshots.map((item) => {
+          {combinedImages.map((item) => {
             const isThumbnail = item.index === thumbnailIndex;
             return (
               <div key={`${item.type}-${item.index}`} className={cn(
@@ -85,7 +85,7 @@ export const ProductMediaUploader = ({
 
                 <div className="flex-1 min-w-0 flex flex-col gap-1 justify-center">
                   <span className="text-sm font-medium truncate text-[var(--text-main)]" title={item.type === 'existing' ? item.url : ''}>
-                    {item.type === 'existing' ? `.../${item.url.split('/').pop()}` : `📎 ${pendingScreenshots[item.index - existingScreenshotsLength]?.file.name}`}
+                    {item.type === 'existing' ? `.../${item.url.split('/').pop()}` : `📎 ${pendingImages[item.index - existingImagesLength]?.file.name}`}
                   </span>
                   <span className={cn(
                     "text-[11px] font-bold uppercase tracking-wider",
@@ -96,8 +96,8 @@ export const ProductMediaUploader = ({
                 </div>
 
                 <button type="button" onClick={() => {
-                  if (item.type === 'existing') removeExistingScreenshot(item.index);
-                  else removePendingScreenshot(item.index - existingScreenshotsLength);
+                  if (item.type === 'existing') removeExistingImage(item.index);
+                  else removePendingImage(item.index - existingImagesLength);
                 }} className="text-red-500 p-2 hover:bg-red-500/10 rounded-lg transition-colors">
                   <X size={18} />
                 </button>
@@ -107,8 +107,8 @@ export const ProductMediaUploader = ({
         </div>
         
         <div className="flex items-center gap-2 mt-4">
-          <input type="file" id="screenshotSelect" accept="image/*" multiple className="hidden" onChange={handleScreenshotSelect} />
-          <label htmlFor="screenshotSelect" className="cursor-pointer flex items-center gap-2 text-sm font-semibold px-5 py-2.5 border-2 border-dashed border-[var(--color-primary)]/50 text-[var(--color-primary)] rounded-xl hover:bg-[var(--color-primary)]/10 transition-colors">
+          <input type="file" id="imageSelect" accept="image/*" multiple className="hidden" onChange={handleImageSelect} />
+          <label htmlFor="imageSelect" className="cursor-pointer flex items-center gap-2 text-sm font-semibold px-5 py-2.5 border-2 border-dashed border-[var(--color-primary)]/50 text-[var(--color-primary)] rounded-xl hover:bg-[var(--color-primary)]/10 transition-colors">
             <ImageIcon size={16} /> Add Images
           </label>
         </div>

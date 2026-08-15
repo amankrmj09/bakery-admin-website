@@ -12,6 +12,7 @@ import { Input } from '../components/ui/Input';
 import { Textarea } from '../components/ui/Textarea';
 import SleekSearchDropdown from '../components/ui/SleekSearchDropdown';
 import SingleImageUploader from '../components/shared/SingleImageUploader';
+import api from '../api/axiosConfig';
 
 const initialFormState = {
   name: '',
@@ -57,7 +58,20 @@ export default function CategoryDetails({ category, categories, onClose }) {
     e.preventDefault();
     setIsSaving(true);
     try {
-      const payload = { ...form };
+      let finalMediaUrls = form.mediaUrls || [];
+      
+      if (finalMediaUrls.length > 0 && finalMediaUrls[0] instanceof File) {
+        const formData = new FormData();
+        formData.append('media', finalMediaUrls[0]);
+
+        const response = await api.post('/api/v1/uploads/media', formData, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
+        
+        finalMediaUrls = response.data.urls || [];
+      }
+
+      const payload = { ...form, mediaUrls: finalMediaUrls };
 
       if (isEditing) {
         await dispatch(updateCategory({ categoryId: category.id, data: payload })).unwrap();
