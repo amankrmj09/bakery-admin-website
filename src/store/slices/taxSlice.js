@@ -73,16 +73,7 @@ const taxSlice = createSlice({
       })
       .addCase(fetchTaxRates.fulfilled, (state, action) => {
         state.loading = false;
-        const payload = action.payload;
-        let data = [];
-        if (Array.isArray(payload)) {
-          data = payload;
-        } else if (payload && Array.isArray(payload.content)) {
-          data = payload.content;
-        } else if (payload && Array.isArray(payload.data)) {
-          data = payload.data;
-        }
-        state.taxRates = data;
+        state.taxRates = action.payload?.content || [];
         state.error = null;
       })
       .addCase(fetchTaxRates.rejected, (state, action) => {
