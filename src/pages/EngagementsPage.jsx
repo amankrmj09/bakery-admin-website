@@ -11,6 +11,7 @@ import ActionIconButton from '../components/ui/ActionIconButton';
 import { FaInstagram, FaFacebook, FaGlobe } from 'react-icons/fa';
 import { FaXTwitter, FaThreads } from 'react-icons/fa6';
 import { Modal } from '../components/ui/Modal';
+import { ConfirmDialog } from '../components/ui/ConfirmDialog';
 import { Eye } from 'lucide-react';
 
 export default function EngagementsPage() {
@@ -26,6 +27,7 @@ export default function EngagementsPage() {
   const searchTimeoutRef = useRef(null);
   
   const [selectedFeedback, setSelectedFeedback] = useState(null);
+  const [confirmDialog, setConfirmDialog] = useState(null); // { message, onConfirm }
 
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(10);
@@ -149,31 +151,43 @@ export default function EngagementsPage() {
     }
   };
 
-  const handleDeleteTestimonial = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this testimonial?")) return;
-    try {
-      await engagementsApi.deleteTestimonial(id);
-      toast.success("Testimonial deleted");
-      setTestimonials(testimonials.filter(t => t.id !== id));
-      setTotalElements(prev => prev - 1);
-    } catch (error) {
-      toast.error("Failed to delete testimonial");
-    }
+  const handleDeleteTestimonial = (id) => {
+    setConfirmDialog({
+      title: 'Delete Testimonial',
+      message: 'Are you sure you want to permanently delete this testimonial? This action cannot be undone.',
+      onConfirm: async () => {
+        try {
+          await engagementsApi.deleteTestimonial(id);
+          toast.success('Testimonial deleted');
+          setTestimonials(testimonials.filter(t => t.id !== id));
+          setTotalElements(prev => prev - 1);
+        } catch (error) {
+          toast.error('Failed to delete testimonial');
+        } finally {
+          setConfirmDialog(null);
+        }
+      },
+    });
   };
 
-  const handleDeleteFeedback = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this feedback?")) return;
-    try {
-      await engagementsApi.deleteFeedback(id);
-      toast.success("Feedback deleted");
-      setFeedbacks(feedbacks.filter(f => f.id !== id));
-      setTotalElements(prev => prev - 1);
-      if (selectedFeedback?.id === id) {
-        setSelectedFeedback(null);
-      }
-    } catch (error) {
-      toast.error("Failed to delete feedback");
-    }
+  const handleDeleteFeedback = (id) => {
+    setConfirmDialog({
+      title: 'Delete Message',
+      message: 'Are you sure you want to permanently delete this message? This action cannot be undone.',
+      onConfirm: async () => {
+        try {
+          await engagementsApi.deleteFeedback(id);
+          toast.success('Message deleted');
+          setFeedbacks(feedbacks.filter(f => f.id !== id));
+          setTotalElements(prev => prev - 1);
+          if (selectedFeedback?.id === id) setSelectedFeedback(null);
+        } catch (error) {
+          toast.error('Failed to delete message');
+        } finally {
+          setConfirmDialog(null);
+        }
+      },
+    });
   };
 
   const handleViewDetails = async (item) => {
@@ -705,6 +719,18 @@ export default function EngagementsPage() {
           </div>
         )}
       </Modal>
+
+      {/* Delete Confirmation Dialog */}
+      <ConfirmDialog
+        isOpen={!!confirmDialog}
+        onClose={() => setConfirmDialog(null)}
+        onConfirm={() => confirmDialog?.onConfirm()}
+        title={confirmDialog?.title || 'Confirm Delete'}
+        message={confirmDialog?.message}
+        confirmLabel={confirmDialog?.confirmLabel || 'Delete'}
+        variant={confirmDialog?.variant || 'danger'}
+        icon={confirmDialog?.icon}
+      />
     </div>
   );
 }

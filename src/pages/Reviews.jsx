@@ -7,6 +7,8 @@ import Pagination from '../components/shared/Pagination';
 import { useScrollTop } from '../hooks/useScrollTop';
 import { cn } from '../lib/utils';
 import ActionButton from '../components/ui/ActionButton';
+import { Modal } from '../components/ui/Modal';
+import { ConfirmDialog } from '../components/ui/ConfirmDialog';
 
 export default function Reviews() {
   const navigate = useNavigate();
@@ -14,6 +16,7 @@ export default function Reviews() {
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState('all');
+  const [confirmDialog, setConfirmDialog] = useState(null); // { title, message, onConfirm }
 
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(10);
@@ -43,25 +46,46 @@ export default function Reviews() {
   
   const totalPages = Math.ceil(totalElements / pageSize) || 1;
 
-  const handleDismiss = async (reviewId) => {
-    try {
-      await reviewsApi.dismissReport(reviewId);
-      toast.success('Report dismissed');
-      setReviews(reviews.filter(r => r.id !== reviewId));
-    } catch (error) {
-      toast.error('Failed to dismiss report');
-    }
+  const handleDismiss = (reviewId) => {
+    setConfirmDialog({
+      title: 'Dismiss Report',
+      message: 'Are you sure you want to dismiss this report? The review will remain visible.',
+      confirmLabel: 'Dismiss',
+      confirmClass: 'bg-gray-800 hover:bg-gray-900',
+      icon: Check,
+      onConfirm: async () => {
+        try {
+          await reviewsApi.dismissReport(reviewId);
+          toast.success('Report dismissed');
+          setReviews(reviews.filter(r => r.id !== reviewId));
+        } catch (error) {
+          toast.error('Failed to dismiss report');
+        } finally {
+          setConfirmDialog(null);
+        }
+      },
+    });
   };
 
-  const handleDelete = async (reviewId, productId) => {
-    if (!window.confirm('Are you sure you want to permanently delete this review?')) return;
-    try {
-      await reviewsApi.deleteReportedReview(reviewId, productId);
-      toast.success('Review deleted');
-      setReviews(reviews.filter(r => r.id !== reviewId));
-    } catch (error) {
-      toast.error('Failed to delete review');
-    }
+  const handleDelete = (reviewId, productId) => {
+    setConfirmDialog({
+      title: 'Delete Review',
+      message: 'Are you sure you want to permanently delete this review? This action cannot be undone.',
+      confirmLabel: 'Delete',
+      confirmClass: 'bg-red-600 hover:bg-red-700',
+      icon: Trash,
+      onConfirm: async () => {
+        try {
+          await reviewsApi.deleteReportedReview(reviewId, productId);
+          toast.success('Review deleted');
+          setReviews(reviews.filter(r => r.id !== reviewId));
+        } catch (error) {
+          toast.error('Failed to delete review');
+        } finally {
+          setConfirmDialog(null);
+        }
+      },
+    });
   };
 
   return (
@@ -187,6 +211,18 @@ export default function Reviews() {
           />
         </div>
       </div>
+
+      {/* Confirm Dialog */}
+      <ConfirmDialog
+        isOpen={!!confirmDialog}
+        onClose={() => setConfirmDialog(null)}
+        onConfirm={() => confirmDialog?.onConfirm()}
+        title={confirmDialog?.title || 'Confirm'}
+        message={confirmDialog?.message}
+        confirmLabel={confirmDialog?.confirmLabel || 'Confirm'}
+        variant={confirmDialog?.variant || 'danger'}
+        icon={confirmDialog?.icon}
+      />
     </div>
   );
 }
