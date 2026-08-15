@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
+import api from '../api/axiosConfig';
 import { fetchProducts, fetchCategories, toggleFeaturedProduct } from '../store/slices/dashboardSlice';
 import { fetchTaxRates } from '../store/slices/taxSlice';
 import { Card, CardContent } from '../components/ui/Card';
@@ -40,8 +42,32 @@ export default function Products() {
   
   const totalPages = Math.ceil((totalElements || products?.length || 0) / pageSize) || 1;
 
+  const [searchParams, setSearchParams] = useSearchParams();
   const [showForm, setShowForm] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
+
+  useEffect(() => {
+    const openProductId = searchParams.get('openProductId');
+    if (openProductId && !showForm) {
+      const p = products?.find(prod => prod.id === openProductId);
+      if (p) {
+        setEditingProduct(p);
+        setShowForm(true);
+        setSearchParams(new URLSearchParams());
+      } else if (!loading) {
+        api.get(`/api/v1/products/${openProductId}`)
+          .then(res => {
+            setEditingProduct(res.data);
+            setShowForm(true);
+            setSearchParams(new URLSearchParams());
+          })
+          .catch(err => {
+            console.error('Failed to fetch product for URL param', err);
+            setSearchParams(new URLSearchParams());
+          });
+      }
+    }
+  }, [searchParams, products, loading, showForm, setSearchParams]);
 
   const handleAddClick = () => {
     if (!categories || categories.length === 0) {

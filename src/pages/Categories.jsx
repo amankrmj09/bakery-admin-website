@@ -53,8 +53,12 @@ export default function Categories() {
   const handleToggleStatus = async (categoryId) => {
     try {
       await api.post(`/api/v1/categories/${categoryId}/toggle-status`);
-      dispatch(fetchCategories({ page, size: pageSize }));
-    } catch (error) { console.error('Failed to toggle', error); }
+      toast.success('Category status toggled successfully');
+      dispatch(fetchCategories({ page, size: pageSize, query: searchTerm }));
+    } catch (error) { 
+      console.error('Failed to toggle', error); 
+      toast.error(error.response?.data?.message || 'Failed to toggle category status');
+    }
   };
 
   return (
