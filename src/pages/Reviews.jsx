@@ -152,7 +152,9 @@ export default function Reviews() {
                 reviews.map((r) => (
                   <TableRow key={r.id}>
                     <TableCell className="text-muted-foreground whitespace-nowrap">
-                      {r.reportedAt ? new Date(r.reportedAt).toLocaleDateString() : 'N/A'}
+                      {r.reportedAt || r.createdAt
+                        ? new Date(r.reportedAt || r.createdAt).toLocaleDateString()
+                        : 'N/A'}
                     </TableCell>
                     <TableCell className="font-medium whitespace-nowrap">{r.userName}</TableCell>
                     <TableCell className="max-w-[400px]">
