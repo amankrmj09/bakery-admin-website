@@ -103,7 +103,6 @@ export default function Categories() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Order</TableHead>
                 <TableHead>Name</TableHead>
                 <TableHead>Products</TableHead>
                 <TableHead>Status</TableHead>
@@ -117,7 +116,6 @@ export default function Categories() {
               ) : categories?.length > 0 ? (
                 categories.map((c) => (
                   <TableRow key={c.id}>
-                    <TableCell className="text-muted-foreground">{c.displayOrder}</TableCell>
                     <TableCell className="font-medium">{c.name}</TableCell>
                     <TableCell>{c.productCount || 0}</TableCell>
                     <TableCell><Badge variant={c.active ? 'success' : 'secondary'}>{c.active ? 'Active' : 'Inactive'}</Badge></TableCell>
@@ -128,7 +126,7 @@ export default function Categories() {
                     </TableCell>
                   </TableRow>
                 ))
-              ) : <TableRow><TableCell colSpan={6} className="h-24 text-center text-muted-foreground">No categories found.</TableCell></TableRow>}
+              ) : <TableRow><TableCell colSpan={5} className="h-24 text-center text-muted-foreground">No categories found.</TableCell></TableRow>}
             </TableBody>
           </Table>
         </CardContent>
