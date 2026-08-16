@@ -2,12 +2,14 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { reviewsApi } from '../api/reviewsApi';
 import { toast } from 'sonner';
-import { AlertTriangle, Check, Trash2 as Trash, MessageSquare, ExternalLink } from 'lucide-react';
+import { Check, Trash2 as Trash, MessageSquare, ExternalLink } from 'lucide-react';
 import Pagination from '../components/shared/Pagination';
 import { useScrollTop } from '../hooks/useScrollTop';
 import { cn } from '../lib/utils';
-import ActionButton from '../components/ui/ActionButton';
-import { Modal } from '../components/ui/Modal';
+import { Card, CardContent } from '../components/ui/Card';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/Table';
+import ActionIconButton from '../components/ui/ActionIconButton';
+import { Badge } from '../components/ui/Badge';
 import { ConfirmDialog } from '../components/ui/ConfirmDialog';
 
 export default function Reviews() {
@@ -16,7 +18,7 @@ export default function Reviews() {
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState('all');
-  const [confirmDialog, setConfirmDialog] = useState(null); // { title, message, onConfirm }
+  const [confirmDialog, setConfirmDialog] = useState(null);
 
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(10);
@@ -104,115 +106,113 @@ export default function Reviews() {
             </h1>
             <p className="text-[var(--text-muted)] text-sm">Review and moderate community content</p>
           </div>
-        </div>
-        <div className="inline-flex bg-gray-100 p-1 rounded-xl shadow-inner border border-gray-200">
-          <button
-            onClick={() => { setTab('all'); setPage(0); }}
-            className={`px-6 py-2 text-sm font-semibold rounded-lg transition-all duration-200 ${
-              tab === 'all' 
-                ? 'bg-white text-[var(--color-primary)] shadow-sm ring-1 ring-gray-900/5' 
-                : 'text-gray-500 hover:text-gray-800 hover:bg-gray-200/50'
-            }`}
-          >
-            All Reviews
-          </button>
-          <button
-            onClick={() => { setTab('reported'); setPage(0); }}
-            className={`px-6 py-2 text-sm font-semibold rounded-lg transition-all duration-200 ${
-              tab === 'reported' 
-                ? 'bg-white text-red-600 shadow-sm ring-1 ring-gray-900/5' 
-                : 'text-gray-500 hover:text-gray-800 hover:bg-gray-200/50'
-            }`}
-          >
-            Reported Reviews
-          </button>
+          <div className="inline-flex bg-[var(--bg-panel)] p-1 rounded-xl shadow-sm border border-[var(--border-color)]">
+            <button
+              onClick={() => { setTab('all'); setPage(0); }}
+              className={cn(
+                "px-6 py-2 text-sm font-semibold rounded-lg transition-all duration-200",
+                tab === 'all' 
+                  ? "bg-blue-50 text-[var(--color-primary)] shadow-sm" 
+                  : "text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-gray-50"
+              )}
+            >
+              All Reviews
+            </button>
+            <button
+              onClick={() => { setTab('reported'); setPage(0); }}
+              className={cn(
+                "px-6 py-2 text-sm font-semibold rounded-lg transition-all duration-200",
+                tab === 'reported' 
+                  ? "bg-red-50 text-red-600 shadow-sm" 
+                  : "text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-gray-50"
+              )}
+            >
+              Reported Reviews
+            </button>
+          </div>
         </div>
       </div>
 
-      <div className="bg-[var(--bg-panel)]/80 backdrop-blur-xl rounded-2xl border border-[var(--border-color)] shadow-sm flex flex-col flex-1">
-        {loading && reviews.length === 0 ? (
-          <div className="text-center py-16 text-gray-500 font-medium">Loading reviews...</div>
-        ) : reviews.length === 0 ? (
-          <div className="text-center py-16">
-            <MessageSquare className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900">No {tab === 'reported' ? 'reported ' : ''}reviews</h3>
-            <p className="text-gray-500">{tab === 'reported' ? 'Everything looks good!' : 'No reviews have been submitted yet.'}</p>
-          </div>
-        ) : (
-          <div className="p-4 space-y-4">
-            {reviews.map(review => (
-              <div key={review.id} className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm flex flex-col md:flex-row gap-6">
-                <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-2">
-                    <span className="font-bold text-gray-900">{review.userName}</span>
-                    <span className="text-sm text-gray-500">
-                      {review.reportedAt ? new Date(review.reportedAt).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }) : ''}
-                    </span>
-                  </div>
-                  {review.isReported && review.reportReason && (
-                    <div className="mb-4">
-                      <p className="text-sm text-red-600 font-medium mb-1">Reason for report:</p>
-                      <p className="text-gray-800 bg-red-50 p-3 rounded-lg text-sm border border-red-100">{review.reportReason}</p>
-                    </div>
-                  )}
-                  <div>
-                    <p className="text-sm text-gray-500 font-medium mb-1">Review Content:</p>
-                    <p className="text-gray-700 italic">"{review.comment}"</p>
-                  </div>
-                </div>
-                
-                <div className="flex flex-row md:flex-col gap-3 justify-center md:border-l border-gray-100 md:pl-6">
-                  <ActionButton
-                    text="View Product"
-                    onClick={() => navigate(`/products?openProductId=${review.productId}`)}
-                    icon={ExternalLink}
-                    bgClass="bg-blue-50"
-                    textClass="text-blue-700"
-                    iconColor="text-blue-700"
-                    hoverBgClass="bg-blue-100"
-                    className="px-4 h-[42px] w-full"
-                  />
-                  {review.isReported && (
-                    <ActionButton
-                      text="Dismiss Report"
-                      onClick={() => handleDismiss(review.id)}
-                      icon={Check}
-                      bgClass="bg-gray-100"
-                      textClass="text-gray-700"
-                      iconColor="text-gray-700"
-                      hoverBgClass="bg-gray-200"
-                      className="px-4 h-[42px] w-full"
-                    />
-                  )}
-                  <ActionButton
-                    text="Delete Review"
-                    onClick={() => handleDelete(review.id, review.productId)}
-                    icon={Trash}
-                    bgClass="bg-red-500"
-                    hoverBgClass="bg-red-600"
-                    className="px-4 h-[42px] w-full"
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-        
-        {/* Pagination Controls */}
-        <div className="mt-auto">
-          <Pagination
-            currentPage={page}
-            totalPages={totalPages}
-            totalElements={totalElements}
-            pageSize={pageSize}
-            onPageChange={setPage}
-            onPageSizeChange={(newSize) => { setPageSize(newSize); setPage(0); }}
-            loading={loading}
-          />
-        </div>
-      </div>
+      <Card>
+        <CardContent className="p-0">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Date</TableHead>
+                <TableHead>User</TableHead>
+                <TableHead>Review</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {loading && reviews.length === 0 ? (
+                <TableRow><TableCell colSpan={5} className="h-24 text-center">Loading reviews...</TableCell></TableRow>
+              ) : reviews.length > 0 ? (
+                reviews.map((r) => (
+                  <TableRow key={r.id}>
+                    <TableCell className="text-muted-foreground whitespace-nowrap">
+                      {r.reportedAt ? new Date(r.reportedAt).toLocaleDateString() : 'N/A'}
+                    </TableCell>
+                    <TableCell className="font-medium whitespace-nowrap">{r.userName}</TableCell>
+                    <TableCell className="max-w-[400px]">
+                      <p className="text-sm text-gray-700 truncate" title={r.comment}>"{r.comment}"</p>
+                      {r.isReported && r.reportReason && (
+                        <p className="text-xs text-red-600 mt-1 truncate" title={r.reportReason}>Reported: {r.reportReason}</p>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      {r.isReported ? (
+                        <Badge variant="destructive">Reported</Badge>
+                      ) : (
+                        <Badge variant="success">Active</Badge>
+                      )}
+                    </TableCell>
+                    <TableCell className="text-right whitespace-nowrap">
+                      <ActionIconButton 
+                        icon={ExternalLink} 
+                        onClick={() => navigate(`/products?openProductId=${r.productId}`)} 
+                        title="View Product" 
+                        colorClass="text-blue-600 bg-blue-50 hover:bg-blue-100" 
+                      />
+                      {r.isReported && (
+                        <ActionIconButton 
+                          icon={Check} 
+                          onClick={() => handleDismiss(r.id)} 
+                          title="Dismiss Report" 
+                          colorClass="text-emerald-600 bg-emerald-50 hover:bg-emerald-100" 
+                        />
+                      )}
+                      <ActionIconButton 
+                        icon={Trash} 
+                        onClick={() => handleDelete(r.id, r.productId)} 
+                        title="Delete Review" 
+                        colorClass="text-red-600 bg-red-50 hover:bg-red-100" 
+                      />
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={5} className="h-24 text-center text-muted-foreground">
+                    No {tab === 'reported' ? 'reported ' : ''}reviews found.
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </CardContent>
+        <Pagination
+          currentPage={page}
+          totalPages={totalPages}
+          totalElements={totalElements}
+          pageSize={pageSize}
+          onPageChange={setPage}
+          onPageSizeChange={(newSize) => { setPageSize(newSize); setPage(0); }}
+          loading={loading}
+        />
+      </Card>
 
-      {/* Confirm Dialog */}
       <ConfirmDialog
         isOpen={!!confirmDialog}
         onClose={() => setConfirmDialog(null)}
@@ -226,4 +226,5 @@ export default function Reviews() {
     </div>
   );
 }
+
 
