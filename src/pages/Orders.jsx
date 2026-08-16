@@ -137,7 +137,7 @@ export default function Orders() {
                             <TableCell className="font-medium text-muted-foreground">{order.orderNumber || order.id.slice(0,8)}</TableCell>
                             <TableCell>{order.customerName}</TableCell>
                             <TableCell>{new Date(order.createdAt).toLocaleDateString()}</TableCell>
-                            <TableCell>${order.totalAmount}</TableCell>
+                            <TableCell>₹{order.totalAmount?.toFixed(2) || '0.00'}</TableCell>
                             <TableCell>
                               <Badge variant={getStatusBadge(order.status)}>
                                 {order.status === 'DELIVERED' && order.deliveryType === 'PICKUP' ? 'PICKED_UP' : order.status}
